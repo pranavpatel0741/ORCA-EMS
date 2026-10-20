@@ -29,7 +29,8 @@ AMBULANCE_TRANSITIONS: dict[AmbulanceState, set[AmbulanceState]] = {
     # Staging releases into a short EN_ROUTE leg to the scene once it is secured.
     A.STAGING: {A.EN_ROUTE, A.RETURNING},
     A.ON_SCENE: {A.LOADING, A.RETURNING},
-    A.LOADING: {A.TRANSPORTING},
+    # LOADING -> RETURNING only if every assigned patient died or was taken by another unit.
+    A.LOADING: {A.TRANSPORTING, A.RETURNING},
     A.TRANSPORTING: {A.WAITING_AT_ER},
     A.WAITING_AT_ER: {A.HANDOVER},
     A.HANDOVER: {A.RETURNING},

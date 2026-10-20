@@ -183,6 +183,7 @@ class Patient(BaseModel):
     walk_in: bool = False
     hospital_id: str | None = None
     ambulance_id: str | None = None
+    survival_prob: float | None = None  # synthetic outcome model; frozen at definitive care
 
 
 class Incident(BaseModel):
@@ -194,6 +195,34 @@ class Incident(BaseModel):
     true_victim_ids: list[str]  # hidden from agents
     violent: bool = False
     scene_secured: bool = True
-    scene_secured_tick: int | None = None  # hidden; drawn by generator
+    scene_secured_tick: int | None = None  # hidden; set when police on scene + secure delay
+    secure_delay_min: int = 10  # hidden; drawn by generator (5-15)
     needs_fire_extrication: bool = False
+    extrication_min: int = 0  # hidden; minutes of fire work after fire arrives
     narrative: str = ""
+
+
+# --- Scenario --------------------------------------------------------------------------------
+
+
+class WalkIn(BaseModel):
+    patient_id: str
+    hospital_id: str
+    tick: int
+
+
+class Scenario(BaseModel):
+    seed: int
+    demand: str = "normal"  # normal | surge
+    info: str = "complete"  # complete | partial
+    horizon: int = 180  # minutes during which calls arrive
+    drain_min: int = 120  # extra minutes simulated after the horizon
+    hospitals: list[Hospital]
+    initial_occupancy: dict[str, float] = Field(default_factory=dict)  # ER-bed fraction
+    background_arrivals: bool = True
+    ambulances: list[Ambulance]
+    firms: list[PrivateFirm] = Field(default_factory=list)
+    teams: list[ResponderTeam] = Field(default_factory=list)
+    incidents: list[Incident]
+    patients: list[Patient]
+    walk_ins: list[WalkIn] = Field(default_factory=list)
