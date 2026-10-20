@@ -11,7 +11,7 @@
 ## Milestones
 
 - [x] M0 Setup
-- [ ] M1 Entities and state machines
+- [x] M1 Entities and state machines
 - [ ] M2 Engine, hospital model, travel (checkpoint for review after this)
 - [ ] M3 Validator and generator
 - [ ] M4 Observations, monitor, calibration
@@ -27,3 +27,8 @@
 
 - **M0 (2026-10-19):** repo, Python 3.11 venv (uv), pinned requirements, ruff/pytest config,
   `.env.example`, `config/settings.py`, package skeleton.
+- **M1 (2026-10-19):** `sim/entities.py` (Pydantic models + enums), `sim/events.py` (EventLog,
+  JSONL), `sim/state_machine.py` (explicit transition tables; one event per transition; patient
+  timestamps set on entry). Design choices: EN_ROUTE→EN_ROUTE is an empty reassignment;
+  STAGING releases into a short EN_ROUTE leg; walk-ins go WAITING_ON_SCENE→WAITING_AT_ER.
+  138 tests pass.
