@@ -1,0 +1,12 @@
+openai-agents==0.24.0
+pydantic>=2.7,<3
+numpy>=1.26
+pandas>=2.2
+duckdb>=1.0
+streamlit>=1.38
+plotly>=5.24
+pydeck>=0.9
+faker>=26
+python-dotenv>=1.0
+pytest>=8
+ruff>=0.6
