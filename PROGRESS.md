@@ -1,12 +1,15 @@
-# PROGRESS
+# PROGRESS — ORCA-EMS
+
+ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
 
 ## Open questions / decisions taken
 
 1. **Package name clash.** PLAN §5 names the agent package `agents/`, but `openai-agents` installs
    as the importable module `agents`, so a local `agents/` would shadow the SDK.
-   *Decision:* local package is `emerge_agents/`. All PLAN references to `agents/...` map to
-   `emerge_agents/...`.
-2. **Repo folder.** Built in place in `EMERGE-AI/` rather than a nested `emerge-ai/`.
+   *Decision:* local package is `orca_agents/`. All PLAN references to `agents/...` map to
+   `orca_agents/...`.
+2. **Repo folder.** Built in place in `EMERGE-AI/` rather than a nested `orca-ems/`; the folder can be renamed
+   to `ORCA-EMS/` at any time (nothing depends on its name).
 3. **R2 when every hospital is full (M2).** Strict "resources free at ETA" would leave loaded
    ambulances with no legal destination during a surge. *Decision:* R2 passes if the hospital is
    projected to have the resources at ETA (free now + releases before ETA − queue − committed

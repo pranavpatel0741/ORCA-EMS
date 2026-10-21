@@ -1,4 +1,6 @@
-# EMERGE-AI: End-to-End Build Plan
+# ORCA-EMS: End-to-End Build Plan
+
+**ORCA-EMS: Orchestrated Response and Capacity Allocation** — multi-agent negotiation for ambulance-to-hospital coordination.
 
 **Project:** Multi-agent emergency response coordination simulator (course mid-term)
 **Owner:** Pranav Patel
@@ -92,7 +94,7 @@ APPROVAL_MODE=policy      # policy (experiments) | interactive (demo)
 ## 5. Repository structure
 
 ```
-emerge-ai/
+orca-ems/
 ├── PLAN.md                     # this file
 ├── CLAUDE.md                   # short pointer: "Follow PLAN.md; update PROGRESS.md"
 ├── PROGRESS.md                 # milestone checklist, updated as work completes

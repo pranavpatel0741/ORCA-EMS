@@ -1,5 +1,6 @@
 [project]
-name = "emerge-ai"
+name = "orca-ems"
+description = "ORCA-EMS: Orchestrated Response and Capacity Allocation. Multi-agent negotiation for ambulance-to-hospital coordination."
 version = "0.1.0"
 requires-python = ">=3.11"
 
