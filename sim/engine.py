@@ -265,7 +265,8 @@ class Engine:
         blocks = [r for r in results if r.level == "block"]
         flags = [{"rule_id": r.rule_id, "level": r.level, "code": r.code, "reason": r.reason}
                  for r in results if r.level in ("review", "warn")]
-        dumped = action.model_dump(mode="json")
+        dumped = action.model_dump(mode="json") if hasattr(action, "model_dump") else {
+            "kind": type(action).__name__}
         record = {"tick": self.tick, "actor": actor, "action": dumped,
                   "results": [r.model_dump() for r in results], "committed": not blocks}
         self.commits.append(record)

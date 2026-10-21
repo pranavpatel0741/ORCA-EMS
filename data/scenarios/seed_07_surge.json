@@ -1,0 +1,2590 @@
+{
+ "ambulances": [
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": null,
+   "home_station": [
+    42.365,
+    -71.054
+   ],
+   "id": "AMB-1",
+   "location": [
+    42.34511,
+    -71.09791
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PUBLIC",
+   "state": "RETURNING",
+   "state_until_tick": 16,
+   "unit_type": "ALS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": null,
+   "home_station": [
+    42.34,
+    -71.075
+   ],
+   "id": "AMB-2",
+   "location": [
+    42.34,
+    -71.075
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PUBLIC",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "ALS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": null,
+   "home_station": [
+    42.353,
+    -71.115
+   ],
+   "id": "AMB-3",
+   "location": [
+    42.353,
+    -71.115
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PUBLIC",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "ALS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": null,
+   "home_station": [
+    42.365,
+    -71.054
+   ],
+   "id": "AMB-4",
+   "location": [
+    42.365,
+    -71.054
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PUBLIC",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "BLS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": null,
+   "home_station": [
+    42.34,
+    -71.075
+   ],
+   "id": "AMB-5",
+   "location": [
+    42.34,
+    -71.075
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PUBLIC",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "BLS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": "MedRide",
+   "home_station": [
+    42.348,
+    -71.09
+   ],
+   "id": "PVT-1",
+   "location": [
+    42.348,
+    -71.09
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PRIVATE",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "BLS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": "MedRide",
+   "home_station": [
+    42.348,
+    -71.09
+   ],
+   "id": "PVT-2",
+   "location": [
+    42.348,
+    -71.09
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PRIVATE",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "BLS"
+  },
+  {
+   "assigned_incident": null,
+   "assigned_patient_ids": [],
+   "destination_hospital": null,
+   "firm_id": "MedRide",
+   "home_station": [
+    42.348,
+    -71.09
+   ],
+   "id": "PVT-3",
+   "location": [
+    42.348,
+    -71.09
+   ],
+   "onboard_patient_ids": [],
+   "owner": "PRIVATE",
+   "state": "IDLE",
+   "state_until_tick": null,
+   "unit_type": "BLS"
+  }
+ ],
+ "background_arrivals": true,
+ "demand": "surge",
+ "drain_min": 120,
+ "firms": [
+  {
+   "activation_minutes": 10,
+   "id": "MedRide",
+   "max_mutual_aid_units": 2,
+   "name": "MedRide",
+   "unit_ids": [
+    "PVT-1",
+    "PVT-2",
+    "PVT-3"
+   ]
+  }
+ ],
+ "horizon": 180,
+ "hospitals": [
+  {
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "er_beds_total": 10,
+   "id": "A",
+   "location": [
+    42.3631,
+    -71.0686
+   ],
+   "min_nurse_coverage": 4,
+   "name": "Hospital A",
+   "nurses_total": 8,
+   "ors_total": 3,
+   "owner": "PUBLIC",
+   "stabilization_only": false,
+   "surge_contract": null,
+   "trauma_bays_total": 3,
+   "trauma_surgeons_total": 3
+  },
+  {
+   "capabilities": [
+    "GENERAL"
+   ],
+   "er_beds_total": 12,
+   "id": "B",
+   "location": [
+    42.3496,
+    -71.0632
+   ],
+   "min_nurse_coverage": 3,
+   "name": "Hospital B",
+   "nurses_total": 6,
+   "ors_total": 0,
+   "owner": "PUBLIC",
+   "stabilization_only": true,
+   "surge_contract": null,
+   "trauma_bays_total": 1,
+   "trauma_surgeons_total": 0
+  },
+  {
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "er_beds_total": 8,
+   "id": "C",
+   "location": [
+    42.335,
+    -71.0723
+   ],
+   "min_nurse_coverage": 3,
+   "name": "Hospital C",
+   "nurses_total": 6,
+   "ors_total": 2,
+   "owner": "PUBLIC",
+   "stabilization_only": false,
+   "surge_contract": null,
+   "trauma_bays_total": 2,
+   "trauma_surgeons_total": 2
+  },
+  {
+   "capabilities": [
+    "GENERAL"
+   ],
+   "er_beds_total": 10,
+   "id": "D",
+   "location": [
+    42.3398,
+    -71.1061
+   ],
+   "min_nurse_coverage": 3,
+   "name": "Hospital D",
+   "nurses_total": 6,
+   "ors_total": 2,
+   "owner": "PRIVATE",
+   "stabilization_only": false,
+   "surge_contract": {
+    "accepts_critical_trauma": false,
+    "eligible_severities": [
+     "SERIOUS"
+    ],
+    "max_surge_patients": 4
+   },
+   "trauma_bays_total": 0,
+   "trauma_surgeons_total": 0
+  }
+ ],
+ "incidents": [
+  {
+   "call_tick": 4,
+   "extrication_min": 0,
+   "id": "I-001",
+   "location": [
+    42.33943,
+    -71.05959
+   ],
+   "narrative": "My friend is really sick and dizzy, I don't know what's wrong.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-001-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  {
+   "call_tick": 10,
+   "extrication_min": 0,
+   "id": "I-002",
+   "location": [
+    42.33523,
+    -71.06302
+   ],
+   "narrative": "Someone's having chest pain, they can barely breathe.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-002-P0"
+   ],
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  {
+   "call_tick": 19,
+   "extrication_min": 0,
+   "id": "I-003",
+   "location": [
+    42.3425,
+    -71.08627
+   ],
+   "narrative": "He's slurring his words and can't stand up.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-003-P0"
+   ],
+   "type": "MEDICAL_STROKE",
+   "violent": false
+  },
+  {
+   "call_tick": 23,
+   "extrication_min": 0,
+   "id": "I-004",
+   "location": [
+    42.33147,
+    -71.08459
+   ],
+   "narrative": "My husband grabbed his chest and collapsed, he's sweating a lot.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-004-P0"
+   ],
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  {
+   "call_tick": 29,
+   "extrication_min": 0,
+   "id": "I-005",
+   "location": [
+    42.3734,
+    -71.10357
+   ],
+   "narrative": "My neighbor is really sick and dizzy, I don't know what's wrong.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-005-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  {
+   "call_tick": 30,
+   "extrication_min": 0,
+   "id": "I-006",
+   "location": [
+    42.35867,
+    -71.05965
+   ],
+   "narrative": "Someone's having chest pain, they can barely breathe.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-006-P0"
+   ],
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  {
+   "call_tick": 30,
+   "extrication_min": 0,
+   "id": "MCI-1",
+   "location": [
+    42.35446,
+    -71.09244
+   ],
+   "narrative": "I heard gunshots, people are down, I'm hiding.",
+   "needs_fire_extrication": false,
+   "reported_victims": 2,
+   "scene_secured": false,
+   "scene_secured_tick": null,
+   "secure_delay_min": 9,
+   "true_victim_ids": [
+    "MCI-1-P0",
+    "MCI-1-P1"
+   ],
+   "type": "SHOOTING",
+   "violent": true
+  },
+  {
+   "call_tick": 35,
+   "extrication_min": 25,
+   "id": "MCI-2",
+   "location": [
+    42.34479,
+    -71.11141
+   ],
+   "narrative": "A bus flipped over! There are so many people, maybe 30 or so, people screaming.",
+   "needs_fire_extrication": true,
+   "reported_victims": 31,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "MCI-2-P00",
+    "MCI-2-P01",
+    "MCI-2-P02",
+    "MCI-2-P03",
+    "MCI-2-P04",
+    "MCI-2-P05",
+    "MCI-2-P06",
+    "MCI-2-P07",
+    "MCI-2-P08",
+    "MCI-2-P09",
+    "MCI-2-P10",
+    "MCI-2-P11",
+    "MCI-2-P12",
+    "MCI-2-P13",
+    "MCI-2-P14",
+    "MCI-2-P15",
+    "MCI-2-P16",
+    "MCI-2-P17",
+    "MCI-2-P18",
+    "MCI-2-P19",
+    "MCI-2-P20",
+    "MCI-2-P21",
+    "MCI-2-P22",
+    "MCI-2-P23",
+    "MCI-2-P24",
+    "MCI-2-P25",
+    "MCI-2-P26",
+    "MCI-2-P27",
+    "MCI-2-P28"
+   ],
+   "type": "BUS_CRASH",
+   "violent": false
+  },
+  {
+   "call_tick": 39,
+   "extrication_min": 0,
+   "id": "I-007",
+   "location": [
+    42.36259,
+    -71.08814
+   ],
+   "narrative": "There's been a crash at the intersection, 2 people hurt.",
+   "needs_fire_extrication": false,
+   "reported_victims": 2,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-007-P0",
+    "I-007-P1"
+   ],
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  {
+   "call_tick": 41,
+   "extrication_min": 0,
+   "id": "I-008",
+   "location": [
+    42.35152,
+    -71.06295
+   ],
+   "narrative": "My friend grabbed his chest and collapsed, he's sweating a lot.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-008-P0"
+   ],
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  {
+   "call_tick": 63,
+   "extrication_min": 0,
+   "id": "I-009",
+   "location": [
+    42.36776,
+    -71.05397
+   ],
+   "narrative": "There's been a crash at the intersection, 2 people hurt.",
+   "needs_fire_extrication": false,
+   "reported_victims": 2,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-009-P0",
+    "I-009-P1"
+   ],
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  {
+   "call_tick": 65,
+   "extrication_min": 0,
+   "id": "I-010",
+   "location": [
+    42.37269,
+    -71.06339
+   ],
+   "narrative": "My husband is really sick and dizzy, I don't know what's wrong.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-010-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  {
+   "call_tick": 78,
+   "extrication_min": 0,
+   "id": "I-011",
+   "location": [
+    42.37445,
+    -71.07222
+   ],
+   "narrative": "My husband fell off a ladder, there's some blood.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-011-P0"
+   ],
+   "type": "FALL",
+   "violent": false
+  },
+  {
+   "call_tick": 81,
+   "extrication_min": 0,
+   "id": "I-012",
+   "location": [
+    42.3611,
+    -71.05544
+   ],
+   "narrative": "Her face is drooping and she can't lift her arm, please hurry.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-012-P0"
+   ],
+   "type": "MEDICAL_STROKE",
+   "violent": false
+  },
+  {
+   "call_tick": 83,
+   "extrication_min": 0,
+   "id": "I-013",
+   "location": [
+    42.36276,
+    -71.10836
+   ],
+   "narrative": "Someone's having chest pain, they can barely breathe.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-013-P0"
+   ],
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  {
+   "call_tick": 115,
+   "extrication_min": 0,
+   "id": "I-014",
+   "location": [
+    42.34315,
+    -71.11488
+   ],
+   "narrative": "There's been a crash at the intersection, 2 people hurt.",
+   "needs_fire_extrication": false,
+   "reported_victims": 2,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-014-P0",
+    "I-014-P1"
+   ],
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  {
+   "call_tick": 131,
+   "extrication_min": 0,
+   "id": "I-015",
+   "location": [
+    42.3689,
+    -71.0616
+   ],
+   "narrative": "An older person fell down the stairs and can't get up.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-015-P0"
+   ],
+   "type": "FALL",
+   "violent": false
+  },
+  {
+   "call_tick": 139,
+   "extrication_min": 0,
+   "id": "I-016",
+   "location": [
+    42.3733,
+    -71.05844
+   ],
+   "narrative": "Someone fainted, they're awake now but confused.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-016-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  {
+   "call_tick": 140,
+   "extrication_min": 0,
+   "id": "I-017",
+   "location": [
+    42.34909,
+    -71.06435
+   ],
+   "narrative": "There's been a crash at the intersection, 2 people hurt.",
+   "needs_fire_extrication": false,
+   "reported_victims": 2,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-017-P0",
+    "I-017-P1"
+   ],
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  {
+   "call_tick": 146,
+   "extrication_min": 0,
+   "id": "I-018",
+   "location": [
+    42.36672,
+    -71.065
+   ],
+   "narrative": "Her face is drooping and she can't lift her arm, please hurry.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-018-P0"
+   ],
+   "type": "MEDICAL_STROKE",
+   "violent": false
+  },
+  {
+   "call_tick": 151,
+   "extrication_min": 0,
+   "id": "I-019",
+   "location": [
+    42.35871,
+    -71.11281
+   ],
+   "narrative": "My neighbor fell off a ladder, there's some blood.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-019-P0"
+   ],
+   "type": "FALL",
+   "violent": false
+  },
+  {
+   "call_tick": 156,
+   "extrication_min": 0,
+   "id": "I-020",
+   "location": [
+    42.35981,
+    -71.09123
+   ],
+   "narrative": "Someone fainted, they're awake now but confused.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-020-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  {
+   "call_tick": 157,
+   "extrication_min": 0,
+   "id": "I-021",
+   "location": [
+    42.34986,
+    -71.0573
+   ],
+   "narrative": "My friend fell off a ladder, there's some blood.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-021-P0"
+   ],
+   "type": "FALL",
+   "violent": false
+  },
+  {
+   "call_tick": 163,
+   "extrication_min": 0,
+   "id": "I-022",
+   "location": [
+    42.36953,
+    -71.06366
+   ],
+   "narrative": "An older person fell down the stairs and can't get up.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-022-P0"
+   ],
+   "type": "FALL",
+   "violent": false
+  },
+  {
+   "call_tick": 176,
+   "extrication_min": 0,
+   "id": "I-023",
+   "location": [
+    42.37384,
+    -71.0955
+   ],
+   "narrative": "Someone fainted, they're awake now but confused.",
+   "needs_fire_extrication": false,
+   "reported_victims": 1,
+   "scene_secured": true,
+   "scene_secured_tick": null,
+   "secure_delay_min": 10,
+   "true_victim_ids": [
+    "I-023-P0"
+   ],
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  }
+ ],
+ "info": "complete",
+ "initial_occupancy": {
+  "A": 0.695,
+  "B": 0.716,
+  "C": 0.537,
+  "D": 0.514
+ },
+ "patients": [
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-001-P0",
+   "incident_id": "I-001",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 4,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.027,
+   "hospital_id": null,
+   "id": "I-002-P0",
+   "incident_id": "I-002",
+   "needs": {
+    "capability": "CARDIAC_CATH",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 10,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.106,
+   "hospital_id": null,
+   "id": "I-003-P0",
+   "incident_id": "I-003",
+   "needs": {
+    "capability": "STROKE",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 19,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-004-P0",
+   "incident_id": "I-004",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 23,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-005-P0",
+   "incident_id": "I-005",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 29,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.12,
+   "hospital_id": null,
+   "id": "I-006-P0",
+   "incident_id": "I-006",
+   "needs": {
+    "capability": "CARDIAC_CATH",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 30,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.032,
+   "hospital_id": null,
+   "id": "I-007-P0",
+   "incident_id": "I-007",
+   "needs": {
+    "capability": "TRAUMA_L2",
+    "er_bed": false,
+    "nurse": true,
+    "or_within_minutes": 60,
+    "trauma_bay": true,
+    "trauma_surgeon": true
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 39,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-007-P1",
+   "incident_id": "I-007",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 39,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-008-P0",
+   "incident_id": "I-008",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 41,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-009-P0",
+   "incident_id": "I-009",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 63,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-009-P1",
+   "incident_id": "I-009",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 63,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-010-P0",
+   "incident_id": "I-010",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 65,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-011-P0",
+   "incident_id": "I-011",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 78,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-012-P0",
+   "incident_id": "I-012",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 81,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-013-P0",
+   "incident_id": "I-013",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 83,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-014-P0",
+   "incident_id": "I-014",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 115,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-014-P1",
+   "incident_id": "I-014",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 115,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-015-P0",
+   "incident_id": "I-015",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 131,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-016-P0",
+   "incident_id": "I-016",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 139,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-017-P0",
+   "incident_id": "I-017",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 140,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-017-P1",
+   "incident_id": "I-017",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 140,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-018-P0",
+   "incident_id": "I-018",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 146,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-019-P0",
+   "incident_id": "I-019",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 151,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-020-P0",
+   "incident_id": "I-020",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 156,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-021-P0",
+   "incident_id": "I-021",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 157,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-022-P0",
+   "incident_id": "I-022",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 163,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "I-023-P0",
+   "incident_id": "I-023",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 176,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.152,
+   "hospital_id": null,
+   "id": "MCI-1-P0",
+   "incident_id": "MCI-1",
+   "needs": {
+    "capability": "TRAUMA_L2",
+    "er_bed": false,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": true,
+    "trauma_surgeon": true
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 30,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.001,
+   "hospital_id": null,
+   "id": "MCI-1-P1",
+   "incident_id": "MCI-1",
+   "needs": {
+    "capability": "TRAUMA_L2",
+    "er_bed": false,
+    "nurse": true,
+    "or_within_minutes": 60,
+    "trauma_bay": true,
+    "trauma_surgeon": true
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 30,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.148,
+   "hospital_id": null,
+   "id": "MCI-2-P00",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "TRAUMA_L2",
+    "er_bed": false,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": true,
+    "trauma_surgeon": true
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.126,
+   "hospital_id": null,
+   "id": "MCI-2-P01",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "TRAUMA_L2",
+    "er_bed": false,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": true,
+    "trauma_surgeon": true
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "CRITICAL",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P02",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P03",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P04",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P05",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P06",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P07",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P08",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P09",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P10",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P11",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P12",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "SERIOUS",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P13",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P14",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P15",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P16",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P17",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P18",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P19",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P20",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P21",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P22",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P23",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P24",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P25",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P26",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P27",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  },
+  {
+   "ambulance_id": null,
+   "deterioration_rate": 0.0,
+   "hospital_id": null,
+   "id": "MCI-2-P28",
+   "incident_id": "MCI-2",
+   "needs": {
+    "capability": "GENERAL",
+    "er_bed": true,
+    "nurse": true,
+    "or_within_minutes": null,
+    "trauma_bay": false,
+    "trauma_surgeon": false
+   },
+   "observed_severity": null,
+   "status": "WAITING_ON_SCENE",
+   "survival_prob": null,
+   "timestamps": {
+    "arrived_hospital": null,
+    "call": 35,
+    "deceased": null,
+    "definitive_care_start": null,
+    "discharged": null,
+    "loaded": null,
+    "unit_on_scene": null
+   },
+   "true_severity": "MINOR",
+   "walk_in": false
+  }
+ ],
+ "seed": 7,
+ "teams": [
+  {
+   "assigned_incident": null,
+   "home": [
+    42.355,
+    -71.06
+   ],
+   "id": "POL-1",
+   "kind": "POLICE",
+   "location": [
+    42.355,
+    -71.06
+   ],
+   "state": "IDLE",
+   "state_until_tick": null
+  },
+  {
+   "assigned_incident": null,
+   "home": [
+    42.342,
+    -71.095
+   ],
+   "id": "POL-2",
+   "kind": "POLICE",
+   "location": [
+    42.342,
+    -71.095
+   ],
+   "state": "IDLE",
+   "state_until_tick": null
+  },
+  {
+   "assigned_incident": null,
+   "home": [
+    42.351,
+    -71.07
+   ],
+   "id": "FIRE-1",
+   "kind": "FIRE",
+   "location": [
+    42.351,
+    -71.07
+   ],
+   "state": "IDLE",
+   "state_until_tick": null
+  }
+ ],
+ "walk_ins": [
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P15",
+   "tick": 50
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P22",
+   "tick": 55
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P16",
+   "tick": 56
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P26",
+   "tick": 61
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P14",
+   "tick": 62
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P18",
+   "tick": 63
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P21",
+   "tick": 68
+  },
+  {
+   "hospital_id": "D",
+   "patient_id": "MCI-2-P13",
+   "tick": 76
+  }
+ ]
+}
