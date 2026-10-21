@@ -3,11 +3,19 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import ClassVar
+from typing import Annotated, ClassVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PlainSerializer
 
 Location = tuple[float, float]  # (lat, lon)
+
+
+def _sorted_list(values: set) -> list:
+    return sorted(values)
+
+
+# Sets serialize in sorted order so scenario files and logs are byte-identical across runs.
+SortedSet = PlainSerializer(_sorted_list, return_type=list, when_used="always")
 
 
 class Severity(StrEnum):
@@ -88,7 +96,7 @@ class Mode(StrEnum):
 
 class SurgeContract(BaseModel):
     max_surge_patients: int
-    eligible_severities: set[Severity]
+    eligible_severities: Annotated[set[Severity], SortedSet]
     accepts_critical_trauma: bool
 
 
@@ -99,7 +107,7 @@ class Hospital(BaseModel):
     name: str
     location: Location
     owner: Owner
-    capabilities: set[Capability]
+    capabilities: Annotated[set[Capability], SortedSet]
     er_beds_total: int
     trauma_bays_total: int
     ors_total: int

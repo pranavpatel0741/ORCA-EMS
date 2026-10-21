@@ -7,20 +7,28 @@ commits them. Tick order (one tick = one simulated minute):
   2. complete unit transitions and move units
   3. finish treatments, release resources, admit from ER queues
   4. patient deterioration and outcome updates
-  5. new incidents, walk-ins, scene events, staff loans, background arrivals
-  6. collect decisions from the active policy
+  5. new incidents, walk-ins, scene events, staff loans, mutual aid, background arrivals
+  6. collect decisions from the active policy (R9 fingerprint around the call)
   7. validate and commit
   8. log hospital status changes; run invariant hook
+
+A patient admitted at tick t is never also marked dead at t (step 3 runs before step 4).
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Callable
 from typing import Any, Protocol
 
-import numpy as np
-
-from sim.actions import Action, Dispatch, LendStaff, RouteToHospital
+from sim.actions import (
+    Action,
+    ActivateMutualAid,
+    Dispatch,
+    LendStaff,
+    RouteToHospital,
+)
 from sim.entities import (
     Ambulance,
     AmbulanceState,
@@ -50,19 +58,31 @@ from sim.state_machine import (
     transition_patient,
     transition_team,
 )
-from sim.travel import Sampler, TimingConfig, estimate_eta, interpolate, offset_point
-from sim.validator import Validator, has_capability
+from sim.travel import (
+    Sampler,
+    TimingConfig,
+    estimate_eta,
+    interpolate,
+    midpoint,
+    offset_point,
+)
+from sim.validator import Validator, scene_entry_allowed
 
 A = AmbulanceState
 MOVING = {A.EN_ROUTE, A.TRANSPORTING, A.RETURNING}
 ACTIVE_PATIENT = {PatientStatus.WAITING_ON_SCENE, PatientStatus.IN_TRANSPORT,
                   PatientStatus.WAITING_AT_ER}
+INITIAL_UNIT_STATES = {A.IDLE, A.RETURNING}
 
 
 class Policy(Protocol):
     name: str
 
     def decide(self, engine: Engine) -> list[Action]: ...
+
+
+class R9Violation(RuntimeError):
+    """A policy changed engine state outside `commit` (PLAN R9)."""
 
 
 class Leg:
@@ -79,11 +99,12 @@ class Leg:
 
 
 class StaffLoan:
-    __slots__ = ("lender", "borrower", "nurses", "arrive_tick", "return_tick", "arrived")
+    __slots__ = ("lender", "borrower", "nurses", "arrive_tick", "return_tick", "phase")
 
     def __init__(self, lender: str, borrower: str, nurses: int, arrive_tick: int, return_tick: int):
         self.lender, self.borrower, self.nurses = lender, borrower, nurses
-        self.arrive_tick, self.return_tick, self.arrived = arrive_tick, return_tick, False
+        self.arrive_tick, self.return_tick = arrive_tick, return_tick
+        self.phase = "DEPARTED"  # DEPARTED -> ARRIVED -> RETURNING -> (removed)
 
 
 class Engine:
@@ -101,8 +122,7 @@ class Engine:
         self.policy = policy
         self.timing = timing or TimingConfig()
         self.validator = validator or Validator()
-        self.rng = np.random.default_rng([scenario.seed, 1])
-        self.sampler = Sampler(self.rng, self.timing)
+        self.sampler = Sampler(scenario.seed, self.timing)
         self.run_id = run_id or f"s{scenario.seed:02d}_{scenario.demand}_{scenario.info}_" + (
             policy.name if policy else "none"
         )
@@ -119,6 +139,9 @@ class Engine:
         self.incidents: dict[str, Incident] = {i.id: i for i in sc.incidents}
         self.patients: dict[str, Patient] = {p.id: p for p in sc.patients}
         self.walk_ins = sc.walk_ins
+        self.patient_u = {pid: self.sampler.patient_uniforms(i)
+                          for i, pid in enumerate(sorted(self.patients))}
+        self._firm_of = {uid: f.id for f in sc.firms for uid in f.unit_ids}
 
         self.tick = 0
         self.state_version = 0
@@ -128,14 +151,18 @@ class Engine:
         self.activated_units: set[str] = {
             a.id for a in sc.ambulances if a.owner == Owner.PUBLIC
         }
+        self.pending_mutual_aid: list[tuple[str, int, int]] = []  # (firm, units, ready_tick)
         self.pending_team_requests: list[tuple[str, TeamKind]] = []
         self.extrication_done: dict[str, int] = {}
         self.loans: list[StaffLoan] = []
         self.committed_units_this_tick: set[str] = set()
         self.commits: list[dict[str, Any]] = []
+        # unit -> (patients, hospital) of the last validated destination decision
+        self.validated_dest: dict[str, tuple[frozenset[str], str]] = {}
         self._last_status: dict[str, dict] = {}
         self._bg_rate: dict[str, float] = {}
         self._initialized = False
+        self._summarized = False
 
     # ==========================================================================================
     # Queries used by the validator, policies, and observations
@@ -152,8 +179,12 @@ class Engine:
             return self.ambulances[unit_id].location
         return self.teams[unit_id].location
 
-    def incoming_demands(self, hospital_id: str, exclude: set[str] | None = None) -> list[dict]:
-        """Resource demand of patients committed to `hospital_id` but not yet arrived."""
+    def demand_at(self, hospital_id: str, p: Patient) -> dict[str, int]:
+        stab = self.hospitals[hospital_id].config.stabilization_only and p.needs.trauma_bay
+        return resource_demand(p.needs, p.true_severity, stabilization_only=stab)
+
+    def incoming_patients(self, hospital_id: str, exclude: set[str] | None = None) -> list[Patient]:
+        """Patients committed to `hospital_id` but not yet arrived."""
         exclude = exclude or set()
         out = []
         for amb in self.ambulances.values():
@@ -161,39 +192,55 @@ class Engine:
                 continue
             for pid in amb.assigned_patient_ids:
                 p = self.patients[pid]
-                if pid in exclude or p.status not in (
-                    PatientStatus.WAITING_ON_SCENE, PatientStatus.IN_TRANSPORT
-                ):
-                    continue
-                out.append(resource_demand(p.needs, p.true_severity))
+                if pid not in exclude and p.status in (PatientStatus.WAITING_ON_SCENE,
+                                                       PatientStatus.IN_TRANSPORT):
+                    out.append(p)
         return out
 
-    def structurally_capable(self, hospital_id: str, patients: list[Patient]) -> bool:
-        hs = self.hospitals[hospital_id]
-        return all(
-            has_capability(hs.config.capabilities, p.needs.capability)
-            and hs.has_resource_types(resource_demand(p.needs, p.true_severity))
-            for p in patients
-        )
+    def incoming_demands(self, hospital_id: str, exclude: set[str] | None = None) -> list[dict]:
+        return [self.demand_at(hospital_id, p) for p in self.incoming_patients(hospital_id,
+                                                                                exclude)]
 
-    def eta_tick_for(self, action: Action, hospital_id: str) -> int:
-        """Expected arrival tick at `hospital_id` for the unit in `action` (median estimate)."""
+    def contract_patient_count(self, hospital_id: str, exclude: set[str] | None = None) -> int:
+        """Ambulance patients admitted to or committed to `hospital_id` (R4 contract limit)."""
+        exclude = exclude or set()
+        arrived = sum(1 for p in self.patients.values()
+                      if p.hospital_id == hospital_id and not p.walk_in and p.id not in exclude)
+        return arrived + len(self.incoming_patients(hospital_id, exclude))
+
+    def mutual_aid_units(self, firm_id: str) -> int:
+        active = sum(1 for uid in self.activated_units if self._firm_of.get(uid) == firm_id)
+        pending = sum(n for f, n, _ in self.pending_mutual_aid if f == firm_id)
+        return active + pending
+
+    def expected_arrival(self, action: Action, hospital_id: str) -> int:
+        """Expected arrival tick at `hospital_id` for the unit in `action`.
+
+        Uses the median travel estimate and the midpoint of the severity-specific scene and
+        loading ranges. This is the single ETA model shared by the validator, baselines, and
+        agents (PLAN §9)."""
+        cfg = self.timing
         hloc = self.hospitals[hospital_id].config.location
         if isinstance(action, Dispatch):
             inc = self.incidents[action.incident_id]
-            to_scene = estimate_eta(self.position(action.unit_id), inc.location, self.timing)
-            on_scene = self.timing.scene_time_other[0] + self.timing.loading[0]
-            to_hosp = estimate_eta(inc.location, hloc, self.timing)
-            return self.tick + round(to_scene["median_min"] + on_scene + to_hosp["median_min"])
+            pats = [self.patients[p] for p in action.patient_ids if p in self.patients]
+            critical = any(p.true_severity == Severity.CRITICAL for p in pats)
+            scene = midpoint(cfg.scene_time_critical if critical else cfg.scene_time_other)
+            to_scene = estimate_eta(self.position(action.unit_id), inc.location, cfg)
+            to_hosp = estimate_eta(inc.location, hloc, cfg)
+            return self.tick + round(to_scene["median_min"] + scene + midpoint(cfg.loading)
+                                     + to_hosp["median_min"])
         amb = self.ambulances[action.unit_id]
-        remaining = 0
-        if amb.state == A.LOADING and amb.state_until_tick is not None:
-            remaining = max(0, amb.state_until_tick - self.tick)
+        remaining = 0.0
+        if amb.state == A.LOADING:
+            if amb.state_until_tick is not None:
+                remaining = max(0, amb.state_until_tick - self.tick)
         elif amb.state == A.ON_SCENE:
-            left = (amb.state_until_tick or self.tick) - self.tick
-            remaining = self.timing.loading[0] + max(0, left)
-        to_hosp = estimate_eta(self.position(amb.id), hloc, self.timing)
-        return self.tick + remaining + round(to_hosp["median_min"])
+            left = (amb.state_until_tick - self.tick if amb.state_until_tick is not None
+                    else midpoint(cfg.scene_time_other))
+            remaining = max(0, left) + midpoint(cfg.loading)
+        to_hosp = estimate_eta(self.position(amb.id), hloc, cfg)
+        return self.tick + round(remaining + to_hosp["median_min"])
 
     def waiting_patients(self, incident_id: str) -> list[Patient]:
         inc = self.incidents[incident_id]
@@ -215,23 +262,25 @@ class Engine:
 
     def commit(self, action: Action, actor: str = "policy") -> bool:
         results = self.validator.check(action, self)
-        failures = [r for r in results if not r.ok]
-        record = {"tick": self.tick, "actor": actor, "action": action.model_dump(mode="json"),
-                  "results": [r.model_dump() for r in results], "committed": not failures}
+        blocks = [r for r in results if r.level == "block"]
+        flags = [{"rule_id": r.rule_id, "level": r.level, "code": r.code, "reason": r.reason}
+                 for r in results if r.level in ("review", "warn")]
+        dumped = action.model_dump(mode="json")
+        record = {"tick": self.tick, "actor": actor, "action": dumped,
+                  "results": [r.model_dump() for r in results], "committed": not blocks}
         self.commits.append(record)
-        if failures:
-            for f in failures:
+        if blocks:
+            for f in blocks:
                 self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, actor,
-                              {"action": record["action"], "rule_id": f.rule_id,
+                              {"action": dumped, "rule_id": f.rule_id, "code": f.code,
                                "reason": f.reason})
             return False
-        notes = [r.reason for r in results if r.reason]
         self.log.emit(self.tick, EventType.PROPOSAL_VALIDATED, actor,
-                      {"action": record["action"], "notes": notes})
+                      {"action": dumped, "flags": flags})
         self._apply(action, actor)
         self.state_version += 1
         self.log.emit(self.tick, EventType.COMMITTED, actor,
-                      {"action": record["action"], "state_version": self.state_version})
+                      {"action": dumped, "state_version": self.state_version})
         return True
 
     def _apply(self, action: Action, actor: str) -> None:
@@ -241,6 +290,8 @@ class Engine:
             self._apply_route(action, actor)
         elif isinstance(action, LendStaff):
             self._apply_loan(action, actor)
+        elif isinstance(action, ActivateMutualAid):
+            self._apply_mutual_aid(action, actor)
 
     def _apply_dispatch(self, action: Dispatch, actor: str) -> None:
         amb = self.ambulances[action.unit_id]
@@ -252,13 +303,16 @@ class Engine:
         amb.assigned_incident = inc.id
         amb.assigned_patient_ids = list(action.patient_ids)
         amb.destination_hospital = action.target_hospital
+        self.validated_dest.pop(amb.id, None)
+        if action.target_hospital is not None:
+            self.validated_dest[amb.id] = (frozenset(action.patient_ids), action.target_hospital)
         for pid in action.patient_ids:
             self.patients[pid].ambulance_id = amb.id
         self._start_leg_to_incident(amb, inc, actor)
 
     def _start_leg_to_incident(self, amb: Ambulance, inc: Incident, actor: str) -> None:
         origin = self.position(amb.id)
-        if inc.violent and not inc.scene_secured:
+        if not scene_entry_allowed(inc):
             dest = offset_point(inc.location, origin, self.timing.staging_offset_km)
             target = "staging"
         else:
@@ -274,13 +328,14 @@ class Engine:
         amb = self.ambulances[action.unit_id]
         self.committed_units_this_tick.add(amb.id)
         amb.destination_hospital = action.hospital_id
+        self.validated_dest[amb.id] = (frozenset(amb.assigned_patient_ids), action.hospital_id)
         if amb.state == A.LOADING and amb.state_until_tick is None:
             self._start_transport(amb)
 
     def _apply_loan(self, action: LendStaff, actor: str) -> None:
         lender = self.hospitals[action.lender_id]
         lender.nurses_loaned_out += action.nurses
-        arrive = self.tick + self.sampler.minutes(self.timing.staff_transfer)
+        arrive = self.tick + self.sampler.minutes(self.timing.staff_transfer, stream="staff")
         loan = StaffLoan(action.lender_id, action.borrower_id, action.nurses, arrive,
                          arrive + self.timing.staff_loan_duration)
         self.loans.append(loan)
@@ -288,6 +343,17 @@ class Engine:
                       {"lender": loan.lender, "borrower": loan.borrower, "nurses": loan.nurses,
                        "arrive_tick": loan.arrive_tick, "return_tick": loan.return_tick,
                        "phase": "DEPARTED"})
+
+    def _apply_mutual_aid(self, action: ActivateMutualAid, actor: str) -> None:
+        firm = self.firms[action.firm_id]
+        ready = self.tick + firm.activation_minutes
+        self.pending_mutual_aid.append((firm.id, action.units, ready))
+        self.log.emit(self.tick, EventType.MESSAGE, actor,
+                      {"type": "MUTUAL_AID_REQUEST", "recipient": f"firm:{firm.id}",
+                       "units": action.units})
+        self.log.emit(self.tick, EventType.MESSAGE, f"firm:{firm.id}",
+                      {"type": "MUTUAL_AID_RESPONSE", "recipient": actor, "accepted": True,
+                       "units": action.units, "ready_tick": ready})
 
     # ==========================================================================================
     # Tick loop
@@ -298,22 +364,49 @@ class Engine:
         return self.scenario.horizon + self.scenario.drain_min
 
     def initialize(self) -> None:
-        """Set up initial hospital load and process tick 0 (steps 5–8)."""
-        for hid, frac in self.scenario.initial_occupancy.items():
+        """Set up initial hospital load, log RUN_STARTED, and process tick 0 (steps 5–8)."""
+        bg = self.sampler.stream("background")
+        lo, hi = self.timing.er_background
+        for hid in sorted(self.scenario.initial_occupancy):
             hs = self.hospitals[hid]
-            n = round(frac * hs.config.er_beds_total)
-            lo, hi = self.timing.er_background
+            n = round(self.scenario.initial_occupancy[hid] * hs.config.er_beds_total)
             for _ in range(n):
-                remaining = self.sampler.minutes((1, hi))
-                hs.add_background_patient(0, self.sampler, in_treatment=True, remaining=remaining)
-            mean = (lo + hi) / 2
-            self._bg_rate[hid] = n / mean if self.scenario.background_arrivals else 0.0
-        for amb in self.ambulances.values():
-            if amb.state in MOVING and amb.state_until_tick is not None and amb.id not in self.legs:
-                self.legs[amb.id] = Leg(amb.location, amb.home_station, 0, amb.state_until_tick,
-                                        "home")
+                # Steady-state residual stay: length-biased total stay, uniform elapsed share.
+                while True:
+                    stay = self.sampler.minutes((lo, hi), float(bg.random()))
+                    if bg.random() < stay / hi:
+                        break
+                remaining = max(1, int(bg.integers(1, stay + 1)))
+                hs.add_background_patient(0, stay, in_treatment=True, remaining=remaining)
+            self._bg_rate[hid] = n / midpoint((lo, hi)) if self.scenario.background_arrivals else 0
+        for amb in sorted(self.ambulances.values(), key=lambda a: a.id):
+            if amb.state not in INITIAL_UNIT_STATES:
+                raise ValueError(f"{amb.id}: initial state must be IDLE or RETURNING")
+            if amb.state == A.RETURNING:
+                until = amb.state_until_tick or 1
+                amb.state_until_tick = until
+                self.legs[amb.id] = Leg(amb.location, amb.home_station, 0, until, "home")
+        self.log.emit(0, EventType.RUN_STARTED, "engine", self._run_started_payload())
         self._initialized = True
         self._events_and_decisions()
+
+    def _run_started_payload(self) -> dict[str, Any]:
+        sc = self.scenario
+        return {
+            "seed": sc.seed, "demand": sc.demand, "info": sc.info, "horizon": sc.horizon,
+            "end_tick": self.end_tick,
+            "policy": self.policy.name if self.policy else None,
+            "timing": self.timing.model_dump(mode="json"),
+            "hospitals": [h.model_dump(mode="json") for h in sc.hospitals],
+            "ambulances": [{"id": a.id, "owner": a.owner, "unit_type": a.unit_type,
+                            "home_station": a.home_station} for a in sc.ambulances],
+            "incidents": [{"id": i.id, "type": i.type, "call_tick": i.call_tick,
+                           "location": i.location, "violent": i.violent,
+                           "victims": len(i.true_victim_ids)} for i in sc.incidents],
+            "patients": [{"id": p.id, "incident_id": p.incident_id, "severity": p.true_severity,
+                          "needs": p.needs.model_dump(mode="json"), "call_tick": p.timestamps.call}
+                         for p in sorted(sc.patients, key=lambda p: p.id)],
+        }
 
     def step(self) -> None:
         if not self._initialized:
@@ -328,16 +421,43 @@ class Engine:
         self._events_and_decisions()  # 5–8
 
     def run(self, until: int | None = None) -> EventLog:
-        until = self.end_tick if until is None else until
+        until = self.end_tick if until is None else min(until, self.end_tick)
         if not self._initialized:
             self.initialize()
         while self.tick < until:
             self.step()
-        self.log.emit(self.tick, EventType.RUN_SUMMARY, "engine",
-                      {"end_tick": self.tick, "state_version": self.state_version,
-                       "patients": {s: sum(1 for p in self.patients.values() if p.status == s)
-                                    for s in PatientStatus}})
+        if self.tick >= self.end_tick:
+            self.finalize()
         return self.log
+
+    def finalize(self) -> None:
+        """Emit RUN_SUMMARY once, with each patient's final state and synthetic survival."""
+        if self._summarized:
+            return
+        self._summarized = True
+        self.log.emit(self.tick, EventType.RUN_SUMMARY, "engine", {
+            "end_tick": self.tick, "state_version": self.state_version,
+            "patients": [{"id": p.id, "status": p.status, "hospital_id": p.hospital_id,
+                          "walk_in": p.walk_in, "survival_prob": p.survival_prob,
+                          "timestamps": p.timestamps.model_dump()}
+                         for p in sorted(self.patients.values(), key=lambda p: p.id)],
+        })
+
+    def _fingerprint(self) -> str:
+        state = {
+            "hospitals": {h: (hs.config.model_dump(mode="json"), hs.occupied,
+                              hs.nurses_loaned_in, hs.nurses_loaned_out, len(hs.queue),
+                              len(hs.treatments))
+                          for h, hs in sorted(self.hospitals.items())},
+            "ambulances": {a: (x.state, x.state_until_tick, x.assigned_incident,
+                               x.assigned_patient_ids, x.destination_hospital, x.location)
+                           for a, x in sorted(self.ambulances.items())},
+            "units": sorted(self.activated_units),
+            "patients": {p: (x.status, x.ambulance_id, x.hospital_id)
+                         for p, x in sorted(self.patients.items())},
+            "scenes": {i: x.scene_secured for i, x in sorted(self.incidents.items())},
+        }
+        return hashlib.sha256(json.dumps(state, sort_keys=True, default=str).encode()).hexdigest()
 
     def _events_and_decisions(self) -> None:
         self._scene_events()  # 5
@@ -345,10 +465,18 @@ class Engine:
         self._walk_ins()
         self._dispatch_teams()
         self._staff_loans()
+        self._mutual_aid_activation()
         self._background_arrivals()
         self._close_incidents()
         if self.policy is not None:  # 6
-            for action in self.policy.decide(self):  # 7
+            before = self._fingerprint()
+            actions = self.policy.decide(self)
+            if self._fingerprint() != before:
+                self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, self.policy.name,
+                              {"rule_id": "R9", "code": "STATE_MUTATED",
+                               "reason": "policy modified engine state outside commit"})
+                raise R9Violation(f"{self.policy.name} mutated engine state at tick {self.tick}")
+            for action in actions:  # 7
                 self.commit(action, actor=self.policy.name)
         self._log_hospital_status()  # 8
         if self.tick_hook is not None:
@@ -360,14 +488,16 @@ class Engine:
         for amb in sorted(self.ambulances.values(), key=lambda a: a.id):
             if amb.state in MOVING and amb.id in self.legs:
                 amb.location = self.legs[amb.id].position(self.tick)
-            if amb.state == A.ON_SCENE and amb.state_until_tick is None:
-                self._finish_on_scene(amb)  # was waiting for extrication
+            if amb.state_until_tick is None:
+                # Held states, re-checked every tick.
+                if amb.state == A.ON_SCENE:
+                    self._finish_on_scene(amb)  # waiting for extrication
+                elif amb.state == A.LOADING and not amb.assigned_patient_ids:
+                    self._start_return(amb)  # loaded patients all died before routing
+                elif amb.state == A.WAITING_AT_ER:
+                    self._finish_offload(amb)  # crew waiting for its patients to be admitted
                 continue
-            if amb.state == A.LOADING and amb.state_until_tick is None:
-                if not amb.assigned_patient_ids:  # loaded patients all died before routing
-                    self._start_return(amb)
-                continue
-            if amb.state_until_tick is None or amb.state_until_tick > self.tick:
+            if amb.state_until_tick > self.tick:
                 continue
             handler = {
                 A.EN_ROUTE: self._arrive_en_route,
@@ -385,8 +515,8 @@ class Engine:
         leg = self.legs.pop(amb.id)
         amb.location = leg.dest
         inc = self.incidents[amb.assigned_incident]  # type: ignore[index]
-        if leg.target == "staging":
-            if inc.scene_secured:
+        if leg.target == "staging" or not scene_entry_allowed(inc):
+            if scene_entry_allowed(inc):
                 self._start_leg_to_incident(amb, inc, "engine")
             else:
                 transition_ambulance(amb, A.STAGING, self.tick, self.log, incident_id=inc.id)
@@ -410,11 +540,23 @@ class Engine:
                            "by_severity": counts, "violent": inc.violent,
                            "needs_fire": inc.needs_fire_extrication})
 
+    def _lead_patient(self, pids: list[str]) -> Patient | None:
+        pats = [self.patients[p] for p in pids]
+        if not pats:
+            return None
+        return min(pats, key=lambda p: (SEVERITY_PRIORITY[p.true_severity], p.id))
+
+    def _patient_minutes(self, pids: list[str], draw: str, r: tuple[int, int]) -> int:
+        lead = self._lead_patient(pids)
+        u = self.patient_u[lead.id][draw] if lead else None
+        return self.sampler.minutes(r, u)
+
     def _assessment_minutes(self, amb: Ambulance, inc: Incident) -> int:
-        pats = [self.patients[p] for p in amb.assigned_patient_ids] or self.waiting_patients(inc.id)
-        critical = any(p.true_severity == Severity.CRITICAL for p in pats)
+        pids = amb.assigned_patient_ids or [p.id for p in self.waiting_patients(inc.id)]
+        lead = self._lead_patient(pids)
+        critical = lead is not None and lead.true_severity == Severity.CRITICAL
         r = self.timing.scene_time_critical if critical else self.timing.scene_time_other
-        return self.sampler.minutes(r)
+        return self._patient_minutes(pids, "scene", r)
 
     def _finish_on_scene(self, amb: Ambulance) -> None:
         inc = self.incidents[amb.assigned_incident]  # type: ignore[index]
@@ -425,7 +567,8 @@ class Engine:
                 return
         alive = [p for p in amb.assigned_patient_ids
                  if self.patients[p].status == PatientStatus.WAITING_ON_SCENE]
-        if not alive:
+        crew_triage = not alive
+        if crew_triage:
             alive = self._crew_pick_patients(amb, inc)
         amb.assigned_patient_ids = alive
         for pid in alive:
@@ -433,9 +576,25 @@ class Engine:
         if not alive:
             self._start_return(amb)
             return
+        cleared = self._clear_unvalidated_destination(amb)
         transition_ambulance(amb, A.LOADING, self.tick, self.log,
-                             until=self.tick + self.sampler.minutes(self.timing.loading),
-                             incident_id=inc.id, patient_ids=alive)
+                             until=self.tick + self._patient_minutes(alive, "loading",
+                                                                     self.timing.loading),
+                             actor="engine:crew" if crew_triage else "engine",
+                             incident_id=inc.id, patient_ids=alive, crew_triage=crew_triage,
+                             destination_cleared=cleared)
+
+    def _clear_unvalidated_destination(self, amb: Ambulance) -> bool:
+        """A destination stands only if it was validated for (a superset of) these patients."""
+        if amb.destination_hospital is None:
+            return False
+        validated = self.validated_dest.get(amb.id)
+        if validated and validated[1] == amb.destination_hospital and \
+                set(amb.assigned_patient_ids) <= validated[0]:
+            return False
+        amb.destination_hospital = None
+        self.validated_dest.pop(amb.id, None)
+        return True
 
     def _crew_pick_patients(self, amb: Ambulance, inc: Incident) -> list[str]:
         """On-scene crew triage: most severe unassigned waiting patients, within R7 capacity."""
@@ -457,10 +616,32 @@ class Engine:
         if not amb.assigned_patient_ids:
             self._start_return(amb)
             return
+        if amb.destination_hospital is not None:
+            self._revalidate_destination(amb)
         if amb.destination_hospital is None:
             amb.state_until_tick = None  # loaded; waiting for a destination decision
             return
         self._start_transport(amb)
+
+    def _revalidate_destination(self, amb: Ambulance) -> None:
+        """PLAN §14.1: a decision made on an older state is re-validated, not executed blindly."""
+        route = RouteToHospital(unit_id=amb.id, hospital_id=amb.destination_hospital or "")
+        results = self.validator.check(route, self)
+        blocks = [r for r in results if r.level == "block"]
+        self.commits.append({"tick": self.tick, "actor": "engine:revalidate",
+                             "action": route.model_dump(mode="json"),
+                             "results": [r.model_dump() for r in results],
+                             "committed": not blocks})
+        if blocks:
+            for f in blocks:
+                self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, "engine:revalidate",
+                              {"action": route.model_dump(mode="json"), "rule_id": f.rule_id,
+                               "code": f.code, "reason": f.reason})
+            amb.destination_hospital = None
+            self.validated_dest.pop(amb.id, None)
+        else:
+            self.validated_dest[amb.id] = (frozenset(amb.assigned_patient_ids),
+                                           route.hospital_id)
 
     def _start_transport(self, amb: Ambulance) -> None:
         hs = self.hospitals[amb.destination_hospital]  # type: ignore[index]
@@ -481,33 +662,54 @@ class Engine:
                        "severities": [self.patients[p].observed_severity
                                       for p in amb.onboard_patient_ids]})
 
+    def _queue_item(self, p: Patient, hospital_id: str, tick: int) -> QueueItem:
+        cfg, u = self.timing, self.patient_u[p.id]
+        stab = self.hospitals[hospital_id].config.stabilization_only and p.needs.trauma_bay
+        er_range = cfg.er_serious if p.true_severity in (Severity.CRITICAL, Severity.SERIOUS) \
+            else cfg.er_minor
+        return QueueItem(
+            id=p.id, severity=p.true_severity, demand=self.demand_at(hospital_id, p),
+            needs_or=p.needs.or_within_minutes is not None and not stab, arrival_tick=tick,
+            durations={"bay": self.sampler.minutes(cfg.trauma_bay, u["bay"]),
+                       "or": self.sampler.minutes(cfg.operating_room, u["or"]),
+                       "er": self.sampler.minutes(er_range, u["er"])},
+            stabilization=stab,
+        )
+
     def _arrive_hospital(self, amb: Ambulance) -> None:
         leg = self.legs.pop(amb.id)
         amb.location = leg.dest
         hs = self.hospitals[amb.destination_hospital]  # type: ignore[index]
+        alive = [pid for pid in amb.onboard_patient_ids
+                 if self.patients[pid].status == PatientStatus.IN_TRANSPORT]
+        if not alive:  # every onboard patient died in transport; no offload or handover
+            self._start_return(amb)
+            return
         occupancy, queue_len = hs.er_occupancy(), len(hs.queue)
-        for pid in amb.onboard_patient_ids:
+        for pid in alive:
             p = self.patients[pid]
-            if p.status != PatientStatus.IN_TRANSPORT:
-                continue
             transition_patient(p, PatientStatus.WAITING_AT_ER, self.tick, self.log,
                                hospital_id=hs.id, unit_id=amb.id)
             p.hospital_id = hs.id
-            hs.enqueue(QueueItem(
-                id=p.id, severity=p.true_severity,
-                demand=resource_demand(p.needs, p.true_severity),
-                needs_or=p.needs.or_within_minutes is not None, arrival_tick=self.tick,
-            ))
+            hs.enqueue(self._queue_item(p, hs.id, self.tick))
         hs.ambulances_waiting.append(amb.id)
-        wait = self.sampler.offload(occupancy, queue_len)
-        transition_ambulance(amb, A.WAITING_AT_ER, self.tick, self.log, until=self.tick + wait,
-                             hospital_id=hs.id, occupancy=round(occupancy, 3))
+        band = self.sampler.offload_band(occupancy, queue_len, self.patient_u[alive[0]]["offload"])
+        transition_ambulance(amb, A.WAITING_AT_ER, self.tick, self.log, until=self.tick + band,
+                             hospital_id=hs.id, occupancy=round(occupancy, 3), band_minutes=band)
 
     def _finish_offload(self, amb: Ambulance) -> None:
+        """The crew stays with its patients until the hospital has taken every one into care
+        (PLAN §8). Minimum stay is the crowding band; there is no cap."""
+        waiting = [p for p in amb.onboard_patient_ids
+                   if self.patients[p].status == PatientStatus.WAITING_AT_ER]
+        if waiting:
+            amb.state_until_tick = None
+            return
         hs = self.hospitals[amb.destination_hospital]  # type: ignore[index]
         hs.ambulances_waiting.remove(amb.id)
         transition_ambulance(amb, A.HANDOVER, self.tick, self.log,
-                             until=self.tick + self.sampler.minutes(self.timing.handover),
+                             until=self.tick + self._patient_minutes(
+                                 amb.onboard_patient_ids, "handover", self.timing.handover),
                              hospital_id=hs.id)
 
     def _finish_handover(self, amb: Ambulance) -> None:
@@ -521,6 +723,7 @@ class Engine:
         amb.assigned_patient_ids = []
         amb.assigned_incident = None
         amb.destination_hospital = None
+        self.validated_dest.pop(amb.id, None)
         transition_ambulance(amb, A.RETURNING, self.tick, self.log, until=self.tick + minutes)
 
     def _arrive_home(self, amb: Ambulance) -> None:
@@ -572,16 +775,19 @@ class Engine:
     # --- step 3: hospitals --------------------------------------------------------------------
 
     def _hospital_flow(self) -> None:
-        for hs in self.hospitals.values():
-            for pid in hs.finish_treatments(self.tick, self.sampler):
+        for hid in sorted(self.hospitals):
+            hs = self.hospitals[hid]
+            for pid in hs.finish_treatments(self.tick):
                 transition_patient(self.patients[pid], PatientStatus.DISCHARGED, self.tick,
                                    self.log, hospital_id=hs.id)
-            for pid in hs.admit_from_queue(self.tick, self.sampler):
+            stabilization = {q.id for q in hs.queue if q.stabilization}
+            for pid in hs.admit_from_queue(self.tick):
                 p = self.patients[pid]
                 p.survival_prob = survival_probability(
                     p.true_severity, self.tick - p.timestamps.call, p.deterioration_rate)
                 transition_patient(p, PatientStatus.IN_TREATMENT, self.tick, self.log,
-                                   hospital_id=hs.id)
+                                   hospital_id=hs.id, survival_prob=round(p.survival_prob, 4),
+                                   stabilization_only=pid in stabilization)
 
     # --- step 4: deterioration ----------------------------------------------------------------
 
@@ -599,7 +805,9 @@ class Engine:
                     amb = self.ambulances[p.ambulance_id]
                     if p.id in amb.assigned_patient_ids:
                         amb.assigned_patient_ids.remove(p.id)
-                transition_patient(p, PatientStatus.DECEASED, self.tick, self.log)
+                # ambulance_id / hospital_id are kept on the patient as history.
+                transition_patient(p, PatientStatus.DECEASED, self.tick, self.log,
+                                   survival_prob=round(p.survival_prob, 4))
 
     def active_or_closed(self) -> set[str]:
         return set(self.active_incidents) | self.closed_incidents
@@ -621,13 +829,17 @@ class Engine:
                 self.pending_team_requests.append((inc.id, TeamKind.FIRE))
 
     def _scene_events(self) -> None:
-        for inc in list(self.active_incidents.values()):
+        for inc_id in sorted(self.active_incidents):
+            inc = self.active_incidents[inc_id]
             if inc.scene_secured or inc.scene_secured_tick is None:
                 continue
             if inc.scene_secured_tick <= self.tick:
                 secure_scene(inc, self.tick, self.log, actor="police")
                 for amb in sorted(self.ambulances.values(), key=lambda a: a.id):
-                    if amb.state == A.STAGING and amb.assigned_incident == inc.id:
+                    if amb.assigned_incident != inc.id:
+                        continue
+                    staging_leg = amb.state == A.EN_ROUTE and self.legs[amb.id].target == "staging"
+                    if amb.state == A.STAGING or staging_leg:
                         self._start_leg_to_incident(amb, inc, "engine")
 
     def _walk_ins(self) -> None:
@@ -642,45 +854,61 @@ class Engine:
             p.hospital_id = hs.id
             transition_patient(p, PatientStatus.WAITING_AT_ER, self.tick, self.log,
                                hospital_id=hs.id, walk_in=True)
-            hs.enqueue(QueueItem(id=p.id, severity=p.true_severity,
-                                 demand=resource_demand(p.needs, p.true_severity),
-                                 arrival_tick=self.tick))
+            hs.enqueue(self._queue_item(p, hs.id, self.tick))
             self.log.emit(self.tick, EventType.WALK_IN, f"hospital:{hs.id}",
                           {"patient_id": p.id, "hospital_id": hs.id, "incident_id": p.incident_id})
 
     def _staff_loans(self) -> None:
-        for loan in self.loans:
-            if not loan.arrived and loan.arrive_tick <= self.tick:
-                loan.arrived = True
-                self.hospitals[loan.borrower].nurses_loaned_in += loan.nurses
-                self.log.emit(self.tick, EventType.STAFF_LOAN, "engine",
-                              {"lender": loan.lender, "borrower": loan.borrower,
-                               "nurses": loan.nurses, "phase": "ARRIVED"})
         kept = []
         for loan in self.loans:
             borrower = self.hospitals[loan.borrower]
-            needed = loan.nurses * PATIENTS_PER_NURSE
-            due = loan.arrived and loan.return_tick <= self.tick
-            if due and borrower.free("nurse_slot") >= needed:
+            slots = loan.nurses * PATIENTS_PER_NURSE
+            if loan.phase == "DEPARTED" and loan.arrive_tick <= self.tick:
+                loan.phase = "ARRIVED"
+                borrower.nurses_loaned_in += loan.nurses
+                self._log_loan(loan, "ARRIVED")
+            if loan.phase == "ARRIVED" and loan.return_tick <= self.tick:
+                # Due back: the borrower may not admit into these nurses' slots any more.
+                loan.phase = "RETURNING"
+                borrower.nurse_slots_held_back += slots
+            if loan.phase == "RETURNING" and borrower.free("nurse_slot") >= slots:
+                borrower.nurse_slots_held_back -= slots
                 borrower.nurses_loaned_in -= loan.nurses
                 self.hospitals[loan.lender].nurses_loaned_out -= loan.nurses
-                self.log.emit(self.tick, EventType.STAFF_LOAN, "engine",
-                              {"lender": loan.lender, "borrower": loan.borrower,
-                               "nurses": loan.nurses, "phase": "RETURNED"})
-            else:
-                kept.append(loan)
+                self._log_loan(loan, "RETURNED")
+                continue
+            kept.append(loan)
         self.loans = kept
+
+    def _log_loan(self, loan: StaffLoan, phase: str) -> None:
+        self.log.emit(self.tick, EventType.STAFF_LOAN, "engine",
+                      {"lender": loan.lender, "borrower": loan.borrower, "nurses": loan.nurses,
+                       "phase": phase})
+
+    def _mutual_aid_activation(self) -> None:
+        remaining = []
+        for firm_id, n, ready in self.pending_mutual_aid:
+            if ready > self.tick:
+                remaining.append((firm_id, n, ready))
+                continue
+            firm = self.firms[firm_id]
+            new = [u for u in sorted(firm.unit_ids) if u not in self.activated_units][:n]
+            self.activated_units.update(new)
+            self.log.emit(self.tick, EventType.MESSAGE, f"firm:{firm_id}",
+                          {"type": "STATUS", "recipient": "all", "units_activated": new})
+        self.pending_mutual_aid = remaining
 
     def _background_arrivals(self) -> None:
         if self.tick == 0:
             return
+        bg = self.sampler.stream("background")
         for hid in sorted(self._bg_rate):
             rate = self._bg_rate[hid]
             if rate <= 0:
                 continue
-            for _ in range(int(self.rng.poisson(rate))):
-                self.hospitals[hid].add_background_patient(self.tick, self.sampler,
-                                                           in_treatment=False)
+            for _ in range(int(bg.poisson(rate))):
+                stay = self.sampler.minutes(self.timing.er_background, float(bg.random()))
+                self.hospitals[hid].add_background_patient(self.tick, stay, in_treatment=False)
 
     def _close_incidents(self) -> None:
         for inc_id in sorted(self.active_incidents):

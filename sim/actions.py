@@ -1,13 +1,20 @@
-"""Proposed actions. Policies and agents emit these; only `Engine.commit` applies them."""
+"""Proposed actions. Policies and agents emit these; only `Engine.commit` applies them.
+
+Actions are frozen and forbid extra fields (part of R9: agents can only request these changes).
+"""
 
 from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class Dispatch(BaseModel):
+class _Action(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class Dispatch(_Action):
     """Send a unit to an incident, optionally for specific patients and a target hospital."""
 
     kind: Literal["dispatch"] = "dispatch"
@@ -18,7 +25,7 @@ class Dispatch(BaseModel):
     rationale: str = ""
 
 
-class RouteToHospital(BaseModel):
+class RouteToHospital(_Action):
     """Set the destination hospital for a unit that is on scene or loading."""
 
     kind: Literal["route"] = "route"
@@ -27,7 +34,7 @@ class RouteToHospital(BaseModel):
     rationale: str = ""
 
 
-class LendStaff(BaseModel):
+class LendStaff(_Action):
     kind: Literal["lend_staff"] = "lend_staff"
     lender_id: str
     borrower_id: str
@@ -35,4 +42,14 @@ class LendStaff(BaseModel):
     rationale: str = ""
 
 
-Action = Dispatch | RouteToHospital | LendStaff
+class ActivateMutualAid(_Action):
+    """Ask a private firm to activate `units` ambulances under its mutual-aid contract."""
+
+    kind: Literal["mutual_aid"] = "mutual_aid"
+    firm_id: str
+    units: int
+    rationale: str = ""
+
+
+Action = Dispatch | RouteToHospital | LendStaff | ActivateMutualAid
+ACTION_TYPES = (Dispatch, RouteToHospital, LendStaff, ActivateMutualAid)

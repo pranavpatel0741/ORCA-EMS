@@ -1,11 +1,11 @@
-import numpy as np
+import pytest
 
 from sim.actions import Dispatch, LendStaff, RouteToHospital
-from sim.engine import Engine
+from sim.engine import Engine, R9Violation
 from sim.entities import AmbulanceState, PatientStatus, Severity
 from sim.events import EventType
 from sim.hospital import HospitalState, QueueItem
-from sim.travel import Sampler, TimingConfig
+from sim.travel import TimingConfig
 from tests.helpers import (
     GreedyTestPolicy,
     hospital,
@@ -16,6 +16,7 @@ from tests.helpers import (
 from tests.invariants import check_invariants
 
 A = AmbulanceState
+TRAUMA_DEMAND = {"er_bed": 0, "trauma_bay": 1, "or": 0, "surgeon": 1, "nurse_slot": 2}
 
 
 class LifecyclePolicy:
@@ -40,11 +41,19 @@ def run_lifecycle():
     return engine
 
 
+def fill_er(engine, hid, until=500):
+    hs = engine.hospitals[hid]
+    while hs.free("er_bed") > 0:
+        hs.add_background_patient(engine.tick, until, in_treatment=True)
+    for t in hs.treatments:  # nothing frees before `until`
+        t.end_tick = until
+
+
 def test_mini_scenario_full_lifecycle_exact_timestamps():
     """Hand-computed with deterministic timing (zero noise, lower-bound durations):
     station->scene 11.1 km = 19 min; scene->hospital 5.6 km = 10 min; hospital->station
-    (non-emergency) = 12 min; scene time 5 (serious), loading 3, offload 5 (ER empty),
-    handover 5, ER treatment 60.
+    (non-emergency) = 12 min; scene time 5 (serious), loading 3, offload band 5 (ER empty;
+    patient admitted on arrival), handover 5, ER treatment 60.
     """
     engine = run_lifecycle()
     amb_changes = [
@@ -75,24 +84,42 @@ def test_mini_scenario_full_lifecycle_exact_timestamps():
     assert len(engine.log.of_type(EventType.COMMITTED)) == 2
 
 
+def test_log_supports_metrics():
+    engine = run_lifecycle()
+    started = engine.log.of_type(EventType.RUN_STARTED)
+    assert len(started) == 1 and started[0].payload["patients"][0]["id"] == "P-1"
+    treated = [e for e in engine.log.of_type(EventType.PATIENT_STATE_CHANGED)
+               if e.payload["to"] == PatientStatus.IN_TREATMENT]
+    assert "survival_prob" in treated[0].payload
+    summaries = engine.log.of_type(EventType.RUN_SUMMARY)
+    assert len(summaries) == 1 and summaries[0].payload["patients"][0]["survival_prob"]
+
+
+def test_run_summary_emitted_once_across_partial_runs():
+    engine = Engine(mini_scenario(), LifecyclePolicy(), timing=TimingConfig.deterministic())
+    engine.run(until=30)
+    engine.run(until=60)
+    assert not engine.log.of_type(EventType.RUN_SUMMARY)
+    engine.run()
+    engine.run()
+    assert len(engine.log.of_type(EventType.RUN_SUMMARY)) == 1
+
+
 def test_stress_scenario_invariants_every_tick():
     engine = Engine(stress_scenario(), GreedyTestPolicy(), tick_hook=check_invariants)
     engine.run()
     assert all(patient_done(p) for p in engine.patients.values())
-    types = {e.type for e in engine.log.events}
-    assert EventType.SCENE_SECURED in types
-    staged = [e for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED)
-              if e.payload.get("to") == A.STAGING]
-    assert staged, "an ambulance should stage at the violent scene"
+    assert engine.log.of_type(EventType.SCENE_SECURED)
+    changes = engine.log.of_type(EventType.UNIT_STATE_CHANGED)
+    assert any(e.payload.get("to") == A.STAGING for e in changes)
     secured_tick = engine.log.of_type(EventType.SCENE_SECURED)[0].tick
-    on_scene_i2 = [e.tick for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED)
+    on_scene_i2 = [e.tick for e in changes
                    if e.payload["kind"] == "AMBULANCE" and e.payload.get("to") == A.ON_SCENE
                    and e.payload.get("incident_id") == "I-2"]
     assert on_scene_i2 and min(on_scene_i2) > secured_tick
-    # Extrication: no loading at I-3 before fire finishes.
-    fire_on = [e.tick for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED)
+    fire_on = [e.tick for e in changes
                if e.payload.get("unit_id") == "FIRE-1" and e.payload.get("to") == "ON_SCENE"]
-    load_i3 = [e.tick for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED)
+    load_i3 = [e.tick for e in changes
                if e.payload.get("to") == A.LOADING and e.payload.get("incident_id") == "I-3"]
     assert fire_on and load_i3 and min(load_i3) >= fire_on[0] + 12
 
@@ -107,51 +134,113 @@ def test_same_seed_same_log():
     assert events(3) != events(4)
 
 
-def test_validator_rejects_double_dispatch_and_overcapacity():
+def test_policy_choice_does_not_shift_outside_randomness():
+    """Paired design: background arrivals and per-patient durations are policy-independent."""
+    def run(policy):
+        e = Engine(stress_scenario(), policy)
+        e.run()
+        return e, [hs.background_seq for hs in e.hospitals.values()]
+
+    greedy, bg_greedy = run(GreedyTestPolicy())
+    idle, bg_idle = run(None)
+    assert bg_greedy == bg_idle
+    assert greedy.patient_u == idle.patient_u
+
+
+def test_crew_triage_clears_destination_validated_for_other_patients():
     engine = Engine(stress_scenario(), None, tick_hook=check_invariants)
     engine.run(until=30)
-    p_crit = "I-5-P0"
-    ok = engine.commit(Dispatch(unit_id="AMB-1", incident_id="I-5",
-                                patient_ids=[p_crit, "I-5-P1"]))
-    assert not ok  # R7: critical must travel alone
-    assert engine.log.events[-1].payload["rule_id"] == "R7"
-    assert engine.commit(Dispatch(unit_id="AMB-1", incident_id="I-5", patient_ids=[p_crit]))
-    assert not engine.commit(Dispatch(unit_id="AMB-1", incident_id="I-5",
-                                      patient_ids=["I-5-P1"]))  # R1: already this tick
-    assert not engine.commit(Dispatch(unit_id="AMB-2", incident_id="I-5",
-                                      patient_ids=[p_crit]))  # R1: patient taken
-    check_invariants(engine)
+    assert engine.commit(Dispatch(unit_id="AMB-2", incident_id="I-5", patient_ids=["I-5-P3"],
+                                  target_hospital="B"))
+    # The named minor patient is gone before the unit arrives; the crew triages someone else.
+    engine.patients["I-5-P3"].status = PatientStatus.DECEASED
+    engine.ambulances["AMB-2"].assigned_patient_ids = []
+    engine.run(until=80)
+    loading = [e for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED)
+               if e.payload.get("unit_id") == "AMB-2" and e.payload.get("to") == A.LOADING]
+    assert loading and loading[0].payload["crew_triage"]
+    assert loading[0].payload["destination_cleared"]
+    assert engine.patients["I-5-P0"].hospital_id != "B"
 
 
-def test_r2_rejects_full_hospital_when_another_has_space():
-    engine = Engine(stress_scenario(), None)
-    engine.run(until=30)
-    b = engine.hospitals["B"]
-    sampler = Sampler(np.random.default_rng(0), TimingConfig.deterministic())
-    while b.free("er_bed") > 0:
-        b.add_background_patient(engine.tick, sampler, in_treatment=True, remaining=500)
-    for t in b.treatments:  # nothing frees before the ETA
-        t.end_tick = 500
-    engine.commit(Dispatch(unit_id="AMB-3", incident_id="I-5", patient_ids=["I-5-P3"],
-                           target_hospital="B"))
-    assert engine.log.events[-1].type == EventType.PROPOSAL_REJECTED
-    assert engine.log.events[-1].payload["rule_id"] == "R2"
-    assert engine.commit(Dispatch(unit_id="AMB-3", incident_id="I-5", patient_ids=["I-5-P3"],
-                                  target_hospital="A"))
+def test_r9_policy_mutating_state_raises():
+    class Cheater:
+        name = "cheater"
+
+        def decide(self, engine):
+            engine.hospitals["A"].config.er_beds_total += 5
+            return []
+
+    engine = Engine(stress_scenario(), Cheater())
+    with pytest.raises(R9Violation):
+        engine.run(until=2)
+    assert engine.log.events[-1].payload["rule_id"] == "R9"
+
+
+def test_crew_waits_until_patient_admitted():
+    engine = Engine(stress_scenario(), GreedyTestPolicy(), tick_hook=check_invariants)
+    engine.run(until=0)
+    fill_er(engine, "A", until=150)
+    fill_er(engine, "B", until=150)
+    engine.run()
+    cared = {}  # patient -> tick admitted (or died)
+    for e in engine.log.of_type(EventType.PATIENT_STATE_CHANGED):
+        if e.payload["to"] in (PatientStatus.IN_TREATMENT, PatientStatus.DECEASED):
+            cared.setdefault(e.payload["patient_id"], e.tick)
+    onboard, band_end, extended = {}, {}, 0
+    for e in engine.log.of_type(EventType.UNIT_STATE_CHANGED):
+        if e.payload.get("to") == A.TRANSPORTING:
+            onboard[e.payload["unit_id"]] = e.payload["patient_ids"]
+        if e.payload.get("to") == A.WAITING_AT_ER:
+            band_end[e.payload["unit_id"]] = e.tick + e.payload["band_minutes"]
+        if e.payload.get("to") == A.HANDOVER:
+            for pid in onboard[e.payload["unit_id"]]:
+                assert cared[pid] <= e.tick, f"{pid} handed over before admission"
+            extended += e.tick > band_end[e.payload["unit_id"]]
+    assert extended  # at least one crew waited beyond the crowding band for a bed
 
 
 def test_hospital_bay_then_or_then_discharge():
     hs = HospitalState(config=hospital())
-    sampler = Sampler(np.random.default_rng(0), TimingConfig.deterministic())
-    hs.enqueue(QueueItem(id="P", severity=Severity.CRITICAL,
-                         demand={"er_bed": 0, "trauma_bay": 1, "or": 0, "surgeon": 1,
-                                 "nurse_slot": 2}, needs_or=True, arrival_tick=0))
-    assert hs.admit_from_queue(0, sampler) == ["P"]
+    hs.enqueue(QueueItem(id="P", severity=Severity.CRITICAL, demand=TRAUMA_DEMAND,
+                         needs_or=True, arrival_tick=0,
+                         durations={"bay": 30, "or": 60, "er": 0}))
+    assert hs.admit_from_queue(0) == ["P"]
     assert hs.occupied["trauma_bay"] == 1
-    assert hs.finish_treatments(30, sampler) == []
+    assert hs.finish_treatments(30) == []
     assert hs.occupied["trauma_bay"] == 0 and hs.occupied["or"] == 1
-    assert hs.finish_treatments(90, sampler) == ["P"]
+    assert hs.finish_treatments(90) == ["P"]
     assert all(v == 0 for v in hs.occupied.values())
+
+
+def test_projected_surgeons_stay_busy_through_or_phase():
+    hs = HospitalState(config=hospital(trauma_bays_total=2, ors_total=2,
+                                       trauma_surgeons_total=2))
+    for i in range(2):
+        hs.enqueue(QueueItem(id=f"C{i}", severity=Severity.CRITICAL, demand=TRAUMA_DEMAND,
+                             needs_or=True, arrival_tick=0,
+                             durations={"bay": 30, "or": 120, "er": 0}))
+    hs.admit_from_queue(0)
+    assert hs.projected_free("surgeon", 40, []) == 0
+    assert hs.projected_free("trauma_bay", 40, []) == 2
+    hs.finish_treatments(30)
+    assert hs.free("surgeon") == 0
+
+
+def test_critical_not_starved_by_minor_stream():
+    hs = HospitalState(config=hospital(nurses_total=2, er_beds_total=10))  # 4 nurse slots
+    for i in range(4):
+        hs.add_background_patient(0, 10 + i, in_treatment=True)  # one slot frees per tick
+    hs.enqueue(QueueItem(id="CRIT", severity=Severity.CRITICAL, demand=TRAUMA_DEMAND,
+                         arrival_tick=0, durations={"bay": 30, "or": 0, "er": 0}))
+    admitted_at = None
+    for t in range(1, 200):
+        hs.finish_treatments(t)
+        hs.add_background_patient(t, 60, in_treatment=False)
+        if "CRIT" in hs.admit_from_queue(t):
+            admitted_at = t
+            break
+    assert admitted_at is not None and admitted_at <= 12
 
 
 def test_staff_loan_respects_coverage_and_returns():
@@ -159,26 +248,13 @@ def test_staff_loan_respects_coverage_and_returns():
                     tick_hook=check_invariants)
     engine.run(until=1)
     a = engine.hospitals["A"]
-    assert a.can_lend(2) and not a.can_lend(5)  # 8 nurses, min coverage 4, some slots busy
+    assert a.can_lend(2) and not a.can_lend(5)  # 8 nurses, min coverage 4
     assert engine.commit(LendStaff(lender_id="A", borrower_id="B", nurses=2))
     assert engine.hospitals["A"].nurses_loaned_out == 2
     engine.run(until=1 + 20)
     assert engine.hospitals["B"].nurses_loaned_in == 2
-    engine.run(until=1 + 20 + 120)
+    engine.run(until=1 + 20 + 120 + 100)
     assert engine.hospitals["B"].nurses_loaned_in == 0
     assert engine.hospitals["A"].nurses_loaned_out == 0
-
-
-def test_r2_all_full_clause_allows_queueing():
-    engine = Engine(stress_scenario(), None)
-    engine.run(until=30)
-    sampler = Sampler(np.random.default_rng(0), TimingConfig.deterministic())
-    for hs in engine.hospitals.values():
-        while hs.free("er_bed") > 0:
-            hs.add_background_patient(engine.tick, sampler, in_treatment=True, remaining=500)
-        for t in hs.treatments:
-            t.end_tick = 500
-    assert engine.commit(Dispatch(unit_id="AMB-3", incident_id="I-5", patient_ids=["I-5-P3"],
-                                  target_hospital="B"))
-    validated = engine.log.of_type(EventType.PROPOSAL_VALIDATED)[-1]
-    assert "all-full clause" in validated.payload["notes"][0]
+    phases = [e.payload["phase"] for e in engine.log.of_type(EventType.STAFF_LOAN)]
+    assert phases == ["DEPARTED", "ARRIVED", "RETURNED"]

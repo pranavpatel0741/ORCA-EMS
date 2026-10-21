@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 
 class EventType(StrEnum):
+    RUN_STARTED = "RUN_STARTED"  # scenario summary incl. patient list (for log-only metrics)
     CALL_RECEIVED = "CALL_RECEIVED"
     SCENE_REPORT = "SCENE_REPORT"
     SCENE_SECURED = "SCENE_SECURED"

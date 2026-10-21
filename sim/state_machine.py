@@ -31,7 +31,8 @@ AMBULANCE_TRANSITIONS: dict[AmbulanceState, set[AmbulanceState]] = {
     A.ON_SCENE: {A.LOADING, A.RETURNING},
     # LOADING -> RETURNING only if every assigned patient died or was taken by another unit.
     A.LOADING: {A.TRANSPORTING, A.RETURNING},
-    A.TRANSPORTING: {A.WAITING_AT_ER},
+    # TRANSPORTING -> RETURNING only if every onboard patient died in transport.
+    A.TRANSPORTING: {A.WAITING_AT_ER, A.RETURNING},
     A.WAITING_AT_ER: {A.HANDOVER},
     A.HANDOVER: {A.RETURNING},
     A.RETURNING: {A.IDLE, A.EN_ROUTE},

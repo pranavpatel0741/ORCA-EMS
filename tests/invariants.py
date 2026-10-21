@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 
 from sim.engine import Engine
-from sim.entities import AmbulanceState, PatientStatus
+from sim.entities import AmbulanceState, PatientStatus, Severity
 from sim.hospital import RESOURCES
 
 
@@ -77,10 +77,46 @@ def check_invariants(engine: Engine) -> None:
             if inc.violent and not inc.scene_secured:
                 errors.append(f"{amb.id} {amb.state} at unsecured scene {inc.id}")
 
-    # 5. Every committed action passed the validator.
+    # 5. Every committed action passed the validator, and current state matches validated
+    #    decisions: a transporting unit carries only patients validated for its destination.
     for c in engine.commits:
         if c["committed"] and not all(r["ok"] for r in c["results"]):
             errors.append(f"committed action failed validation: {c}")
+    for amb in engine.ambulances.values():
+        if amb.state != A.TRANSPORTING:
+            continue
+        validated = engine.validated_dest.get(amb.id)
+        if validated is None or validated[1] != amb.destination_hospital \
+                or not set(amb.onboard_patient_ids) <= validated[0]:
+            errors.append(f"{amb.id} transporting {amb.onboard_patient_ids} to "
+                          f"{amb.destination_hospital} without a matching validated decision")
+
+    # 6. Destination can structurally receive onboard patients; R7 holds onboard.
+    for amb in engine.ambulances.values():
+        if amb.state != A.TRANSPORTING:
+            continue
+        hs = engine.hospitals[amb.destination_hospital]
+        onboard = [engine.patients[p] for p in amb.onboard_patient_ids]
+        for p in onboard:
+            if not hs.has_resource_types(engine.demand_at(hs.id, p)):
+                errors.append(f"{amb.id} carries {p.id} to {hs.id} lacking resource types")
+        n_crit = sum(1 for p in onboard if p.true_severity == Severity.CRITICAL)
+        if len(onboard) > 2 or (n_crit and len(onboard) > 1):
+            errors.append(f"{amb.id} onboard violates R7: {amb.onboard_patient_ids}")
+
+    # 7. Patient timestamps never go backward.
+    for p in engine.patients.values():
+        ts = p.timestamps
+        seq = [ts.call, ts.loaded, ts.arrived_hospital, ts.definitive_care_start, ts.discharged]
+        seq = [t for t in seq if t is not None]
+        if seq != sorted(seq) or (ts.unit_on_scene is not None and ts.unit_on_scene < ts.call):
+            errors.append(f"{p.id} timestamps out of order: {ts}")
+
+    # 8. A unit is moving exactly when it has a route.
+    for amb in engine.ambulances.values():
+        moving = amb.state in (A.EN_ROUTE, A.TRANSPORTING, A.RETURNING)
+        if moving != (amb.id in engine.legs):
+            errors.append(f"{amb.id} state {amb.state} but route={amb.id in engine.legs}")
 
     if errors:
         raise InvariantViolation(f"tick {engine.tick}: " + "; ".join(errors))
