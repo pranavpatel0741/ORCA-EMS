@@ -115,6 +115,7 @@ class Hospital(BaseModel):
     nurses_total: int
     min_nurse_coverage: int
     stabilization_only: bool = False  # trauma bays usable only to stabilize (Hospital B)
+    ward_beds_total: int | None = None  # inpatient beds; None = ward not modeled
     surge_contract: SurgeContract | None = None
 
 
@@ -227,6 +228,9 @@ class Scenario(BaseModel):
     drain_min: int = 120  # extra minutes simulated after the horizon
     hospitals: list[Hospital]
     initial_occupancy: dict[str, float] = Field(default_factory=dict)  # ER-bed fraction
+    initial_ward_occupancy: dict[str, float] = Field(default_factory=dict)  # ward-bed fraction
+    population: int | None = None
+    town: dict = Field(default_factory=dict)  # derived town numbers (sim.town.TownProfile)
     background_arrivals: bool = True
     ambulances: list[Ambulance]
     firms: list[PrivateFirm] = Field(default_factory=list)

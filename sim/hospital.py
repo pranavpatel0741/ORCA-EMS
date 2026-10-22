@@ -1,8 +1,13 @@
 """Hospital capacity accounting, ER queue, treatment, and staff loans (PLAN §8).
 
-Resources: ER beds, trauma bays, operating rooms, trauma surgeons, and nurse slots. Each nurse
-covers `PATIENTS_PER_NURSE` patients; a critical patient takes two slots (one dedicated nurse).
-Background (non-scenario) patients are anonymous queue/treatment entries with id `BG-...`.
+Resources: ER beds, trauma bays, operating rooms, trauma surgeons, nurse slots, and ward
+(inpatient) beds. Each nurse covers `PATIENTS_PER_NURSE` patients (ED 1:4); a critical patient
+takes two slots (1:2). Background (non-scenario) patients are anonymous entries with id `BG-...`.
+
+Ward beds and ER boarding (when `Hospital.ward_beds_total` is set): after emergency treatment,
+CRITICAL and SERIOUS patients need a ward bed. If none is free they *board*: they keep their ER
+bed / trauma bay and nurse until a ward bed frees (surgeon and OR are released). Ward stays last
+days, so admitted patients occupy their ward bed for the rest of the run.
 
 Treatment durations are carried on each queue item (drawn by the engine from per-patient or
 background streams), so the hospital itself consumes no randomness.
@@ -14,8 +19,8 @@ from pydantic import BaseModel, Field
 
 from sim.entities import Hospital, PatientNeeds, Severity
 
-PATIENTS_PER_NURSE = 2
-RESOURCES = ("er_bed", "trauma_bay", "or", "surgeon", "nurse_slot")
+PATIENTS_PER_NURSE = 4
+RESOURCES = ("er_bed", "trauma_bay", "or", "surgeon", "nurse_slot", "ward_bed")
 SEVERITY_PRIORITY = {
     Severity.CRITICAL: 0,
     Severity.SERIOUS: 1,
@@ -51,17 +56,19 @@ class QueueItem(BaseModel):
     durations: dict[str, int]  # "bay", "or", "er" minutes as applicable
     background: bool = False
     stabilization: bool = False
+    needs_ward: bool = False
 
 
 class Treatment(BaseModel):
     id: str
     severity: Severity
     held: dict[str, int]
-    phase: str  # "bay" | "or" | "er"
-    end_tick: int | None  # None while waiting in a bay for an OR
+    phase: str  # "bay" | "or" | "er" | "boarding" | "ward"
+    end_tick: int | None  # None while waiting for an OR, boarding, or staying on the ward
     needs_or: bool = False
     or_minutes: int = 0
     background: bool = False
+    needs_ward: bool = False
 
 
 class HospitalState(BaseModel):
@@ -75,6 +82,7 @@ class HospitalState(BaseModel):
     ambulances_waiting: list[str] = Field(default_factory=list)
     background_seq: int = 0
     arrival_seq: int = 0
+    last_moves: list[tuple[str, str]] = Field(default_factory=list)
 
     # --- capacity -----------------------------------------------------------------------------
 
@@ -94,7 +102,16 @@ class HospitalState(BaseModel):
             "or": c.ors_total,
             "surgeon": c.trauma_surgeons_total,
             "nurse_slot": self.effective_nurses * PATIENTS_PER_NURSE,
+            "ward_bed": c.ward_beds_total or 0,
         }[resource]
+
+    @property
+    def models_ward(self) -> bool:
+        return self.config.ward_beds_total is not None
+
+    @property
+    def boarders(self) -> list[Treatment]:
+        return [t for t in self.treatments if t.phase == "boarding"]
 
     def free(self, resource: str) -> int:
         return self.total(resource) - self.occupied[resource]
@@ -126,15 +143,29 @@ class HospitalState(BaseModel):
         and already-committed incoming patients.
 
         A trauma-bay phase that continues into the OR releases only the bay (and only if an OR
-        is projected free); its surgeon and nurse slots stay held through surgery.
+        is projected free); its surgeon and nurse slots stay held through surgery. A treatment
+        that needs a ward bed releases its ER resources only if a ward bed is projected free;
+        otherwise the patient boards (surgeon and OR are released either way).
         """
+        ending = sorted(
+            (t for t in self.treatments if t.end_tick is not None and t.end_tick <= at_tick),
+            key=lambda t: (t.end_tick, t.id),
+        )
+        ward_avail = self.free("ward_bed") - len(self.boarders) + sum(
+            t.held.get("ward_bed", 0) for t in ending if t.phase == "ward")
         releasing = 0
-        for t in self.treatments:
-            if t.end_tick is None or t.end_tick > at_tick:
-                continue
+        for t in ending:
             if t.phase == "bay" and t.needs_or:
                 if resource == "trauma_bay" and self.or_available_by(at_tick):
                     releasing += t.held.get("trauma_bay", 0)
+                continue
+            if t.needs_ward and self.models_ward:
+                moves = ward_avail > 0
+                ward_avail -= int(moves)
+                if resource in ("surgeon", "or") or (moves and resource != "ward_bed"):
+                    releasing += t.held.get(resource, 0)
+                if resource == "ward_bed" and moves:
+                    releasing -= 1
                 continue
             releasing += t.held.get(resource, 0)
         queued = sum(q.demand.get(resource, 0) for q in self.queue)
@@ -203,6 +234,7 @@ class HospitalState(BaseModel):
                 id=item.id, severity=item.severity, held=dict(item.demand), phase=phase,
                 end_tick=tick + minutes, needs_or=item.needs_or,
                 or_minutes=item.durations.get("or", 0), background=item.background,
+                needs_ward=item.needs_ward and self.models_ward,
             ))
             self.remove_from_queue(item.id)
             if not item.background:
@@ -210,12 +242,19 @@ class HospitalState(BaseModel):
         return admitted
 
     def finish_treatments(self, tick: int) -> list[str]:
-        """Advance treatment phases; returns ids of discharged scenario patients."""
+        """Advance treatment phases; returns ids of discharged scenario patients.
+
+        Ward moves (to the ward or into ER boarding) are recorded in `self.last_moves` as
+        (patient_id, "ward" | "boarding") for the engine to report.
+        """
+        self.last_moves = []
+        # Boarders waiting longest (by priority) get freed ward beds first.
+        for t in sorted(self.boarders, key=lambda t: (SEVERITY_PRIORITY[t.severity], t.id)):
+            if self.free("ward_bed") >= 1:
+                self._admit_to_ward(t)
         discharged: list[str] = []
-        still: list[Treatment] = []
-        for t in self.treatments:
-            if t.end_tick is not None and t.end_tick > tick:
-                still.append(t)
+        for t in list(self.treatments):
+            if t.end_tick is None or t.end_tick > tick:
                 continue
             if t.phase == "bay" and t.needs_or:
                 # Move from trauma bay to OR when one is free; otherwise keep holding the bay.
@@ -225,16 +264,56 @@ class HospitalState(BaseModel):
                     self.occupied["or"] += 1
                     t.held["or"] = 1
                     t.phase = "or"
+                    t.needs_or = False
                     t.end_tick = tick + t.or_minutes
                 else:
                     t.end_tick = None
-                still.append(t)
+                continue
+            if t.needs_ward:
+                self._release_kinds(t, ("surgeon", "or"))
+                if self.free("ward_bed") >= 1:
+                    self._admit_to_ward(t)
+                else:
+                    t.phase, t.end_tick = "boarding", None
+                    self.last_moves.append((t.id, "boarding"))
                 continue
             self._release(t.held)
+            self.treatments.remove(t)
             if not t.background:
                 discharged.append(t.id)
-        self.treatments = still
         return discharged
+
+    def _release_kinds(self, t: Treatment, kinds: tuple[str, ...]) -> None:
+        for r in kinds:
+            n = t.held.get(r, 0)
+            self.occupied[r] -= n
+            t.held[r] = 0
+
+    def _admit_to_ward(self, t: Treatment) -> None:
+        self._release(t.held)
+        t.held = {r: 0 for r in RESOURCES}
+        t.held["ward_bed"] = 1
+        self.occupied["ward_bed"] += 1
+        t.phase, t.end_tick, t.needs_ward = "ward", None, False
+        if not t.background:
+            self.last_moves.append((t.id, "ward"))
+
+    def add_background_ward_patient(self, tick: int, stay: int, *, remaining: int | None = None,
+                                    force: bool = False) -> bool:
+        """A non-scenario inpatient. At start (`force`) the bed is taken; later admissions only
+        take a free bed nobody is boarding for. Returns whether the patient was admitted."""
+        if not force and (self.free("ward_bed") < 1 or self.boarders):
+            return False
+        self.background_seq += 1
+        held = {r: 0 for r in RESOURCES}
+        held["ward_bed"] = 1
+        self.occupied["ward_bed"] += 1
+        self.treatments.append(Treatment(
+            id=f"BG-{self.id}-{self.background_seq}", severity=Severity.SERIOUS, held=held,
+            phase="ward", end_tick=tick + (remaining if remaining is not None else stay),
+            background=True,
+        ))
+        return True
 
     def add_background_patient(
         self, tick: int, stay: int, *, in_treatment: bool, remaining: int | None = None
@@ -280,4 +359,5 @@ class HospitalState(BaseModel):
             "er_occupancy": round(self.er_occupancy(), 3),
             "nurses_loaned_in": self.nurses_loaned_in,
             "nurses_loaned_out": self.nurses_loaned_out,
+            "boarding": len(self.boarders),
         }

@@ -228,7 +228,7 @@ def test_projected_surgeons_stay_busy_through_or_phase():
 
 
 def test_critical_not_starved_by_minor_stream():
-    hs = HospitalState(config=hospital(nurses_total=2, er_beds_total=10))  # 4 nurse slots
+    hs = HospitalState(config=hospital(nurses_total=1, er_beds_total=10))  # 4 nurse slots
     for i in range(4):
         hs.add_background_patient(0, 10 + i, in_treatment=True)  # one slot frees per tick
     hs.enqueue(QueueItem(id="CRIT", severity=Severity.CRITICAL, demand=TRAUMA_DEMAND,
@@ -258,3 +258,48 @@ def test_staff_loan_respects_coverage_and_returns():
     assert engine.hospitals["A"].nurses_loaned_out == 0
     phases = [e.payload["phase"] for e in engine.log.of_type(EventType.STAFF_LOAN)]
     assert phases == ["DEPARTED", "ARRIVED", "RETURNED"]
+
+
+SERIOUS_ER = {"er_bed": 1, "trauma_bay": 0, "or": 0, "surgeon": 0, "nurse_slot": 1,
+              "ward_bed": 0}
+
+
+def ward_hospital(ward_beds=1):
+    return HospitalState(config=hospital(ward_beds_total=ward_beds, er_beds_total=2))
+
+
+def test_serious_patient_boards_in_er_when_ward_full_then_moves():
+    hs = ward_hospital(ward_beds=1)
+    assert hs.add_background_ward_patient(0, 500, remaining=100, force=True)  # ward full to t=100
+    hs.enqueue(QueueItem(id="S", severity=Severity.SERIOUS, demand=SERIOUS_ER, arrival_tick=0,
+                         durations={"bay": 0, "or": 0, "er": 60}, needs_ward=True))
+    assert hs.admit_from_queue(0) == ["S"]
+    assert hs.finish_treatments(60) == []
+    assert hs.last_moves == [("S", "boarding")]
+    assert hs.occupied["er_bed"] == 1 and hs.snapshot()["boarding"] == 1  # keeps the ER bed
+    hs.finish_treatments(100)  # background inpatient leaves at t=100
+    hs.finish_treatments(101)  # boarders are served first on the next tick
+    assert hs.last_moves == [("S", "ward")]
+    assert hs.occupied["er_bed"] == 0 and hs.occupied["ward_bed"] == 1 and not hs.boarders
+
+
+def test_boarder_blocks_er_bed_for_next_patient():
+    hs = ward_hospital(ward_beds=0)
+    hs.config.er_beds_total = 1
+    for pid in ("S1", "S2"):
+        hs.enqueue(QueueItem(id=pid, severity=Severity.SERIOUS, demand=SERIOUS_ER,
+                             arrival_tick=0, durations={"bay": 0, "or": 0, "er": 30},
+                             needs_ward=True))
+    assert hs.admit_from_queue(0) == ["S1"]
+    hs.finish_treatments(30)  # S1 boards: no ward beds at all
+    assert hs.admit_from_queue(30) == []  # S2 cannot get the ER bed
+    assert hs.projected_free("er_bed", 500, []) < 1
+
+
+def test_minor_patient_goes_home_without_ward_bed():
+    hs = ward_hospital(ward_beds=0)
+    hs.enqueue(QueueItem(id="M", severity=Severity.MINOR, demand=SERIOUS_ER, arrival_tick=0,
+                         durations={"bay": 0, "or": 0, "er": 30}))
+    hs.admit_from_queue(0)
+    assert hs.finish_treatments(30) == ["M"]
+    assert hs.occupied["er_bed"] == 0

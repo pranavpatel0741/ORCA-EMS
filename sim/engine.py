@@ -162,6 +162,7 @@ class Engine:
         self.validated_dest: dict[str, tuple[frozenset[str], str]] = {}
         self._last_status: dict[str, dict] = {}
         self._bg_rate: dict[str, float] = {}
+        self._ward_rate: dict[str, float] = {}
         self._initialized = False
         self._summarized = False
         self._message_seq = 0
@@ -395,6 +396,16 @@ class Engine:
                 remaining = max(1, int(bg.integers(1, stay + 1)))
                 hs.add_background_patient(0, stay, in_treatment=True, remaining=remaining)
             self._bg_rate[hid] = n / midpoint((lo, hi)) if self.scenario.background_arrivals else 0
+        wlo, whi = self.timing.ward_stay
+        for hid in sorted(self.scenario.initial_ward_occupancy):
+            hs = self.hospitals[hid]
+            n = round(self.scenario.initial_ward_occupancy[hid] * hs.total("ward_bed"))
+            for _ in range(n):
+                stay = self.sampler.minutes((wlo, whi), float(bg.random()))
+                remaining = max(1, int(bg.integers(1, stay + 1)))
+                hs.add_background_ward_patient(0, stay, remaining=remaining, force=True)
+            self._ward_rate[hid] = n / midpoint((wlo, whi)) \
+                if self.scenario.background_arrivals else 0
         for amb in sorted(self.ambulances.values(), key=lambda a: a.id):
             if amb.state not in INITIAL_UNIT_STATES:
                 raise ValueError(f"{amb.id}: initial state must be IDLE or RETURNING")
@@ -689,6 +700,7 @@ class Engine:
                        "or": self.sampler.minutes(cfg.operating_room, u["or"]),
                        "er": self.sampler.minutes(er_range, u["er"])},
             stabilization=stab,
+            needs_ward=p.true_severity in (Severity.CRITICAL, Severity.SERIOUS),
         )
 
     def _arrive_hospital(self, amb: Ambulance) -> None:
@@ -795,6 +807,13 @@ class Engine:
             for pid in hs.finish_treatments(self.tick):
                 transition_patient(self.patients[pid], PatientStatus.DISCHARGED, self.tick,
                                    self.log, hospital_id=hs.id)
+            for pid, move in hs.last_moves:
+                inc = self.patients[pid].incident_id
+                reason = ("admitted to ward" if move == "ward"
+                          else "boarding in ER: no ward bed free")
+                self.send(f"hospital:{hs.id}", "all", MessageType.STATUS, f"{pid} {reason}",
+                          incident_id=inc, patient_ids=[pid],
+                          proposed_action={"move": move})
             stabilization = {q.id for q in hs.queue if q.stabilization}
             for pid in hs.admit_from_queue(self.tick):
                 p = self.patients[pid]
@@ -925,6 +944,13 @@ class Engine:
             for _ in range(int(bg.poisson(rate))):
                 stay = self.sampler.minutes(self.timing.er_background, float(bg.random()))
                 self.hospitals[hid].add_background_patient(self.tick, stay, in_treatment=False)
+        for hid in sorted(self._ward_rate):
+            rate = self._ward_rate[hid]
+            if rate <= 0:
+                continue
+            for _ in range(int(bg.poisson(rate))):  # direct / elective admissions
+                stay = self.sampler.minutes(self.timing.ward_stay, float(bg.random()))
+                self.hospitals[hid].add_background_ward_patient(self.tick, stay)
 
     def _close_incidents(self) -> None:
         for inc_id in sorted(self.active_incidents):

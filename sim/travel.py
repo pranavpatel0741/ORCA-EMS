@@ -43,6 +43,7 @@ class TimingConfig(BaseModel):
     er_serious: MinuteRange = (60, 180)
     er_minor: MinuteRange = (30, 90)
     er_background: MinuteRange = (60, 240)
+    ward_stay: MinuteRange = (2880, 10080)  # inpatient stay, 2-7 days
 
     # Scene operations
     staging_offset_km: float = 0.5
