@@ -17,6 +17,7 @@ from sim.generator import (
     DEFAULT_POPULATION,
     STREAM,
     WARD_OCCUPANCY,
+    _incident_rng,
     _narrative,
     _patient,
     _walk_ins,
@@ -50,7 +51,6 @@ def _call(iid: str, itype: IncidentType, loc: tuple[float, float], sevs: list[Se
     inc = Incident(id=iid, type=itype, location=loc, call_tick=START_TICK,
                    reported_victims=len(patients), true_victim_ids=[p.id for p in patients],
                    **extra)
-    inc.narrative = _narrative(inc, rng)
     return [inc], patients
 
 
@@ -118,6 +118,11 @@ def build_preset(name: str, seed: int = 7, population: int = DEFAULT_POPULATION)
     initial = {h.id: round(float(occ.uniform(0.5, 0.8)), 3) for h in hosp}
     initial_ward = {h.id: round(float(occ.uniform(*WARD_OCCUPANCY)), 3) for h in hosp}
     incidents, patients = preset.build(seed, town)
+    for inc in incidents:  # same caller noise and narrative as the generator
+        reported = _incident_rng(seed, "reported", inc.id)
+        inc.reported_victims = max(1, round(len(inc.true_victim_ids) *
+                                            float(reported.uniform(0.8, 1.2))))
+        inc.narrative = _narrative(inc, _incident_rng(seed, "narrative", inc.id))
     walk_ins = _walk_ins(seed, incidents, {p.id: p for p in patients}, hosp)
     scenario = Scenario(
         seed=seed, demand=name, horizon=preset.horizon, drain_min=preset.drain, hospitals=hosp,

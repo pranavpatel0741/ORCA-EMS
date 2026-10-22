@@ -320,8 +320,9 @@ def _narrative(inc: Incident, rng: np.random.Generator) -> str:
 
 
 def _incident_rng(seed: int, stream: str, incident_id: str) -> np.random.Generator:
-    prefix, num = incident_id.split("-")
-    key = int(num) + (1000 if prefix == "MCI" else 0)
+    prefix, num = incident_id.split("-", 1)
+    key = int(num) + (1000 if prefix == "MCI" else 0) if num.isdigit() else \
+        2000 + sum(map(ord, num))
     return np.random.default_rng([seed, STREAM[stream], key])
 
 

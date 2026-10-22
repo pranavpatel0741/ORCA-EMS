@@ -44,3 +44,10 @@ def test_bus_crash_walk_ins_go_to_nearest_hospital():
 
 def test_presets_are_deterministic():
     assert build_preset("Two-car crash") == build_preset("Two-car crash")
+
+
+@pytest.mark.parametrize("name", ["Cardiac arrest", "Two-car crash", "Shooting",
+                                  "School bus crash"])
+def test_presets_have_caller_narrative(name):
+    for inc in build_preset(name).incidents:
+        assert inc.narrative and inc.reported_victims >= 1
