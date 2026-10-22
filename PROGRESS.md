@@ -130,3 +130,13 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
   - call threads fill in live
   - capacity cards update on admission
   - the feed shows calls, commits, validator rejections, pre-alerts and scene events
+- **Dashboard redesign (2026-10-22):** CAD-style dispatch screen modeled on real systems
+  (CAD incident queue + map + remarks feed; EMResource-style hospital board; EMTrack-style
+  MCI triage and transport summary).
+  - Runs start from an incident picker (`sim/presets.py`): cardiac arrest, two-car crash,
+    shooting, school bus crash, bus crash + shooting, normal day.
+  - Seed, population and policy are under a collapsed "Advanced" sidebar.
+  - The conversation is rewritten as plain radio-style lines between roles (911 caller,
+    Dispatch, ambulances, hospitals, safety rules, police).
+  - Hospital replies (accept / counter) will come from the hospital agents in M6–M7; they are
+    not faked.
