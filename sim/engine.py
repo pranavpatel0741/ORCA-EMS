@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections.abc import Callable
 from typing import Any, Protocol
 
@@ -166,6 +167,7 @@ class Engine:
         self._initialized = False
         self._summarized = False
         self._message_seq = 0
+        self.decision_timings: list[dict[str, Any]] = []
 
     # ==========================================================================================
     # Queries used by the validator, policies, and observations
@@ -497,7 +499,11 @@ class Engine:
         self._close_incidents()
         if self.policy is not None:  # 6
             before = self._fingerprint()
+            started = time.perf_counter()
             actions = self.policy.decide(self)
+            # Wall-clock decision time stays out of the deterministic log (PLAN §3.5).
+            self.decision_timings.append({"tick": self.tick, "actions": len(actions),
+                                          "ms": (time.perf_counter() - started) * 1000})
             if self._fingerprint() != before:
                 self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, self.policy.name,
                               {"rule_id": "R9", "code": "STATE_MUTATED",
