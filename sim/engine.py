@@ -423,6 +423,7 @@ class Engine:
         sc = self.scenario
         return {
             "seed": sc.seed, "demand": sc.demand, "info": sc.info, "horizon": sc.horizon,
+            "population": sc.population, "town": sc.town,
             "end_tick": self.end_tick,
             "policy": self.policy.name if self.policy else None,
             "timing": self.timing.model_dump(mode="json"),
