@@ -22,6 +22,7 @@ import json
 from collections.abc import Callable
 from typing import Any, Protocol
 
+from protocol.messages import Message, MessageType
 from sim.actions import (
     Action,
     ActivateMutualAid,
@@ -163,6 +164,7 @@ class Engine:
         self._bg_rate: dict[str, float] = {}
         self._initialized = False
         self._summarized = False
+        self._message_seq = 0
 
     # ==========================================================================================
     # Queries used by the validator, policies, and observations
@@ -349,12 +351,25 @@ class Engine:
         firm = self.firms[action.firm_id]
         ready = self.tick + firm.activation_minutes
         self.pending_mutual_aid.append((firm.id, action.units, ready))
-        self.log.emit(self.tick, EventType.MESSAGE, actor,
-                      {"type": "MUTUAL_AID_REQUEST", "recipient": f"firm:{firm.id}",
-                       "units": action.units})
-        self.log.emit(self.tick, EventType.MESSAGE, f"firm:{firm.id}",
-                      {"type": "MUTUAL_AID_RESPONSE", "recipient": actor, "accepted": True,
-                       "units": action.units, "ready_tick": ready})
+        self.send(actor, f"firm:{firm.id}", MessageType.MUTUAL_AID_REQUEST,
+                  f"request {action.units} mutual-aid unit(s)",
+                  proposed_action={"units": action.units})
+        self.send(f"firm:{firm.id}", actor, MessageType.MUTUAL_AID_RESPONSE,
+                  f"accepted; {action.units} unit(s) ready at tick {ready}",
+                  proposed_action={"units": action.units, "ready_tick": ready})
+
+    def send(self, sender: str, recipient: str, type: MessageType, reason: str, *,
+             incident_id: str | None = None, patient_ids: list[str] | None = None,
+             proposed_action: dict[str, Any] | None = None, negotiation_round: int = 0) -> Message:
+        """Log a protocol message (PLAN §14.1) as a MESSAGE event."""
+        self._message_seq += 1
+        msg = Message(message_id=f"M-{self._message_seq:05d}", tick=self.tick,
+                      state_version=self.state_version, sender=sender, recipient=recipient,
+                      type=type, incident_id=incident_id, patient_ids=list(patient_ids or []),
+                      proposed_action=proposed_action, reason=reason,
+                      negotiation_round=negotiation_round)
+        self.log.emit(self.tick, EventType.MESSAGE, sender, msg.model_dump(mode="json"))
+        return msg
 
     # ==========================================================================================
     # Tick loop
@@ -656,12 +671,11 @@ class Engine:
                                self.log, unit_id=amb.id, hospital_id=hs.id)
         transition_ambulance(amb, A.TRANSPORTING, self.tick, self.log, until=self.tick + minutes,
                              hospital_id=hs.id, patient_ids=list(amb.onboard_patient_ids))
-        self.log.emit(self.tick, EventType.MESSAGE, amb.id,
-                      {"type": "PRE_ALERT", "recipient": f"hospital:{hs.id}",
-                       "patient_ids": list(amb.onboard_patient_ids),
-                       "eta_tick": self.tick + minutes,
-                       "severities": [self.patients[p].observed_severity
-                                      for p in amb.onboard_patient_ids]})
+        severities = [self.patients[p].observed_severity for p in amb.onboard_patient_ids]
+        self.send(amb.id, f"hospital:{hs.id}", MessageType.PRE_ALERT,
+                  f"{len(severities)} patient(s) inbound, ETA {minutes} min",
+                  incident_id=amb.assigned_incident, patient_ids=amb.onboard_patient_ids,
+                  proposed_action={"eta_tick": self.tick + minutes, "severities": severities})
 
     def _queue_item(self, p: Patient, hospital_id: str, tick: int) -> QueueItem:
         cfg, u = self.timing, self.patient_u[p.id]
@@ -895,8 +909,9 @@ class Engine:
             firm = self.firms[firm_id]
             new = [u for u in sorted(firm.unit_ids) if u not in self.activated_units][:n]
             self.activated_units.update(new)
-            self.log.emit(self.tick, EventType.MESSAGE, f"firm:{firm_id}",
-                          {"type": "STATUS", "recipient": "all", "units_activated": new})
+            self.send(f"firm:{firm_id}", "all", MessageType.STATUS,
+                      f"units activated: {', '.join(new) or 'none'}",
+                      proposed_action={"units_activated": new})
         self.pending_mutual_aid = remaining
 
     def _background_arrivals(self) -> None:
