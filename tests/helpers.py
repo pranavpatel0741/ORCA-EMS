@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-from sim.actions import Action, Dispatch, RouteToHospital
-from sim.engine import Engine
+from baselines.nearest import NearestPolicy
 from sim.entities import (
     Ambulance,
-    AmbulanceState,
     Capability,
     Hospital,
     Incident,
@@ -22,9 +20,6 @@ from sim.entities import (
     TeamKind,
     UnitType,
 )
-from sim.hospital import SEVERITY_PRIORITY
-from sim.state_machine import can_reassign
-from sim.travel import haversine_km
 
 HOSP_LOC = (42.36, -71.06)
 STATION = (42.31, -71.06)
@@ -114,45 +109,10 @@ def stress_scenario(seed: int = 3) -> Scenario:
                     incidents=incidents, patients=patients)
 
 
-class GreedyTestPolicy:
-    """Nearest free unit per waiting patient group; nearest hospital that the validator accepts."""
+class GreedyTestPolicy(NearestPolicy):
+    """Nearest free unit per waiting patient group; nearest hospital the validator accepts."""
 
     name = "greedy_test"
-
-    def decide(self, engine: Engine) -> list[Action]:
-        actions: list[Action] = []
-        used: set[str] = set()
-        for inc_id in sorted(engine.active_incidents):
-            inc = engine.incidents[inc_id]
-            waiting = sorted(
-                (p for p in engine.waiting_patients(inc_id) if p.ambulance_id is None),
-                key=lambda p: (SEVERITY_PRIORITY[p.true_severity], p.id),
-            )
-            while waiting:
-                free = [a for a in engine.ambulances.values()
-                        if a.id not in used and a.state in (AmbulanceState.IDLE,
-                                                            AmbulanceState.RETURNING)
-                        and can_reassign(a) and engine.unit_available(a.id)]
-                if not free:
-                    break
-                unit = min(free, key=lambda a: (haversine_km(engine.position(a.id),
-                                                             inc.location), a.id))
-                if waiting[0].true_severity == Severity.CRITICAL:
-                    group = [waiting.pop(0)]
-                else:
-                    group = [p for p in waiting if p.true_severity != Severity.CRITICAL][:2]
-                    waiting = [p for p in waiting if p not in group]
-                used.add(unit.id)
-                actions.append(Dispatch(unit_id=unit.id, incident_id=inc_id,
-                                        patient_ids=[p.id for p in group]))
-        for amb in sorted(engine.units_needing_destination(), key=lambda a: a.id):
-            for hid in sorted(engine.hospitals, key=lambda h: haversine_km(
-                    engine.position(amb.id), engine.hospitals[h].config.location)):
-                route = RouteToHospital(unit_id=amb.id, hospital_id=hid)
-                if all(r.ok for r in engine.validator.check(route, engine)):
-                    actions.append(route)
-                    break
-        return actions
 
 
 def patient_done(p: Patient) -> bool:
