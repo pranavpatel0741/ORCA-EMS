@@ -6,6 +6,7 @@ from pathlib import Path
 from sim.engine import Engine
 from sim.entities import IncidentType, Owner, Severity
 from sim.generator import BUS_VICTIMS, generate, load, save, to_json
+from sim.town import TownProfile
 from tests.helpers import GreedyTestPolicy
 from tests.invariants import check_invariants
 
@@ -66,16 +67,39 @@ def test_surge_mci_composition():
             bus.true_victim_ids) + 1
 
 
-def test_fixed_infrastructure_matches_plan():
+def test_infrastructure_derived_from_town_profile():
     sc = generate(3, "normal")
+    town = TownProfile()
     h = {x.id: x for x in sc.hospitals}
+    assert sc.population == 50_000 and sc.town == town.summary()
+    assert {k: h[k].er_beds_total for k in "ABCD"} == town.er_beds
+    assert {k: h[k].ward_beds_total for k in "ABCD"} == town.ward_beds
+    assert {k: h[k].nurses_total for k in "ABCD"} == town.ed_nurses
+    assert h["A"].trauma_surgeons_total == 1 and h["C"].trauma_surgeons_total == 1
     assert h["B"].stabilization_only and h["B"].trauma_surgeons_total == 0
     assert h["D"].owner == Owner.PRIVATE and h["D"].surge_contract.max_surge_patients == 4
     assert {a.id for a in sc.ambulances if a.owner == Owner.PUBLIC} == {
-        f"AMB-{i}" for i in range(1, 6)}
+        f"AMB-{i}" for i in range(1, 5)}
     assert sc.firms[0].max_mutual_aid_units == 2 and sc.firms[0].activation_minutes == 10
     assert all(0.5 <= v <= 0.8 for v in sc.initial_occupancy.values())
+    assert all(0.65 <= v <= 0.8 for v in sc.initial_ward_occupancy.values())
     assert all(x.min_nurse_coverage * 2 >= x.nurses_total for x in sc.hospitals)
+
+
+def test_everything_inside_the_town_square():
+    sc = generate(5, "surge")
+    town = TownProfile()
+    points = [i.location for i in sc.incidents] + [h.location for h in sc.hospitals] + [
+        a.home_station for a in sc.ambulances]
+    for lat, lon in points:
+        x, y = town.to_km(lat, lon)
+        assert -1e-6 <= x <= 20 + 1e-6 and -1e-6 <= y <= 20 + 1e-6
+
+
+def test_population_changes_town_and_file_name(tmp_path):
+    big = generate(7, "normal", population=200_000)
+    assert big.town["city_ambulances"] > generate(7, "normal").town["city_ambulances"]
+    assert save(big, tmp_path).name == "seed_07_normal_p200000.json"
 
 
 def test_save_load_roundtrip(tmp_path):

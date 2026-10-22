@@ -40,6 +40,7 @@ from sim.entities import (
     UnitType,
     WalkIn,
 )
+from sim.town import TownProfile
 from sim.travel import haversine_km
 
 STREAM = {
@@ -57,8 +58,6 @@ STREAM = {
 
 HORIZON = 180
 DRAIN = 120
-CALL_RATE_PER_MIN = 1 / 12
-BBOX = ((42.330, 42.375), (-71.120, -71.050))  # lat, lon ranges (central Boston)
 
 SHOOTING_TICK = 30
 BUS_CRASH_TICK = 35
@@ -68,6 +67,7 @@ BUS_MIX = {  # START-style share ranges (PLAN §10); minor takes the remainder
     Severity.SERIOUS: (0.30, 0.35),
     Severity.EXPECTANT: (0.00, 0.05),
 }
+WARD_OCCUPANCY = (0.65, 0.80)  # starting inpatient occupancy (assumption, typical U.S. range)
 WALK_IN_SHARE = (0.50, 0.60)
 WALK_IN_DELAY = (15, 45)
 OR_NEED_PROB = 0.5  # share of critical trauma patients who need an OR within 60 min
@@ -92,78 +92,83 @@ TWO_PATIENT_PROB = {IncidentType.VEHICLE_CRASH: 0.5}
 DEFAULT_TWO_PATIENT_PROB = 0.15
 EXTRICATION_PROB = 0.25
 
-STATIONS = {
-    "S1": (42.3650, -71.0540),
-    "S2": (42.3400, -71.0750),
-    "S3": (42.3530, -71.1150),
-}
-PRIVATE_BASE = (42.3480, -71.0900)
+# Town layout as fractions of the town side (x east, y north from the SW corner).
+HOSPITAL_LAYOUT = {"A": (0.50, 0.55), "B": (0.25, 0.75), "C": (0.75, 0.25), "D": (0.20, 0.35)}
+STATION_LAYOUT = [(0.25, 0.25), (0.75, 0.25), (0.25, 0.75), (0.75, 0.75)]
+PRIVATE_BASE = (0.50, 0.20)
+POLICE_LAYOUT = [(0.50, 0.50), (0.40, 0.62), (0.62, 0.40)]
+FIRE_LAYOUT = [(0.55, 0.45), (0.45, 0.30)]
+DEFAULT_POPULATION = 50_000
 
 
-# --- fixed infrastructure ------------------------------------------------------------------------
+# --- infrastructure derived from the town profile ------------------------------------------------
 
 
-def hospitals() -> list[Hospital]:
-    """PLAN §10 table. Positions approximate real Boston hospital sites; all else synthetic."""
-    def h(hid, loc, owner, caps, er, bays, ors, surgeons, nurses, **kw) -> Hospital:
-        return Hospital(id=hid, name=f"Hospital {hid}", location=loc, owner=owner,
-                        capabilities=set(caps), er_beds_total=er, trauma_bays_total=bays,
-                        ors_total=ors, trauma_surgeons_total=surgeons, nurses_total=nurses,
-                        min_nurse_coverage=math.ceil(nurses / 2), **kw)
-
+def hospitals(town: TownProfile) -> list[Hospital]:
+    """Four hospital roles; every count comes from `TownProfile` (see sim/town.py)."""
+    er, ward, nurses = town.er_beds, town.ward_beds, town.ed_nurses
+    ors, bays, surgeons = town.operating_rooms, town.trauma_bays, town.surgical_teams
     C = Capability
+
+    def h(hid, owner, caps, bays_n, ors_n, surgeons_n, **kw) -> Hospital:
+        return Hospital(id=hid, name=f"Hospital {hid}", location=town.scale(*HOSPITAL_LAYOUT[hid]),
+                        owner=owner, capabilities=set(caps), er_beds_total=er[hid],
+                        trauma_bays_total=bays_n, ors_total=ors_n,
+                        trauma_surgeons_total=surgeons_n, nurses_total=nurses[hid],
+                        min_nurse_coverage=math.ceil(nurses[hid] / 2),
+                        ward_beds_total=ward[hid], **kw)
+
     return [
-        h("A", (42.3631, -71.0686), Owner.PUBLIC,
-          [C.TRAUMA_L1, C.CARDIAC_CATH, C.STROKE, C.GENERAL], 10, 3, 3, 3, 8),
-        h("B", (42.3496, -71.0632), Owner.PUBLIC, [C.GENERAL], 12, 1, 0, 0, 6,
-          stabilization_only=True),
-        h("C", (42.3350, -71.0723), Owner.PUBLIC,
-          [C.TRAUMA_L2, C.CARDIAC_CATH, C.GENERAL], 8, 2, 2, 2, 6),
-        h("D", (42.3398, -71.1061), Owner.PRIVATE, [C.GENERAL], 10, 0, 2, 0, 6,
+        h("A", Owner.PUBLIC, [C.TRAUMA_L1, C.CARDIAC_CATH, C.STROKE, C.GENERAL],
+          bays["A"], ors["A"], surgeons["A"]),
+        h("B", Owner.PUBLIC, [C.GENERAL], 1, 0, 0, stabilization_only=True),
+        h("C", Owner.PUBLIC, [C.TRAUMA_L2, C.CARDIAC_CATH, C.GENERAL],
+          bays["C"], ors["C"], surgeons["C"]),
+        h("D", Owner.PRIVATE, [C.GENERAL], 0, ors["D"], 0,
           surge_contract=SurgeContract(max_surge_patients=4,
                                        eligible_severities={Severity.SERIOUS},
                                        accepts_critical_trauma=False)),
     ]
 
 
-def fleet(rng: np.random.Generator) -> tuple[list[Ambulance], list[PrivateFirm]]:
-    plan = [("AMB-1", UnitType.ALS, "S1"), ("AMB-2", UnitType.ALS, "S2"),
-            ("AMB-3", UnitType.ALS, "S3"), ("AMB-4", UnitType.BLS, "S1"),
-            ("AMB-5", UnitType.BLS, "S2")]
+def fleet(town: TownProfile, rng: np.random.Generator) -> tuple[list[Ambulance], list[PrivateFirm]]:
     ambulances = []
-    for uid, utype, station in plan:
-        home = STATIONS[station]
-        amb = Ambulance(id=uid, owner=Owner.PUBLIC, unit_type=utype, home_station=home,
-                        location=home)
+    for i in range(town.city_ambulances):
+        home = town.scale(*STATION_LAYOUT[i % len(STATION_LAYOUT)])
+        utype = UnitType.ALS if i < town.als_units else UnitType.BLS
+        amb = Ambulance(id=f"AMB-{i + 1}", owner=Owner.PUBLIC, unit_type=utype,
+                        home_station=home, location=home)
         # Some units start busy: returning from an earlier job (the only allowed busy state).
         if rng.random() < BUSY_UNIT_PROB:
             amb.state = AmbulanceState.RETURNING
             amb.state_until_tick = int(rng.integers(5, 26))
-            amb.location = _random_point(rng)
+            amb.location = _random_point(rng, town)
         ambulances.append(amb)
-    private_ids = ["PVT-1", "PVT-2", "PVT-3"]
+    base = town.scale(*PRIVATE_BASE)
+    private_ids = [f"PVT-{i + 1}" for i in range(town.private_units)]
     for uid in private_ids:
         ambulances.append(Ambulance(id=uid, owner=Owner.PRIVATE, unit_type=UnitType.BLS,
-                                    home_station=PRIVATE_BASE, location=PRIVATE_BASE,
-                                    firm_id="MedRide"))
+                                    home_station=base, location=base, firm_id="MedRide"))
     firm = PrivateFirm(id="MedRide", name="MedRide", unit_ids=private_ids,
-                       max_mutual_aid_units=2, activation_minutes=10)
+                       max_mutual_aid_units=min(2, len(private_ids)), activation_minutes=10)
     return ambulances, [firm]
 
 
-def teams() -> list[ResponderTeam]:
-    spec = [("POL-1", TeamKind.POLICE, (42.3550, -71.0600)),
-            ("POL-2", TeamKind.POLICE, (42.3420, -71.0950)),
-            ("FIRE-1", TeamKind.FIRE, (42.3510, -71.0700))]
-    return [ResponderTeam(id=i, kind=k, home=loc, location=loc) for i, k, loc in spec]
+def teams(town: TownProfile) -> list[ResponderTeam]:
+    out = []
+    for kind, n, layout, prefix in ((TeamKind.POLICE, town.police_units, POLICE_LAYOUT, "POL"),
+                                    (TeamKind.FIRE, town.fire_units, FIRE_LAYOUT, "FIRE")):
+        for i in range(n):
+            loc = town.scale(*layout[i % len(layout)])
+            out.append(ResponderTeam(id=f"{prefix}-{i + 1}", kind=kind, home=loc, location=loc))
+    return out
 
 
 # --- demand --------------------------------------------------------------------------------------
 
 
-def _random_point(rng: np.random.Generator) -> tuple[float, float]:
-    (la0, la1), (lo0, lo1) = BBOX
-    return (round(float(rng.uniform(la0, la1)), 5), round(float(rng.uniform(lo0, lo1)), 5))
+def _random_point(rng: np.random.Generator, town: TownProfile) -> tuple[float, float]:
+    return town.to_latlon(float(rng.uniform(0, town.area_km)), float(rng.uniform(0, town.area_km)))
 
 
 def _pick(rng: np.random.Generator, weights: dict) -> object:
@@ -196,18 +201,18 @@ def _patient(pid: str, inc: str, itype: IncidentType, sev: Severity, call: int,
                    timestamps=PatientTimestamps(call=call))
 
 
-def normal_stream(seed: int) -> tuple[list[Incident], list[Patient]]:
+def normal_stream(seed: int, town: TownProfile) -> tuple[list[Incident], list[Patient]]:
     arrivals = np.random.default_rng([seed, STREAM["arrivals"]])
     severity = np.random.default_rng([seed, STREAM["severity"]])
     scene = np.random.default_rng([seed, STREAM["scene"]])
     incidents, patients = [], []
     t = 0.0
     while True:
-        t += float(arrivals.exponential(1 / CALL_RATE_PER_MIN))
+        t += float(arrivals.exponential(1 / town.calls_per_min))
         if t >= HORIZON:
             break
         itype = _pick(arrivals, NORMAL_MIX)
-        loc = _random_point(arrivals)
+        loc = _random_point(arrivals, town)
         two = arrivals.random() < TWO_PATIENT_PROB.get(itype, DEFAULT_TWO_PATIENT_PROB)
         iid = f"I-{len(incidents) + 1:03d}"
         call = int(t)
@@ -226,13 +231,13 @@ def normal_stream(seed: int) -> tuple[list[Incident], list[Patient]]:
     return incidents, patients
 
 
-def mci_stream(seed: int) -> tuple[list[Incident], list[Patient]]:
+def mci_stream(seed: int, town: TownProfile) -> tuple[list[Incident], list[Patient]]:
     rng = np.random.default_rng([seed, STREAM["mci"]])
     scene = np.random.default_rng([seed, STREAM["mci_scene"]])
     incidents, patients = [], []
 
     # Shooting: 2 critical trauma victims, violent, unsecured until police secure it.
-    sid, loc = "MCI-1", _random_point(rng)
+    sid, loc = "MCI-1", _random_point(rng, town)
     pids = []
     for k in range(2):
         p = _patient(f"{sid}-P{k}", sid, IncidentType.SHOOTING, Severity.CRITICAL,
@@ -246,7 +251,7 @@ def mci_stream(seed: int) -> tuple[list[Incident], list[Patient]]:
     ))
 
     # Bus crash: ~31 victims with START-style severity mix.
-    bid, loc = "MCI-2", _random_point(rng)
+    bid, loc = "MCI-2", _random_point(rng, town)
     n = int(rng.integers(BUS_VICTIMS[0], BUS_VICTIMS[1] + 1))
     shares = {s: float(rng.uniform(*r)) for s, r in BUS_MIX.items()}
     shares[Severity.MINOR] = 1.0 - sum(shares.values())
@@ -320,17 +325,19 @@ def _incident_rng(seed: int, stream: str, incident_id: str) -> np.random.Generat
     return np.random.default_rng([seed, STREAM[stream], key])
 
 
-def generate(seed: int, demand: str = "normal") -> Scenario:
+def generate(seed: int, demand: str = "normal", population: int = DEFAULT_POPULATION) -> Scenario:
     if demand not in ("normal", "surge"):
         raise ValueError("demand must be 'normal' or 'surge'")
-    hosp = hospitals()
-    ambulances, firms = fleet(np.random.default_rng([seed, STREAM["busy_units"]]))
+    town = TownProfile(population=population)
+    hosp = hospitals(town)
+    ambulances, firms = fleet(town, np.random.default_rng([seed, STREAM["busy_units"]]))
     occ = np.random.default_rng([seed, STREAM["occupancy"]])
     initial = {h.id: round(float(occ.uniform(0.5, 0.8)), 3) for h in hosp}
+    initial_ward = {h.id: round(float(occ.uniform(*WARD_OCCUPANCY)), 3) for h in hosp}
 
-    incidents, patients = normal_stream(seed)
+    incidents, patients = normal_stream(seed, town)
     if demand == "surge":
-        mci_inc, mci_pat = mci_stream(seed)
+        mci_inc, mci_pat = mci_stream(seed, town)
         incidents += mci_inc
         patients += mci_pat
     incidents.sort(key=lambda i: (i.call_tick, i.id))
@@ -345,7 +352,9 @@ def generate(seed: int, demand: str = "normal") -> Scenario:
     walk_ins = _walk_ins(seed, incidents, by_id, hosp)
     scenario = Scenario(
         seed=seed, demand=demand, horizon=HORIZON, drain_min=DRAIN, hospitals=hosp,
-        initial_occupancy=initial, ambulances=ambulances, firms=firms, teams=teams(),
+        initial_occupancy=initial, initial_ward_occupancy=initial_ward,
+        population=population, town=town.summary(),
+        ambulances=ambulances, firms=firms, teams=teams(town),
         incidents=incidents, patients=sorted(patients, key=lambda p: p.id), walk_ins=walk_ins,
     )
     validate_scenario(scenario)
@@ -396,8 +405,10 @@ def validate_scenario(sc: Scenario) -> None:
               f"{h.id}: private hospital without contract")
 
 
-def scenario_path(seed: int, demand: str, out_dir: Path | None = None) -> Path:
-    return (out_dir or DATA_DIR / "scenarios") / f"seed_{seed:02d}_{demand}.json"
+def scenario_path(seed: int, demand: str, out_dir: Path | None = None,
+                  population: int = DEFAULT_POPULATION) -> Path:
+    suffix = "" if population == DEFAULT_POPULATION else f"_p{population}"
+    return (out_dir or DATA_DIR / "scenarios") / f"seed_{seed:02d}_{demand}{suffix}.json"
 
 
 def to_json(sc: Scenario) -> str:
@@ -405,7 +416,7 @@ def to_json(sc: Scenario) -> str:
 
 
 def save(sc: Scenario, out_dir: Path | None = None) -> Path:
-    path = scenario_path(sc.seed, sc.demand, out_dir)
+    path = scenario_path(sc.seed, sc.demand, out_dir, sc.population or DEFAULT_POPULATION)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(to_json(sc))
     return path
@@ -421,13 +432,19 @@ def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Generate a seeded ORCA-EMS scenario.")
     ap.add_argument("--seed", type=int, required=True)
     ap.add_argument("--demand", choices=["normal", "surge"], default="normal")
+    ap.add_argument("--population", type=int, default=DEFAULT_POPULATION)
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
-    sc = generate(args.seed, args.demand)
+    sc = generate(args.seed, args.demand, args.population)
     path = save(sc, args.out)
     sev = {s.value: sum(1 for p in sc.patients if p.true_severity == s) for s in Severity}
     print(f"wrote {path}: {len(sc.incidents)} incidents, {len(sc.patients)} patients {sev}, "
           f"{len(sc.walk_ins)} walk-ins")
+    t = sc.town
+    print(f"town: {t['population']:,} people on {t['area_km']:g}x{t['area_km']:g} km, "
+          f"{t['calls_per_hour']} calls/h, {t['city_ambulances']} city + {t['private_units']} "
+          f"private ambulances; ER beds {t['er_beds']}, ward beds {t['ward_beds']}, "
+          f"surgical teams {t['surgical_teams']}, ED nurses {t['ed_nurses']}")
 
 
 if __name__ == "__main__":
