@@ -2,6 +2,10 @@
 
 The same code serves live mode (the running engine's log) and replay (a saved JSONL file), and
 it has no Streamlit dependency so it can be tested directly.
+
+Messages are rewritten as plain, radio-style lines between roles (911 caller, Dispatch,
+ambulances, hospitals, safety rules, police, fire). Agent messages (PROPOSE / ACCEPT / COUNTER /
+RESOLVE) arrive as protocol `MESSAGE` events and show up in the same conversation.
 """
 
 from __future__ import annotations
@@ -12,21 +16,65 @@ from typing import Any
 
 from eval.handling import SEVERITY_ORDER, call_handling
 from sim.events import Event, EventType
+from sim.town import TownProfile
 
-# Feed categories drive colors in the UI.
+# Message categories (drive colors) and sender roles (drive the avatar).
 CALL, AGENT, DECISION, REJECT, FLAG, UNIT, HOSPITAL, PATIENT, ALERT = (
     "call", "agent", "decision", "reject", "flag", "unit", "hospital", "patient", "alert")
 
+TRIAGE = {"CRITICAL": "RED", "SERIOUS": "YELLOW", "MINOR": "GREEN", "EXPECTANT": "BLACK"}
 AT_INCIDENT = {"EN_ROUTE", "STAGING", "ON_SCENE", "LOADING"}
 AT_HOSPITAL = {"TRANSPORTING", "WAITING_AT_ER", "HANDOVER"}
-THREAD_UNIT_STATES = {"EN_ROUTE", "STAGING", "ON_SCENE", "LOADING", "TRANSPORTING",
-                      "WAITING_AT_ER"}
-PATIENT_TEXT = {
-    "IN_TRANSPORT": "loaded into ambulance",
-    "WAITING_AT_ER": "arrived at hospital, waiting for a bed",
-    "IN_TREATMENT": "in definitive care",
-    "DISCHARGED": "discharged",
-    "DECEASED": "died before definitive care",
+
+UNIT_SAYS = {
+    "EN_ROUTE": "Responding.",
+    "STAGING": "Staging nearby, waiting for police to secure the scene.",
+    "ON_SCENE": "On scene, assessing patients.",
+    "LOADING": "Loading patient(s).",
+    "TRANSPORTING": "Transporting to {hospital}.",
+    "WAITING_AT_ER": "Arrived at {hospital}, waiting to hand over the patient.",
+    "HANDOVER": "Handing over to {hospital} staff.",
+    "RETURNING": "Clear, returning to station.",
+}
+
+# Plain-language explanations of validator codes (shown to people, not to policies).
+RULE_TEXT = {
+    "UNKNOWN_UNIT": "that unit does not exist",
+    "ALREADY_COMMITTED": "{unit} was already given an order this minute",
+    "DUPLICATE_PATIENT": "the same patient was listed twice",
+    "NOT_ASSIGNABLE": "{unit} is busy with patients and cannot be reassigned",
+    "NOT_ACTIVATED": "{unit} is not in service (private unit not activated)",
+    "INCIDENT_NOT_ACTIVE": "that call is not active",
+    "PATIENT_NOT_AT_INCIDENT": "that patient is not at this call",
+    "PATIENT_NOT_WAITING": "that patient is no longer waiting on scene",
+    "PATIENT_TAKEN": "another ambulance already has that patient",
+    "NOT_ROUTABLE": "{unit} cannot be sent to a hospital right now",
+    "NO_PATIENTS": "{unit} has no patient to transport",
+    "UNKNOWN_HOSPITAL": "that hospital does not exist",
+    "TARGET_WITHOUT_PATIENTS": "a hospital was chosen before the patients were known",
+    "MISSING_CAPABILITY": "{hospital} cannot treat this kind of patient",
+    "NO_CAPACITY_AT_ETA": "{hospital} will not have a free bed and staff when {unit} arrives",
+    "NOT_TRAUMA_CENTER": "{hospital} is not a trauma center",
+    "STABILIZATION_NOT_MOST_UNSTABLE": "Hospital B's stabilization bay is kept for the most "
+                                       "unstable patient",
+    "TRAUMA_CENTER_REACHABLE": "a trauma center can still take this patient in time",
+    "NO_CONTRACT": "{hospital} has no contract to take ambulance patients",
+    "NO_SURGE": "{hospital} only takes ambulance patients during a mass-casualty surge",
+    "SEVERITY_NOT_ELIGIBLE": "{hospital}'s contract only covers stable serious patients",
+    "TRAUMA_NOT_ACCEPTED": "{hospital}'s contract excludes trauma patients",
+    "CONTRACT_LIMIT": "{hospital} has reached its contract limit",
+    "MUTUAL_AID_LIMIT": "the private firm's mutual-aid limit is reached",
+    "SELF_LOAN": "a hospital cannot lend nurses to itself",
+    "BELOW_COVERAGE": "the lending hospital would drop below its minimum nurse staffing",
+    "CRITICAL_NOT_ALONE": "a critical patient must ride alone",
+    "OVER_CAPACITY": "an ambulance carries at most two patients",
+    "UNKNOWN_ACTION": "that action is not allowed",
+    "STATE_MUTATED": "the policy tried to change the world directly",
+}
+FLAG_TEXT = {
+    "STAGING": "Scene is not secure. {unit} will stage nearby until police clear it.",
+    "ALL_FULL": "Every capable hospital is full. The patient will wait at {hospital}.",
+    "OR_LATE": "No operating room is likely free at {hospital} in time.",
 }
 
 
@@ -35,10 +83,11 @@ class FeedRow:
     tick: int
     sender: str
     recipient: str
-    kind: str  # short label, e.g. "911 CALL", "PROPOSE", "REJECTED R2"
+    kind: str  # short label, e.g. "911 CALL", "ORDER", "BLOCKED"
     text: str
     category: str
     incident_id: str | None = None
+    role: str = "system"  # caller | dispatch | unit | hospital | safety | police | fire | firm
 
 
 @dataclass
@@ -52,123 +101,208 @@ class DashState:
     threads: dict[str, list[FeedRow]]
     feed: list[FeedRow]
     handling: list[dict[str, Any]]
+    patients: dict[str, dict[str, Any]] = field(default_factory=dict)
     kpis: dict[str, Any] = field(default_factory=dict)
 
 
-def _hospital_name(hid: str | None) -> str:
-    return f"Hospital {hid}" if hid else "?"
+def _hname(hid: str | None) -> str:
+    return f"Hospital {hid}" if hid else "a hospital"
 
 
-def _action_text(action: dict[str, Any]) -> str:
-    kind = action.get("kind")
-    if kind == "dispatch":
-        who = ", ".join(action.get("patient_ids") or []) or "crew triage on scene"
-        dest = f", then {_hospital_name(action['target_hospital'])}" \
-            if action.get("target_hospital") else ""
-        return f"send {action['unit_id']} to {action['incident_id']} for {who}{dest}"
-    if kind == "route":
-        return f"{action['unit_id']} transports to {_hospital_name(action['hospital_id'])}"
-    if kind == "lend_staff":
-        return (f"Hospital {action['lender_id']} lends {action['nurses']} nurse(s) to "
-                f"Hospital {action['borrower_id']}")
-    if kind == "mutual_aid":
-        return f"activate {action['units']} unit(s) from {action['firm_id']}"
-    return str(action)
+def _role(actor: str) -> str:
+    if actor.startswith("hospital"):
+        return "hospital"
+    if actor.startswith(("AMB", "PVT")):
+        return "unit"
+    if actor.startswith("POL") or actor == "police":
+        return "police"
+    if actor.startswith("FIRE"):
+        return "fire"
+    if actor.startswith("firm"):
+        return "firm"
+    if actor.startswith("engine") or actor == "validator":
+        return "safety"
+    return "dispatch"
+
+
+def _speaker(actor: str) -> str:
+    if actor.startswith("hospital:"):
+        return _hname(actor.split(":", 1)[1])
+    if actor.startswith("firm:"):
+        return actor.split(":", 1)[1]
+    if actor in ("caller",):
+        return "911 caller"
+    if actor.startswith("engine") or actor == "validator":
+        return "Safety rules"
+    if actor == "police":
+        return "Police"
+    if _role(actor) == "dispatch":
+        return "Dispatch"
+    return actor
+
+
+def hospital_status_label(snapshot: dict[str, Any]) -> str:
+    """Board label in the style of hospital status systems (display only)."""
+    if snapshot["er_occupancy"] >= 1.0 or snapshot.get("boarding", 0) \
+            or snapshot.get("queue_scenario", 0):
+        return "SATURATED"
+    return "BUSY" if snapshot["er_occupancy"] >= 0.8 else "OPEN"
 
 
 def build_state(events: list[Event], upto: int | None = None) -> DashState:
     events = [e for e in events if upto is None or e.tick <= upto]
     tick = upto if upto is not None else (events[-1].tick if events else 0)
     started = next((e.payload for e in events if e.type == EventType.RUN_STARTED), {})
+    town = TownProfile(population=started.get("population") or 50_000)
     hospital_cfg = {h["id"]: h for h in started.get("hospitals", [])}
     incident_cfg = {i["id"]: i for i in started.get("incidents", [])}
     patient_cfg = {p["id"]: p for p in started.get("patients", [])}
-    homes = {a["id"]: a["home_station"] for a in started.get("ambulances", [])}
+    amb_cfg = {a["id"]: a for a in started.get("ambulances", [])}
+
+    def grid(loc) -> str:
+        x, y = town.to_km(*loc)
+        return f"grid {x:.0f},{y:.0f}"
 
     hospitals: dict[str, dict[str, Any]] = {}
     changes: dict[str, list[str]] = defaultdict(list)
     units: dict[str, dict[str, Any]] = {
-        uid: {"id": uid, "kind": "AMBULANCE", "state": "IDLE", "incident_id": None,
-              "hospital_id": None, "location": loc, "activated": not uid.startswith("PVT")}
-        for uid, loc in homes.items()
+        uid: {"id": uid, "kind": "AMBULANCE", "unit_type": a["unit_type"], "state": "IDLE",
+              "since": 0, "incident_id": None, "hospital_id": None,
+              "location": a["home_station"], "activated": a["owner"] == "PUBLIC"}
+        for uid, a in amb_cfg.items()
     }
     incidents: dict[str, dict[str, Any]] = {}
     threads: dict[str, list[FeedRow]] = defaultdict(list)
     feed: list[FeedRow] = []
-    patient_status: dict[str, str] = {}
-    patient_unit: dict[str, str] = {}
+    patients: dict[str, dict[str, Any]] = {
+        pid: {"id": pid, "incident_id": p["incident_id"], "severity": p["severity"],
+              "triage": TRIAGE[p["severity"]], "status": "WAITING_ON_SCENE",
+              "hospital_id": None, "unit_id": None, "walk_in": False}
+        for pid, p in patient_cfg.items()
+    }
     unit_incident: dict[str, str] = {}
+    prealerts: dict[str, str] = {}  # patient -> hospital it is inbound to
 
-    def add(row: FeedRow, to_feed: bool = True) -> None:
-        if to_feed:
-            feed.append(row)
+    def add(row: FeedRow) -> None:
+        feed.append(row)
         if row.incident_id:
             threads[row.incident_id].append(row)
 
+    def inc_of(action: dict[str, Any]) -> str | None:
+        return action.get("incident_id") or unit_incident.get(action.get("unit_id", ""))
+
     for e in events:
-        p = e.payload
-        t = e.type
+        p, t = e.payload, e.type
         if t == EventType.CALL_RECEIVED:
-            cfg = incident_cfg.get(p["incident_id"], {})
-            incidents[p["incident_id"]] = {
-                "id": p["incident_id"], "type": p["type"], "call_tick": e.tick,
-                "location": p["location"], "reported": p["reported_victims"],
+            iid = p["incident_id"]
+            cfg = incident_cfg.get(iid, {})
+            incidents[iid] = {
+                "id": iid, "type": p["type"], "call_tick": e.tick, "location": p["location"],
+                "grid": grid(p["location"]), "reported": p["reported_victims"],
                 "victims": cfg.get("victims", p["reported_victims"]), "violent": p["violent"],
                 "secured": not p["violent"], "narrative": p["narrative"],
             }
-            add(FeedRow(e.tick, "caller", "dispatch", "911 CALL",
-                        f"{p['type'].replace('_', ' ').title()}, reported {p['reported_victims']}"
-                        f" victim(s): “{p['narrative']}”", CALL, p["incident_id"]))
+            kind = p["type"].replace("_", " ").lower()
+            add(FeedRow(e.tick, "911 caller", "Dispatch", "911 CALL",
+                        f"“{p['narrative']}” ({kind}, about {p['reported_victims']} "
+                        f"hurt, {grid(p['location'])})", CALL, iid, "caller"))
         elif t == EventType.SCENE_REPORT:
-            counts = ", ".join(f"{p['by_severity'][s]} {s.lower()}" for s in SEVERITY_ORDER
-                               if p["by_severity"].get(s))
-            add(FeedRow(e.tick, e.actor, "dispatch", "SCENE REPORT",
-                        f"{p['victims']} victim(s) on scene: {counts}", UNIT, p["incident_id"]))
+            counts = ", ".join(f"{p['by_severity'][s]} {TRIAGE[s].lower()}"
+                               for s in SEVERITY_ORDER if p["by_severity"].get(s))
+            add(FeedRow(e.tick, e.actor, "Dispatch", "SCENE REPORT",
+                        f"On scene. {p['victims']} patient(s): {counts}.", UNIT,
+                        p["incident_id"], "unit"))
         elif t == EventType.SCENE_SECURED:
             if p["incident_id"] in incidents:
                 incidents[p["incident_id"]]["secured"] = True
-            add(FeedRow(e.tick, e.actor, "all", "SCENE SECURED",
-                        "police report the scene is safe; staged units move in", ALERT,
-                        p["incident_id"]))
+            add(FeedRow(e.tick, "Police", "All units", "SCENE SECURE",
+                        "Scene is secure. Units can move in.", ALERT, p["incident_id"],
+                        "police"))
         elif t == EventType.COMMITTED:
-            action = p["action"]
-            inc = action.get("incident_id")
-            if action.get("kind") == "dispatch":
-                unit_incident[action["unit_id"]] = inc
-            inc = inc or unit_incident.get(action.get("unit_id", ""))
-            add(FeedRow(e.tick, e.actor, "engine", "COMMITTED", _action_text(action), DECISION,
-                        inc))
+            a = p["action"]
+            if a.get("kind") == "dispatch":
+                unit_incident[a["unit_id"]] = a["incident_id"]
+                inc = incidents.get(a["incident_id"], {})
+                pids = a.get("patient_ids") or []
+                crit = sum(1 for x in pids if patient_cfg.get(x, {}).get("severity") == "CRITICAL")
+                who = (f"{len(pids)} patient(s)" + (f", {crit} critical" if crit else "")
+                       if pids else "patients, triage on arrival")
+                dest = f", then transport to {_hname(a['target_hospital'])}" \
+                    if a.get("target_hospital") else ""
+                kind = inc.get("type", "call").replace("_", " ").lower()
+                text = (f"{a['unit_id']}, respond to the {kind} at {inc.get('grid', '')} "
+                        f"for {who}{dest}.")
+                add(FeedRow(e.tick, "Dispatch", a["unit_id"], "ORDER", text, DECISION,
+                            a["incident_id"], "dispatch"))
+            elif a.get("kind") == "route":
+                add(FeedRow(e.tick, "Dispatch", a["unit_id"], "ORDER",
+                            f"{a['unit_id']}, transport to {_hname(a['hospital_id'])}.", DECISION,
+                            inc_of(a), "dispatch"))
+            elif a.get("kind") == "lend_staff":
+                add(FeedRow(e.tick, _hname(a["lender_id"]), _hname(a["borrower_id"]), "STAFF",
+                            f"Sending {a['nurses']} nurse(s) to help.", HOSPITAL, None,
+                            "hospital"))
+            elif a.get("kind") == "mutual_aid":
+                add(FeedRow(e.tick, "Dispatch", a["firm_id"], "MUTUAL AID",
+                            f"Requesting {a['units']} private ambulance(s).", DECISION, None,
+                            "dispatch"))
         elif t == EventType.PROPOSAL_VALIDATED and p.get("flags"):
-            action = p["action"]
-            inc = action.get("incident_id") or unit_incident.get(action.get("unit_id", ""))
+            a = p["action"]
             for f in p["flags"]:
-                label = "NEEDS REVIEW" if f["level"] == "review" else "WARNING"
-                add(FeedRow(e.tick, "validator", e.actor, f"{label} {f['rule_id']}",
-                            f"{f['code']}: {f['reason']}", FLAG, inc))
+                fill = {"unit": a.get("unit_id", ""), "hospital": _hname(
+                    a.get("target_hospital") or a.get("hospital_id"))}
+                if f["level"] == "review":
+                    text = f"Needs human review: {f['reason']}."
+                    kind = "REVIEW"
+                else:
+                    text = FLAG_TEXT.get(f["code"], f["reason"]).format(**fill)
+                    kind = "CAUTION"
+                add(FeedRow(e.tick, "Safety rules", "Dispatch", kind, text, FLAG, inc_of(a),
+                            "safety"))
         elif t == EventType.PROPOSAL_REJECTED:
-            action = p.get("action") or {}
-            inc = action.get("incident_id") or unit_incident.get(action.get("unit_id", ""))
-            what = _action_text(action) if action else "policy action"
-            add(FeedRow(e.tick, "validator", e.actor, f"REJECTED {p['rule_id']}",
-                        f"{p.get('code', '')}: {what}. {p.get('reason', '')}".strip(), REJECT,
-                        inc))
+            a = p.get("action") or {}
+            fill = {"unit": a.get("unit_id", "the unit"),
+                    "hospital": _hname(a.get("target_hospital") or a.get("hospital_id"))}
+            why = RULE_TEXT.get(p.get("code", ""), p.get("reason", "")).format(**fill)
+            prefix = "Re-check before transport failed" if e.actor == "engine:revalidate" \
+                else "Blocked"
+            add(FeedRow(e.tick, "Safety rules", "Dispatch", f"BLOCKED {p['rule_id']}",
+                        f"{prefix}: {why}.", REJECT, inc_of(a), "safety"))
         elif t == EventType.MESSAGE:
+            mtype = p["type"]
+            sender, recipient = _speaker(p["sender"]), _speaker(p["recipient"]) \
+                if p["recipient"] != "all" else "All"
+            text = p.get("reason", "")
+            if mtype == "PRE_ALERT":
+                sev = (p.get("proposed_action") or {}).get("severities") or []
+                colors = ", ".join(f"1 {TRIAGE.get(s, s).lower()}" for s in sev if s)
+                eta = (p.get("proposed_action") or {}).get("eta_tick", e.tick) - e.tick
+                text = f"Inbound with {colors or 'patient(s)'}, ETA {eta} min."
+                for pid in p.get("patient_ids", []):
+                    prealerts[pid] = p["recipient"].split(":", 1)[-1]
+            elif mtype == "STATUS" and (p.get("proposed_action") or {}).get("move"):
+                pid = (p.get("patient_ids") or ["?"])[0]
+                text = (f"{pid} moved up to a ward bed." if p["proposed_action"]["move"] == "ward"
+                        else f"{pid} is boarding in the ER: no ward bed free.")
             category = HOSPITAL if p["sender"].startswith("hospital") else AGENT
-            add(FeedRow(e.tick, p["sender"], p["recipient"], p["type"].replace("_", " "),
-                        p.get("reason", ""), category, p.get("incident_id")))
+            add(FeedRow(e.tick, sender, recipient, mtype.replace("_", " "), text, category,
+                        p.get("incident_id"), _role(p["sender"])))
         elif t == EventType.STAFF_LOAN:
-            add(FeedRow(e.tick, f"hospital:{p['lender']}", f"hospital:{p['borrower']}",
-                        f"STAFF {p['phase']}", f"{p['nurses']} nurse(s)", HOSPITAL))
+            add(FeedRow(e.tick, _hname(p["lender"]), _hname(p["borrower"]),
+                        f"STAFF {p['phase']}", f"{p['nurses']} nurse(s) {p['phase'].lower()}.",
+                        HOSPITAL, None, "hospital"))
         elif t == EventType.WALK_IN:
-            add(FeedRow(e.tick, p["patient_id"], f"hospital:{p['hospital_id']}", "WALK-IN",
-                        "patient arrived without an ambulance", PATIENT, p["incident_id"]))
+            patients.get(p["patient_id"], {}).update(walk_in=True, hospital_id=p["hospital_id"])
+            add(FeedRow(e.tick, _hname(p["hospital_id"]), "Dispatch", "WALK-IN",
+                        f"{p['patient_id']} from {p['incident_id']} walked in without an "
+                        "ambulance.", PATIENT, p["incident_id"], "hospital"))
         elif t == EventType.UNIT_STATE_CHANGED:
-            uid = p["unit_id"]
             if p.get("kind") != "AMBULANCE":
                 continue
-            u = units.setdefault(uid, {"id": uid, "kind": "AMBULANCE", "location": None,
-                                       "activated": True})
-            u["state"] = p["to"]
+            uid = p["unit_id"]
+            u = units.setdefault(uid, {"id": uid, "kind": "AMBULANCE", "unit_type": "?",
+                                       "location": None, "activated": True})
+            u["state"], u["since"] = p["to"], e.tick
             if p.get("incident_id"):
                 u["incident_id"] = p["incident_id"]
             if p.get("hospital_id"):
@@ -176,74 +310,89 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
             if p["to"] in ("RETURNING", "IDLE"):
                 u["incident_id"], u["hospital_id"] = None, None
             inc = p.get("incident_id") or unit_incident.get(uid)
-            if p["to"] in THREAD_UNIT_STATES and inc:
-                where = f" to {_hospital_name(p.get('hospital_id'))}" \
-                    if p["to"] == "TRANSPORTING" else ""
-                add(FeedRow(e.tick, uid, "dispatch", p["to"].replace("_", " "),
-                            f"{uid} {p['to'].lower().replace('_', ' ')}{where}", UNIT, inc),
-                    to_feed=False)
+            if p["to"] in UNIT_SAYS and inc and p["to"] not in ("RETURNING", "LOADING"):
+                text = UNIT_SAYS[p["to"]].format(hospital=_hname(p.get("hospital_id")))
+                threads[inc].append(FeedRow(e.tick, uid, "Dispatch", p["to"].replace("_", " "),
+                                            text, UNIT, inc, "unit"))
         elif t == EventType.PATIENT_STATE_CHANGED:
             pid = p["patient_id"]
-            patient_status[pid] = p["to"]
+            rec = patients.setdefault(pid, {"id": pid, "incident_id": None, "severity": "MINOR",
+                                            "triage": "GREEN", "hospital_id": None,
+                                            "unit_id": None, "walk_in": False})
+            rec["status"] = p["to"]
             if p.get("unit_id"):
-                patient_unit[pid] = p["unit_id"]
-            inc = patient_cfg.get(pid, {}).get("incident_id")
-            where = f" at {_hospital_name(p.get('hospital_id'))}" if p.get("hospital_id") else ""
-            text = f"{pid} {PATIENT_TEXT.get(p['to'], p['to'].lower())}{where}"
-            if p["to"] == "IN_TREATMENT" and p.get("stabilization_only"):
-                text += " (stabilization only)"
-            add(FeedRow(e.tick, "engine", "all", p["to"].replace("_", " "), text, PATIENT, inc),
-                to_feed=p["to"] in ("IN_TREATMENT", "DECEASED"))
-            if p["to"] == "IN_TREATMENT" and p.get("hospital_id"):
-                via = f" via {patient_unit[pid]}" if pid in patient_unit else ""
+                rec["unit_id"] = p["unit_id"]
+            if p.get("hospital_id") and p["to"] in ("WAITING_AT_ER", "IN_TREATMENT"):
+                rec["hospital_id"] = p["hospital_id"]
+            if p["to"] != "IN_TRANSPORT":
+                prealerts.pop(pid, None)
+            inc = rec["incident_id"]
+            if p["to"] == "IN_TREATMENT":
+                bay = " (stabilization only)" if p.get("stabilization_only") else ""
+                add(FeedRow(e.tick, _hname(p.get("hospital_id")), "Dispatch", "IN CARE",
+                            f"{pid} ({rec['triage'].lower()}) is in a treatment bed{bay}.",
+                            PATIENT, inc, "hospital"))
+                via = f" via {rec['unit_id']}" if rec.get("unit_id") else ""
                 changes[p["hospital_id"]].append(f"t={e.tick}: admitted {pid}{via}")
-            if p["to"] == "DISCHARGED" and p.get("hospital_id"):
+            elif p["to"] == "DECEASED":
+                add(FeedRow(e.tick, "Outcome", "All", "DIED",
+                            f"{pid} ({rec['triage'].lower()}) died before reaching care.",
+                            ALERT, inc, "system"))
+            elif p["to"] == "DISCHARGED" and p.get("hospital_id"):
                 changes[p["hospital_id"]].append(f"t={e.tick}: discharged {pid}")
         elif t == EventType.HOSPITAL_STATUS:
             hospitals[p["hospital_id"]] = dict(p)
-        elif t == EventType.MONITOR_ALERT:
-            add(FeedRow(e.tick, "monitor", "all", "ALERT", str(p.get("message", p)), ALERT,
-                        p.get("incident_id")))
-        elif t in (EventType.ESCALATED, EventType.APPROVED, EventType.OVERRIDDEN,
-                   EventType.FALLBACK_USED, EventType.PRIORITY_REPORT):
-            add(FeedRow(e.tick, e.actor, str(p.get("recipient", "all")), t.value.replace("_", " "),
-                        str(p.get("reason", "")), AGENT, p.get("incident_id")))
+        elif t in (EventType.MONITOR_ALERT, EventType.ESCALATED, EventType.APPROVED,
+                   EventType.OVERRIDDEN, EventType.FALLBACK_USED, EventType.PRIORITY_REPORT):
+            add(FeedRow(e.tick, _speaker(e.actor), str(p.get("recipient", "All")),
+                        t.value.replace("_", " "), str(p.get("reason", p.get("message", ""))),
+                        AGENT, p.get("incident_id"), _role(e.actor)))
 
+    incoming: dict[str, int] = defaultdict(int)
+    for pid, hid in prealerts.items():
+        if patients.get(pid, {}).get("status") == "IN_TRANSPORT":
+            incoming[hid] += 1
     for hid, cfg in hospital_cfg.items():
         if hid in hospitals:
-            hospitals[hid]["name"] = cfg["name"]
-            hospitals[hid]["location"] = cfg["location"]
-            hospitals[hid]["owner"] = cfg["owner"]
-            hospitals[hid]["stabilization_only"] = cfg.get("stabilization_only", False)
+            h = hospitals[hid]
+            h.update(name=cfg["name"], location=cfg["location"], owner=cfg["owner"],
+                     stabilization_only=cfg.get("stabilization_only", False),
+                     incoming=incoming.get(hid, 0), status=hospital_status_label(h),
+                     capabilities=cfg.get("capabilities", []))
 
     for u in units.values():  # logical place on the map (no live tracking)
+        u["minutes_in_status"] = tick - u.get("since", 0)
         if u["state"] in AT_INCIDENT and u.get("incident_id") in incidents:
             u["location"] = incidents[u["incident_id"]]["location"]
         elif u["state"] in AT_HOSPITAL and u.get("hospital_id") in hospital_cfg:
             u["location"] = hospital_cfg[u["hospital_id"]]["location"]
-        elif u["id"] in homes:
-            u["location"] = homes[u["id"]]
-    for msg in feed:
-        if msg.kind == "STATUS" and "units activated" in msg.text:
+        elif u["id"] in amb_cfg:
+            u["location"] = amb_cfg[u["id"]]["home_station"]
+    for row in feed:
+        if row.kind == "STATUS" and "units activated" in row.text:
             for uid in units:
-                if uid in msg.text:
+                if uid in row.text:
                     units[uid]["activated"] = True
 
     for inc in incidents.values():
-        pids = [pid for pid, cfg in patient_cfg.items() if cfg["incident_id"] == inc["id"]]
-        inc["waiting"] = sum(1 for pid in pids
-                             if patient_status.get(pid, "WAITING_ON_SCENE") == "WAITING_ON_SCENE")
-        inc["severities"] = sorted({patient_cfg[pid]["severity"] for pid in pids})
+        pids = [pid for pid, rec in patients.items() if rec["incident_id"] == inc["id"]]
+        inc["severities"] = sorted({patients[pid]["severity"] for pid in pids})
+        inc["waiting"] = sum(1 for pid in pids if patients[pid]["status"] == "WAITING_ON_SCENE")
+        inc["triage"] = triage_counts(patients, pids)
+        inc["units"] = sorted(u["id"] for u in units.values() if u.get("incident_id") == inc["id"])
+        inc["status"] = incident_status(inc, patients, pids, units)
+        inc["elapsed"] = tick - inc["call_tick"]
 
-    called = {pid for pid, cfg in patient_cfg.items() if cfg["incident_id"] in incidents}
-    status_counts = defaultdict(int)
-    for pid in called:
-        status_counts[patient_status.get(pid, "WAITING_ON_SCENE")] += 1
+    called = [rec for rec in patients.values() if rec["incident_id"] in incidents]
+    status_counts: dict[str, int] = defaultdict(int)
+    for rec in called:
+        status_counts[rec["status"]] += 1
     handling = call_handling(events)
     care = [r["care_mean_min"] for r in handling if r["care_mean_min"] is not None]
     active_units = [u for u in units.values() if u.get("activated")]
     kpis = {
         "calls": len(incidents),
+        "active_calls": sum(1 for i in incidents.values() if i["status"] != "CLEARED"),
         "waiting_on_scene": status_counts["WAITING_ON_SCENE"],
         "in_transport": status_counts["IN_TRANSPORT"],
         "waiting_at_er": status_counts["WAITING_AT_ER"],
@@ -252,8 +401,58 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
         "free_units": sum(1 for u in active_units if u["state"] == "IDLE"),
         "units": len(active_units),
         "boarding": sum(h.get("boarding", 0) for h in hospitals.values()),
+        "saturated": sum(1 for h in hospitals.values() if h.get("status") == "SATURATED"),
         "avg_call_to_care": round(sum(care) / len(care), 1) if care else None,
     }
     return DashState(tick=tick, run=started, hospitals=hospitals,
                      hospital_changes=dict(changes), units=units, incidents=incidents,
-                     threads=dict(threads), feed=feed, handling=handling, kpis=kpis)
+                     threads=dict(threads), feed=feed, handling=handling, patients=patients,
+                     kpis=kpis)
+
+
+def triage_counts(patients: dict[str, dict[str, Any]], pids: list[str]) -> dict[str, dict]:
+    """Triage colors by where the patients are: on scene, in transport, at hospital, died."""
+    out = {c: {"total": 0, "on_scene": 0, "transport": 0, "hospital": 0, "died": 0}
+           for c in TRIAGE.values()}
+    for pid in pids:
+        rec = patients[pid]
+        c = out[rec["triage"]]
+        c["total"] += 1
+        status = rec["status"]
+        key = {"WAITING_ON_SCENE": "on_scene", "IN_TRANSPORT": "transport",
+               "DECEASED": "died"}.get(status, "hospital")
+        c[key] += 1
+    return out
+
+
+def incident_status(inc: dict[str, Any], patients: dict[str, dict[str, Any]], pids: list[str],
+                    units: dict[str, dict[str, Any]]) -> str:
+    states = {u["state"] for u in units.values() if u.get("incident_id") == inc["id"]}
+    statuses = {patients[pid]["status"] for pid in pids}
+    if statuses <= {"IN_TREATMENT", "DISCHARGED", "DECEASED", "WAITING_AT_ER"} and \
+            "WAITING_ON_SCENE" not in statuses and "IN_TRANSPORT" not in statuses:
+        return "CLEARED"
+    if "IN_TRANSPORT" in statuses or "TRANSPORTING" in states:
+        return "TRANSPORTING"
+    if states & {"ON_SCENE", "LOADING"}:
+        return "ON SCENE"
+    if "STAGING" in states:
+        return "STAGING"
+    if "EN_ROUTE" in states:
+        return "UNITS EN ROUTE"
+    return "PENDING"
+
+
+def transport_summary(state: DashState, incident_id: str | None = None) -> dict[str, dict]:
+    """Patients by hospital and triage color (EMTrack-style hospital transport summary)."""
+    out: dict[str, dict[str, int]] = {}
+    for rec in state.patients.values():
+        if rec["incident_id"] not in state.incidents:
+            continue
+        if incident_id and rec["incident_id"] != incident_id:
+            continue
+        if not rec.get("hospital_id"):
+            continue
+        row = out.setdefault(rec["hospital_id"], {c: 0 for c in TRIAGE.values()})
+        row[rec["triage"]] += 1
+    return dict(sorted(out.items()))
