@@ -262,24 +262,32 @@ It writes `data/calibration.json`. If the file exists, `travel.py` samples from 
 
 `generate(seed: int, demand: "normal" | "surge", info: "complete" | "partial") -> Scenario`, saved as `data/scenarios/seed_{seed:02d}_{demand}.json`.
 
-### Hospitals (positions approximate real Boston hospital sites; names and all capacities are synthetic)
+### Town, hospitals, and fleet (revised 2026-10-22: derived from population)
 
-| ID | Approx. location | Owner | Capabilities | ER beds | Trauma bays | ORs | Trauma surgeons | Nurses | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| A | 42.3631, −71.0686 | Public | TRAUMA_L1, CARDIAC_CATH, STROKE, GENERAL | 10 | 3 | 3 | 3 | 8 | Main trauma center |
-| B | 42.3496, −71.0632 | Public | GENERAL | 12 | 1 (stabilization only) | 0 | 0 | 6 | Community hospital |
-| C | 42.3350, −71.0723 | Public | TRAUMA_L2, CARDIAC_CATH, GENERAL | 8 | 2 | 2 | 2 | 6 | Second trauma center |
-| D | 42.3398, −71.1061 | Private | GENERAL | 10 | 0 | 2 (elective, protected) | 0 | 6 | Contract: up to 4 stable SERIOUS in a surge; no critical trauma |
+The town is a fictional 20 × 20 km square; the default population is **50,000**, kept small so LLM runs stay cheap. All resources come from `sim/town.py::TownProfile`, using U.S. per-capita figures:
+- staffed beds 2.28 per 1,000
+- physicians 2.55 per 1,000
+- nurses 12.4 per 1,000
 
-Use generic names ("Hospital A", etc.). Coordinates are approximate; verify on a map before the demo.
+The steps that turn those totals into on-duty resources are labeled modeling assumptions; see `ASSUMPTIONS.md`. Values for 50k:
 
-### Fleet and teams
-- City ambulances: AMB-1…AMB-5 (3 ALS, 2 BLS) at 3 stations spread across the map.
-- Private firm "MedRide": PVT-1…PVT-3; `max_mutual_aid_units = 2`, `activation_minutes = 10`.
-- Police: POL-1, POL-2. Fire: FIRE-1 (extrication).
+| ID | Role | Position (km) | ER beds | Ward beds | Trauma bays | Surgical teams | ORs | ED nurses on duty |
+|---|---|---|---|---|---|---|---|---|
+| A | Public trauma center (L1) | (10, 11) | 6 | 46 | 2 | 1 | 2 | 4 |
+| B | Public community | (5, 15) | 6 | 28 | 1 (stabilization only) | 0 | 0 | 4 |
+| C | Public trauma center (L2) | (15, 5) | 6 | 23 | 1 | 1 | 1 | 4 |
+| D | Private; contract up to 4 stable SERIOUS in a surge, no critical trauma | (4, 7) | 4 | 17 | 0 | 0 | 2 (elective) | 2 |
+
+- **Ward beds and ER boarding.** After emergency care, CRITICAL and SERIOUS patients need a ward bed. If the ward is full they board in their ER bed, which crowds the ER and delays ambulance offload.
+- **Hospital pressure at the start:** ER 50–80% full, wards 65–80% full.
+- **Fleet:** 4 city ambulances (coverage-based: one per ~105 km²), one station per quadrant. The private firm "MedRide" has 2 units: max 2 on mutual aid, 10-min activation.
+- **Police and fire:** 2 police units and 1 fire unit.
+- **Other populations:** run with `--population`; resources scale accordingly.
+
+The original small-hospital table (8–12 ER beds at approximate Boston sites) was replaced at the owner's request.
 
 ### Demand
-- **Normal:** 180-minute window, Poisson arrivals (default λ = 1 call per 12 min), mix of MEDICAL_CARDIAC, MEDICAL_STROKE, MEDICAL_GENERAL, FALL, VEHICLE_CRASH; 1–2 patients each.
+- **Normal:** 180-minute window, Poisson arrivals at the population-derived rate (50k ≈ 1 call per 58 min), mix of MEDICAL_CARDIAC, MEDICAL_STROKE, MEDICAL_GENERAL, FALL, VEHICLE_CRASH; 1–2 patients each.
 - **Surge:** the normal stream, plus at tick 30 a SHOOTING (2 victims, violent) and at tick 35 a BUS_CRASH (~31 victims).
 - **Severity:** simplified START-style assignment for MCIs (default bus crash mix ≈ 15–20% critical, 30–35% serious, 45–55% minor, 0–5% expectant); single-patient severity by incident type. True counts are hidden; `reported_victims` is noisy (±20%).
 - **Initial fleet state:** some units start busy (drawn by the generator, then fixed in the scenario file) so starting conditions are explicit.

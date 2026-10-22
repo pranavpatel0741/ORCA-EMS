@@ -16,6 +16,19 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
   IN_TREATMENT event).
 - **min_nurse_coverage:** half the nurses, rounded up (reviewer default; owner did not object).
 
+## Owner decisions (2026-10-22)
+
+- **Town:** a fictional 20 × 20 km town, default 50,000 people (cheap LLM runs). The 4 hospital
+  roles are kept; all resources are derived from U.S. per-capita figures in `sim/town.py`
+  (see ASSUMPTIONS.md). Real scarcity is accepted: nothing is tuned to make the surge easy or
+  impossible.
+- **Ward beds and ER boarding** were added so the 114 staffed beds matter.
+- **Out of scope:** ambulance live tracking / GPS telemetry; the dispatcher keeps exact unit
+  status.
+- **Dashboard early (M10 before M4–M9):** a live Streamlit dashboard centered on per-call
+  agent communication, with live hospital capacity, a simple grid map, and per-call handling
+  times. The nearest baseline (part of M5) drives it until agents exist.
+
 ## Decisions taken (judgment calls)
 
 1. **Package name clash.** `openai-agents` imports as `agents`, so the local package is
@@ -77,12 +90,12 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
 - [x] M2 Engine, hospital model, travel (+ review fix pass)
 - [x] M3 Validator and generator
 - [ ] M4 Observations, monitor, calibration
-- [ ] M5 Baselines, metrics, CLI
+- [ ] M5 Baselines, metrics, CLI (nearest baseline + handling metrics done)
 - [ ] M6 Agent models, tools, single agents
 - [ ] M7 Orchestrator, negotiation, confidence, approval, fallbacks
 - [ ] M8 Integration check
 - [ ] M9 Experiments
-- [ ] M10 Dashboard
+- [~] M10 Dashboard (live mode, replay, call threads, capacity, grid map done; approval cards wait for M7)
 - [ ] M11 Documentation and submission
 
 ## Log
@@ -104,3 +117,16 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
   scenario; files are byte-identical across `PYTHONHASHSEED`; the surge file contains the normal
   stream exactly; R1–R9 pass/fail matrix; greedy surge run holds all invariants.
   173 tests in ~2 s.
+- **Town + dashboard (2026-10-22):**
+  - population-based town profile (`sim/town.py`)
+  - generator derives hospitals and fleet from it (50k default, `--population`)
+  - ward beds and ER boarding; ED nurse ratio 1:4
+  - protocol `Message` schema; engine messages use it
+  - nearest baseline (`baselines/nearest.py`)
+  - per-call handling metrics (`eval/handling.py`) and wall-clock decision timing
+  - dashboard: `app/state.py`, `app/map_view.py`, `app/panels.py`, `app/streamlit_app.py`
+  
+  Checked in the browser:
+  - call threads fill in live
+  - capacity cards update on admission
+  - the feed shows calls, commits, validator rejections, pre-alerts and scene events
