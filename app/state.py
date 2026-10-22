@@ -275,7 +275,8 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
             text = p.get("reason", "")
             if mtype == "PRE_ALERT":
                 sev = (p.get("proposed_action") or {}).get("severities") or []
-                colors = ", ".join(f"1 {TRIAGE.get(s, s).lower()}" for s in sev if s)
+                tally = {c: sum(1 for s in sev if TRIAGE.get(s) == c) for c in TRIAGE.values()}
+                colors = ", ".join(f"{n} {c.lower()}" for c, n in tally.items() if n)
                 eta = (p.get("proposed_action") or {}).get("eta_tick", e.tick) - e.tick
                 text = f"Inbound with {colors or 'patient(s)'}, ETA {eta} min."
                 for pid in p.get("patient_ids", []):

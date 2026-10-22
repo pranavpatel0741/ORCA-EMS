@@ -1,9 +1,10 @@
-"""ORCA-EMS live dashboard.
+"""ORCA-EMS dispatch dashboard.
 
     streamlit run app/streamlit_app.py
 
-Live mode runs a scenario tick by tick in this process; replay mode reads a saved log.
-Everything on screen is rebuilt from the event log, so live and replay look the same.
+Pick an incident, press Start, and watch how it is handled: the incident table, map, and the
+conversation between caller, dispatch, ambulances, hospitals, and the safety rules. Everything
+on screen is rebuilt from the event log, so a saved run replays exactly.
 """
 
 from __future__ import annotations
@@ -24,106 +25,121 @@ from baselines.nearest import NearestPolicy  # noqa: E402
 from config.settings import LOG_DIR  # noqa: E402
 from sim.engine import Engine  # noqa: E402
 from sim.events import read_jsonl  # noqa: E402
-from sim.generator import DEFAULT_POPULATION, generate  # noqa: E402
+from sim.generator import DEFAULT_POPULATION  # noqa: E402
+from sim.presets import PRESETS, build_preset  # noqa: E402
 from sim.town import TownProfile  # noqa: E402
 
-POLICIES = {"nearest (baseline)": NearestPolicy}
+POLICIES = {"Nearest hospital (baseline)": NearestPolicy}
 
-st.set_page_config(page_title="ORCA-EMS Live", layout="wide", page_icon="🚑")
+st.set_page_config(page_title="ORCA-EMS Dispatch", layout="wide",
+                   initial_sidebar_state="collapsed")
 panels.inject_css()
 ss = st.session_state
+ss.setdefault("playing", False)
+ss.setdefault("focus", "All incidents")
+ss.setdefault("preset", "School bus crash")
 
 
-def new_engine(seed: int, demand: str, population: int, policy: str) -> None:
-    ss.engine = Engine(generate(seed, demand, population), POLICIES[policy]())
+def new_engine() -> None:
+    cfg = (ss.get("preset", "School bus crash"), int(ss.get("seed", 7)),
+           int(ss.get("population", DEFAULT_POPULATION)),
+           ss.get("policy", next(iter(POLICIES))))
+    ss.engine = Engine(build_preset(cfg[0], cfg[1], cfg[2]), POLICIES[cfg[3]]())
     ss.engine.initialize()
+    ss.config = cfg
     ss.playing = False
-    ss.config = (seed, demand, population, policy)
+    ss.focus = "All incidents"
 
 
-# --- sidebar ------------------------------------------------------------------------------------
+def toggle_play() -> None:
+    if ss.engine.tick >= ss.engine.end_tick:
+        new_engine()
+    ss.playing = not ss.playing
+
+
+def step(minutes: int) -> None:
+    ss.playing = False
+    ss.engine.run(until=ss.engine.tick + minutes)
+
+
+# --- Advanced (sidebar, collapsed by default) -------------------------------------------------
 with st.sidebar:
-    st.markdown("### ORCA-EMS")
-    st.caption("Orchestrated Response and Capacity Allocation")
-    mode = st.radio("Mode", ["Live", "Replay"], horizontal=True, key="mode")
-    if mode == "Live":
-        seed = st.number_input("Seed", 0, 999, 7, key="seed")
-        demand = st.selectbox("Demand", ["surge", "normal"], key="demand")
-        population = st.number_input("Population", 10_000, 1_000_000, DEFAULT_POPULATION,
-                                     step=10_000, key="population")
-        policy = st.selectbox("Policy", list(POLICIES), key="policy",
-                              help="LLM agents are added here in milestones M6–M7.")
-        speed = st.slider("Speed (sim minutes per second)", 1, 15, 3, key="speed")
-        config = (int(seed), demand, int(population), policy)
-        if "engine" not in ss or ss.get("config") != config:
-            new_engine(*config)
-        c1, c2 = st.columns(2)
-        c1.button("Pause" if ss.playing else "Play", use_container_width=True, type="primary",
-                  on_click=lambda: ss.update(playing=not ss.playing))
-        c2.button("Reset", use_container_width=True, on_click=new_engine, args=config)
-        c3, c4 = st.columns(2)
-        if c3.button("+1 min", use_container_width=True):
-            ss.engine.run(until=ss.engine.tick + 1)
-        if c4.button("+15 min", use_container_width=True):
-            ss.engine.run(until=ss.engine.tick + 15)
-        if st.button("Save log", use_container_width=True):
-            path = ss.engine.log.write_jsonl(LOG_DIR / f"run_{ss.engine.run_id}.jsonl")
-            st.success(f"Saved {path.name}")
-    else:
+    st.markdown("### Advanced")
+    st.caption("For experiments. Viewers do not need these.")
+    st.number_input("Seed (variation of the same incident)", 0, 999, 7, key="seed",
+                    on_change=new_engine)
+    st.number_input("Town population", 10_000, 1_000_000, DEFAULT_POPULATION, step=10_000,
+                    key="population", on_change=new_engine)
+    st.selectbox("Who makes the decisions", list(POLICIES), key="policy", on_change=new_engine,
+                 help="The LLM agents join this list in milestones M6–M7.")
+    st.slider("Speed (simulated minutes per second)", 1, 15, 3, key="speed")
+    replay = st.toggle("Replay a saved run", key="replay_mode")
+    if st.button("Save this run", use_container_width=True) and "engine" in ss:
+        path = ss.engine.log.write_jsonl(LOG_DIR / f"run_{ss.engine.run_id}.jsonl")
+        st.success(f"Saved {path.name}")
+    if replay:
         logs = sorted(LOG_DIR.glob("run_*.jsonl"))
-        if not logs:
-            st.warning("No saved runs in logs/. Use Live mode and press Save log.")
         choice = st.selectbox("Saved run", logs, format_func=lambda p: p.name, key="replay_file")
-        speed = st.slider("Speed (sim minutes per second)", 1, 15, 5, key="replay_speed")
         if choice is not None and ss.get("replay_path") != str(choice):
             ss.replay_events = read_jsonl(choice)
             ss.replay_path = str(choice)
             ss.replay_tick = 0
-            ss.replay_playing = False
-        if choice is not None:
-            end = ss.replay_events[-1].tick
-            st.button("Pause" if ss.replay_playing else "Play", use_container_width=True,
-                      type="primary",
-                      on_click=lambda: ss.update(replay_playing=not ss.replay_playing))
-            ss.replay_tick = st.slider("Minute", 0, end, ss.replay_tick)
+
+if "engine" not in ss:
+    new_engine()
+
+# --- top bar ----------------------------------------------------------------------------------
+st.markdown("### ORCA-EMS · Dispatch")
+pick, b1, b2, b3, b4 = st.columns([3, 1, 1, 1, 1], vertical_alignment="bottom")
+pick.selectbox("Incident", list(PRESETS), key="preset", on_change=new_engine,
+               label_visibility="collapsed")
+b1.button("Pause" if ss.playing else "Start", type="primary", use_container_width=True,
+          on_click=toggle_play)
+b2.button("+1 min", use_container_width=True, on_click=step, args=(1,))
+b3.button("+15 min", use_container_width=True, on_click=step, args=(15,))
+b4.button("Reset", use_container_width=True, on_click=new_engine)
+st.caption(PRESETS[ss.get("preset", "School bus crash")].description +
+           " · Town of 50,000 on a 20 × 20 km grid · decisions by "
+           f"{ss.get('policy', next(iter(POLICIES))).lower()}")
 
 
-# --- main view (refreshes itself while playing) --------------------------------------------------
-def render(events, tick, timings, population) -> None:
+def render(events, tick, timings) -> None:
     state = build_state(events, upto=tick)
-    town = TownProfile(population=population)
-    t = state.run.get("town") or {}
-    st.markdown(
-        f"#### {state.run.get('demand', '').title()} scenario · seed {state.run.get('seed')} · "
-        f"{population:,} people on {town.area_km:g} × {town.area_km:g} km · policy "
-        f"`{state.run.get('policy')}`")
-    if t:
-        st.caption(
-            f"Derived town: {t.get('city_ambulances')} city + {t.get('private_units')} private "
-            f"ambulances · {t.get('calls_per_hour')} calls/h · {t.get('staffed_beds')} staffed "
-            f"beds · {t.get('physicians_on_duty')} physicians and "
-            f"{t.get('hospital_nurses_on_duty')} hospital nurses on duty "
-            "(from U.S. per-capita ratios; see ASSUMPTIONS.md)")
-    panels.kpi_bar(state)
-    left, right = st.columns([3, 2], gap="medium")
+    chips, clock = st.columns([6, 1], vertical_alignment="center")
+    with chips:
+        panels.status_chips(state)
+    clock.markdown(panels.clock_html(tick), unsafe_allow_html=True)
+    options = ["All incidents"] + sorted(state.incidents)
+    if ss.focus not in options:
+        ss.focus = "All incidents"
+    focus_id = None if ss.focus == "All incidents" else ss.focus
+    town = TownProfile(population=state.run.get("population") or DEFAULT_POPULATION)
+
+    panels.incident_table(state, focus_id)
+    left, right = st.columns([1, 1.1], gap="medium")
     with left:
-        st.plotly_chart(town_map(state, town), use_container_width=True,
+        st.markdown('<div class="cad-h">Town map (km grid)</div>', unsafe_allow_html=True)
+        st.plotly_chart(town_map(state, town, focus_id, height=420), use_container_width=True,
                         config={"displayModeBar": False})
     with right:
-        st.markdown("**Hospital capacity (live)**")
-        panels.hospital_cards(state)
-    tabs = st.tabs(["Calls and agent messages", "All messages", "Handling time", "Ambulances"])
+        st.selectbox("Show conversation for", options, key="focus")
+        panels.conversation(state, focus_id, height=440)
+
+    panels.hospital_board(state)
+    tabs = st.tabs(["Ambulances", "Mass-casualty board", "Timeline and handling time"])
     with tabs[0]:
-        panels.call_threads(state)
+        panels.unit_board(state)
     with tabs[1]:
-        panels.message_feed(state)
+        panels.mci_board(state)
     with tabs[2]:
-        panels.handling_tab(state, events, timings)
-    with tabs[3]:
-        panels.units_table(state)
+        panels.timeline(state, events, timings, focus_id)
 
 
-if mode == "Live":
+if ss.get("replay_mode") and ss.get("replay_events"):
+    events = ss.replay_events
+    ss.replay_tick = st.slider("Replay minute", 0, events[-1].tick, ss.get("replay_tick", 0))
+    render(events, ss.replay_tick, [])
+else:
     @st.fragment(run_every=1.0 if ss.playing else None)
     def live_view() -> None:
         engine: Engine = ss.engine
@@ -132,20 +148,6 @@ if mode == "Live":
             if engine.tick >= engine.end_tick:
                 ss.playing = False
                 st.rerun(scope="app")
-        render(engine.log.events, engine.tick, engine.decision_timings,
-               engine.scenario.population or DEFAULT_POPULATION)
+        render(engine.log.events, engine.tick, engine.decision_timings)
 
     live_view()
-elif ss.get("replay_events"):
-    @st.fragment(run_every=1.0 if ss.replay_playing else None)
-    def replay_view() -> None:
-        events = ss.replay_events
-        if ss.replay_playing:
-            ss.replay_tick = min(events[-1].tick, ss.replay_tick + ss.replay_speed)
-            if ss.replay_tick >= events[-1].tick:
-                ss.replay_playing = False
-        started = next((e.payload for e in events if e.type == "RUN_STARTED"), {})
-        render(events, ss.replay_tick, [],
-               (started.get("town") or {}).get("population", DEFAULT_POPULATION))
-
-    replay_view()

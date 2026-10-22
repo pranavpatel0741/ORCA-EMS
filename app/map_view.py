@@ -34,7 +34,8 @@ def _hospital_color(h: dict) -> str:
     return "#F2A33A" if occ >= 0.8 else "#3DD68C"
 
 
-def town_map(state: DashState, town: TownProfile) -> go.Figure:
+def town_map(state: DashState, town: TownProfile, focus: str | None = None,
+             height: int = 560) -> go.Figure:
     size = town.area_km
     fig = go.Figure()
 
@@ -43,6 +44,11 @@ def town_map(state: DashState, town: TownProfile) -> go.Figure:
         x, y = town.to_km(*inc["location"])
         worst = next((s for s in SEVERITY_COLOR if s in inc["severities"]), "MINOR")
         waiting = inc["waiting"] > 0
+        if inc["id"] == focus:  # selected incident: highlight ring
+            fig.add_trace(go.Scatter(
+                x=[x], y=[y], mode="markers", showlegend=False, hoverinfo="skip",
+                marker=dict(size=30 + 2.2 * min(inc["victims"], 20), color="rgba(0,0,0,0)",
+                            line=dict(color="#4C9EFF", width=3))))
         fig.add_trace(go.Scatter(
             x=[x], y=[y], mode="markers+text", showlegend=False,
             marker=dict(size=10 + 2.2 * min(inc["victims"], 20),
@@ -97,13 +103,14 @@ def town_map(state: DashState, town: TownProfile) -> go.Figure:
             text=ids, hovertemplate="%{text}<extra>" + label + "</extra>",
         ))
 
-    axis = dict(range=[-0.5, size + 0.5], dtick=1, gridcolor=GRID, zeroline=False,
-                showline=False, tickfont=dict(color="#7D8A97", size=9), fixedrange=True)
+    axis = dict(range=[-2.5, size + 2.5], dtick=2, gridcolor=GRID, zeroline=False,
+                showline=False, tickfont=dict(color="#7D8A97", size=9), fixedrange=True,
+                constrain="domain")  # keep the km range; shrink the plot area for 1:1
     fig.update_layout(
         xaxis={**axis, "title": dict(text="km east", font=dict(color="#7D8A97", size=10))},
         yaxis={**axis, "title": dict(text="km north", font=dict(color="#7D8A97", size=10)),
                "scaleanchor": "x", "scaleratio": 1},
-        plot_bgcolor=BG, paper_bgcolor="rgba(0,0,0,0)", height=560,
+        plot_bgcolor=BG, paper_bgcolor="rgba(0,0,0,0)", height=height,
         margin=dict(l=40, r=10, t=10, b=40),
         legend=dict(orientation="h", y=-0.12, font=dict(color=TEXT, size=11),
                     bgcolor="rgba(0,0,0,0)"),
