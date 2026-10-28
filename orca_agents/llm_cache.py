@@ -106,10 +106,13 @@ class LLMClient:
     backend: Backend | None
     mode: str = field(default_factory=lambda: settings.LLM_MODE)
     cache_dir: Path = CACHE_DIR
+    model_name: str | None = None  # for cache_only replay without a backend
 
     @property
     def model(self) -> str:
-        return self.backend.model if self.backend else (settings.OPENAI_MODEL or "unset")
+        if self.backend:
+            return self.backend.model
+        return self.model_name or settings.OPENAI_MODEL or "unset"
 
     def key(self, spec: AgentSpec, payload: dict[str, Any]) -> str:
         blob = json.dumps({"agent": spec.agent_id, "model": self.model, "prompt": spec.version,
