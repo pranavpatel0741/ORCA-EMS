@@ -76,7 +76,7 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
     `policy.decide` and raises `R9Violation` on any change.
 17. **Start-of-run busy units** are RETURNING only (generator and engine enforce this).
 
-## Deferred to M4 (from review)
+## Done in M4 (from review)
 
 - `Policy.decide(obs)` with a frozen observation instead of the engine (principle 2); the test
   greedy policy currently reads true severity.
@@ -89,14 +89,14 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
 - [x] M1 Entities and state machines
 - [x] M2 Engine, hospital model, travel (+ review fix pass)
 - [x] M3 Validator and generator
-- [ ] M4 Observations, monitor, calibration
-- [ ] M5 Baselines, metrics, CLI (nearest baseline + handling metrics done)
-- [ ] M6 Agent models, tools, single agents
-- [ ] M7 Orchestrator, negotiation, confidence, approval, fallbacks
-- [ ] M8 Integration check
-- [ ] M9 Experiments
-- [~] M10 Dashboard (live mode, replay, call threads, capacity, grid map done; approval cards wait for M7)
-- [ ] M11 Documentation and submission
+- [x] M4 Observations, monitor, calibration
+- [x] M5 Baselines, metrics, CLI
+- [x] M6 Agent models, tools, single agents (offline-tested; live LLM check needs a key)
+- [x] M7 Orchestrator, negotiation, confidence, approval, fallbacks
+- [x] M8 Integration check (automated, scripted backend)
+- [~] M9 Experiments (grid + tables done; baselines run; LLM runs pending a key)
+- [x] M10 Dashboard (live, replay, agents, interactive approval)
+- [~] M11 Documentation (README, report draft, attribution, assumptions done; final results pending)
 
 ## Log
 
@@ -140,3 +140,53 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
     Dispatch, ambulances, hospitals, safety rules, police).
   - Hospital replies (accept / counter) will come from the hospital agents in M6–M7; they are
     not faked.
+- **M4 (2026-10-28):** `sim/observations.py`. Policies now decide from a frozen
+  `Observation`:
+  - complete info: live board, victims known at the call
+  - partial info: board refreshed every 15 min, victims known after the scene report,
+    walk-ins visible at the next update
+  - rejections come back as rule codes only
+  
+  Also `sim/monitor.py` (alerts: hospital full, ER wait, no free unit in a district, surge)
+  and `sim/calibrate.py` (DataSF quantiles; falls back to default timing).
+- **M5 (2026-10-28):** `baselines/rule_based.py`, `eval/metrics.py` (PLAN §16, from the log
+  only), `run.py`, and a cross-process reproducibility test. Seed 7 surge, partial info:
+  rule-based had fewer deaths and capacity failures than nearest but slower response
+  (reported, not tuned).
+- **M6–M7 (2026-10-28):** `orca_agents/`:
+  - models, versioned prompts, read-only tools
+  - LLM cache (live / record / cache_only)
+  - the four agents
+  - orchestrator: assessment, dispatch, hospital PROPOSE / ACCEPT / COUNTER (up to 3
+    rounds), allocator, staff requests, mutual aid, confidence gate, fallbacks
+  - scripted offline stand-in for tests
+  
+  Engine approval queue: R6 or low-confidence decisions wait 2 min, then the policy approves
+  or overrides; interactive mode is used on the dashboard. Also a hindsight-best evaluator for
+  confidence calibration. Decisions:
+  - the confidence gate applies to routes carrying critical patients
+  - k = 1, so consistency is 1.0
+  - a unit is negotiated once; after a rule rejection it is re-routed by the rule-based choice
+    (this prevents loops and bounds LLM cost: ~80–170 calls per surge run with the stand-in)
+- **M8 (2026-10-28):** `tests/test_integration.py`. A negotiated surge log contains:
+  - an ambulance conflict between two calls
+  - capacity COUNTERs
+  - a STAFF_REQUEST / RESPONSE (test fixture with a short nurse roster)
+  - a mutual-aid exchange
+  - a staged unit released by SCENE_SECURED
+  - escalations
+  - no rule-violating commits
+- **M9 (2026-10-28):** `eval/run_experiments.py` (resumable, paired, parallel baselines,
+  sequential LLM runs) and `eval/report_tables.py` (summary.csv / summary.md, H1–H3 paired
+  verdicts, calibration and cost). Baseline results for 5 seeds are committed. Scripted dry
+  runs go to `results/scripted/` (gitignored).
+- **M10–M11 (2026-10-28):** the dashboard gains agent policies (OpenAI when a key is set,
+  otherwise a labeled offline stand-in) and interactive approval cards. Added README,
+  ATTRIBUTION, FUTURE_WORK, a report draft, and extended ASSUMPTIONS.
+- **Cut, per PLAN's cut list:** LLM-written caller narratives (templates are used) and
+  consistency sampling k > 1.
+- **Remaining for the owner:**
+  - add `OPENAI_API_KEY` / `OPENAI_MODEL` to `.env`
+  - do a one-run live check: `LLM_MODE=record python run.py --policy agents --preset "Cardiac arrest"`
+  - record the grid: `LLM_MODE=record python eval/run_experiments.py --seeds 5`
+  - put the results into `docs/REPORT.md` §5
