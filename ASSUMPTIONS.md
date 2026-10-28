@@ -51,4 +51,25 @@ Derived values for the default town (50,000 people, 20 × 20 km):
 - **Offload.** The crew stays with its patients until the hospital takes them into care, with no cap.
 - **Hospital D** takes ambulance patients only under its surge contract during an active surge.
 - **Hospital B's stabilization bay** counts as definitive care for survival, but is excluded from the critical on-time rate.
-- **Approval policy** for experiments (planned, M7): picks the better option on observed state after a 2-minute delay. Baselines use the same path.
+- **Approval policy (experiments).** Decisions flagged by R6, or escalated by an agent's
+  confidence gate, wait 2 simulated minutes. The policy then compares the proposed hospital
+  with the best alternative that has capacity. It picks the one where definitive care starts
+  earlier (projected from hospital state at decision time). Baselines use the same path. In
+  interactive mode a person decides on the dashboard; an undecided case falls back to the
+  policy.
+- **Confidence gate (agents).** score = 0.4 consistency + 0.3 margin + 0.2 freshness +
+  0.1 validator-clean.
+  - ≥ 0.90: execute; 0.75–0.90: information round (ask the hospital for its live status,
+    then recompute); < 0.75: human review.
+  - Applied to routes carrying critical patients.
+  - Consistency is 1.0 because k = 1 sample, to save cost.
+  - A 10-minute severity-weighted objective gap counts as full margin; board age reaches 0
+    freshness at 30 minutes.
+- **Hindsight-best evaluator** (for confidence calibration). It uses true state at decision
+  time and checks whether the chosen hospital offered the earliest start of definitive care.
+- **Calibration.** If `data/calibration.json` exists (from `python -m sim.calibrate` on DataSF
+  calls for service), it sets scene times and handover; travel keeps the distance model. The
+  repository has no real SF extract, only a synthetic test fixture, so experiments use the
+  defaults.
+- **Offline stand-in.** `orca_agents/scripted.py` follows the agent instructions with simple
+  rules. It is used for tests and labeled dry runs only, never reported as LLM results.
