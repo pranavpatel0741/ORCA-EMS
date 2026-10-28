@@ -55,6 +55,7 @@ from sim.hospital import (
     QueueItem,
     resource_demand,
 )
+from sim.monitor import Monitor
 from sim.observations import (
     Observation,
     ObsFirm,
@@ -184,6 +185,7 @@ class Engine:
         self.decision_timings: list[dict[str, Any]] = []
         self.board: dict[str, dict[str, Any]] = {}  # hospital status board (PLAN §11)
         self.board_tick = -1
+        self.monitor = Monitor()
         self._rejections: list[Rejection] = []  # fed back to the policy as rule codes only
 
     # ==========================================================================================
@@ -619,7 +621,8 @@ class Engine:
             self._drain_outbox(obs)
             for action in actions:  # 7
                 self.commit(action, actor=self.policy.name)
-        self._log_hospital_status()  # 8
+        self.monitor.update(self)  # 8
+        self._log_hospital_status()
         if self.tick_hook is not None:
             self.tick_hook(self)
 

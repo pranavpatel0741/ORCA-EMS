@@ -343,7 +343,12 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
                 changes[p["hospital_id"]].append(f"t={e.tick}: discharged {pid}")
         elif t == EventType.HOSPITAL_STATUS:
             hospitals[p["hospital_id"]] = dict(p)
-        elif t in (EventType.MONITOR_ALERT, EventType.ESCALATED, EventType.APPROVED,
+        elif t == EventType.MONITOR_ALERT:
+            add(FeedRow(e.tick, "Monitor", "Dispatch",
+                        "ALERT" if p.get("phase") == "RAISED" else "ALERT CLEARED",
+                        p.get("message", ""), ALERT if p.get("phase") == "RAISED" else UNIT,
+                        None, "system"))
+        elif t in (EventType.ESCALATED, EventType.APPROVED,
                    EventType.OVERRIDDEN, EventType.FALLBACK_USED, EventType.PRIORITY_REPORT):
             add(FeedRow(e.tick, _speaker(e.actor), str(p.get("recipient", "All")),
                         t.value.replace("_", " "), str(p.get("reason", p.get("message", ""))),
