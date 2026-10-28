@@ -24,12 +24,12 @@ class LifecyclePolicy:
 
     name = "lifecycle"
 
-    def decide(self, engine):
+    def decide(self, obs):
         actions = []
-        if "I-1" in engine.active_incidents and engine.ambulances["AMB-1"].state == A.IDLE \
-                and engine.patients["P-1"].ambulance_id is None:
+        if "I-1" in obs.incidents and obs.units["AMB-1"].state == A.IDLE \
+                and obs.waiting("I-1"):
             actions.append(Dispatch(unit_id="AMB-1", incident_id="I-1", patient_ids=["P-1"]))
-        if engine.units_needing_destination():
+        if obs.units_needing_destination():
             actions.append(RouteToHospital(unit_id="AMB-1", hospital_id="H"))
         return actions
 
@@ -164,14 +164,17 @@ def test_crew_triage_clears_destination_validated_for_other_patients():
 
 
 def test_r9_policy_mutating_state_raises():
-    class Cheater:
+    class Cheater:  # holds a back-door reference to the engine and edits it directly
         name = "cheater"
+        engine = None
 
-        def decide(self, engine):
-            engine.hospitals["A"].config.er_beds_total += 5
+        def decide(self, obs):
+            self.engine.hospitals["A"].config.er_beds_total += 5
             return []
 
-    engine = Engine(stress_scenario(), Cheater())
+    cheater = Cheater()
+    engine = Engine(stress_scenario(), cheater)
+    cheater.engine = engine
     with pytest.raises(R9Violation):
         engine.run(until=2)
     assert engine.log.events[-1].payload["rule_id"] == "R9"

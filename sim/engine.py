@@ -23,6 +23,7 @@ import time
 from collections.abc import Callable
 from typing import Any, Protocol
 
+import config.settings as settings
 from protocol.messages import Message, MessageType
 from sim.actions import (
     Action,
@@ -48,13 +49,24 @@ from sim.entities import (
 from sim.events import EventLog, EventType
 from sim.hospital import (
     PATIENTS_PER_NURSE,
+    RESOURCES,
     SEVERITY_PRIORITY,
     HospitalState,
     QueueItem,
     resource_demand,
 )
+from sim.observations import (
+    Observation,
+    ObsFirm,
+    ObsHospital,
+    ObsIncident,
+    ObsPatient,
+    ObsUnit,
+    Rejection,
+)
 from sim.outcomes import is_dead, survival_probability
 from sim.state_machine import (
+    can_reassign,
     secure_scene,
     transition_ambulance,
     transition_patient,
@@ -68,7 +80,7 @@ from sim.travel import (
     midpoint,
     offset_point,
 )
-from sim.validator import Validator, scene_entry_allowed
+from sim.validator import Validator, scene_entry_allowed, surge_active
 
 A = AmbulanceState
 MOVING = {A.EN_ROUTE, A.TRANSPORTING, A.RETURNING}
@@ -80,7 +92,7 @@ INITIAL_UNIT_STATES = {A.IDLE, A.RETURNING}
 class Policy(Protocol):
     name: str
 
-    def decide(self, engine: Engine) -> list[Action]: ...
+    def decide(self, obs: Observation) -> list[Action]: ...
 
 
 class R9Violation(RuntimeError):
@@ -119,13 +131,15 @@ class Engine:
         validator: Validator | None = None,
         run_id: str | None = None,
         tick_hook: Callable[[Engine], None] | None = None,
+        info: str | None = None,
     ) -> None:
         self.scenario = scenario
         self.policy = policy
+        self.info = info or scenario.info
         self.timing = timing or TimingConfig()
         self.validator = validator or Validator()
         self.sampler = Sampler(scenario.seed, self.timing)
-        self.run_id = run_id or f"s{scenario.seed:02d}_{scenario.demand}_{scenario.info}_" + (
+        self.run_id = run_id or f"s{scenario.seed:02d}_{scenario.demand}_{self.info}_" + (
             policy.name if policy else "none"
         )
         self.log = EventLog(self.run_id)
@@ -168,6 +182,9 @@ class Engine:
         self._summarized = False
         self._message_seq = 0
         self.decision_timings: list[dict[str, Any]] = []
+        self.board: dict[str, dict[str, Any]] = {}  # hospital status board (PLAN §11)
+        self.board_tick = -1
+        self._rejections: list[Rejection] = []  # fed back to the policy as rule codes only
 
     # ==========================================================================================
     # Queries used by the validator, policies, and observations
@@ -280,6 +297,8 @@ class Engine:
                 self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, actor,
                               {"action": dumped, "rule_id": f.rule_id, "code": f.code,
                                "reason": f.reason})
+                self._rejections.append(Rejection(tick=self.tick, action=dumped,
+                                                  rule_id=f.rule_id, code=f.code))
             return False
         self.log.emit(self.tick, EventType.PROPOSAL_VALIDATED, actor,
                       {"action": dumped, "flags": flags})
@@ -489,6 +508,92 @@ class Engine:
         }
         return hashlib.sha256(json.dumps(state, sort_keys=True, default=str).encode()).hexdigest()
 
+    # --- observations (PLAN §11) ---------------------------------------------------------------
+
+    def _refresh_board(self) -> None:
+        self.board_tick = self.tick
+        self.board = {}
+        for hid, hs in sorted(self.hospitals.items()):
+            self.board[hid] = {
+                "free": {r: hs.free(r) for r in RESOURCES},
+                "er_occupancy": round(hs.er_occupancy(), 3),
+                "queue": sum(1 for q in hs.queue if not q.background),
+                "boarding": len(hs.boarders),
+            }
+
+    def observe(self) -> Observation:
+        """The view a dispatcher (baseline or agent) gets this tick."""
+        if self.info == "complete" or self.board_tick < 0 or \
+                self.tick % settings.BOARD_UPDATE_MIN == 0:
+            self._refresh_board()
+        partial = self.info == "partial"
+        incidents: dict[str, ObsIncident] = {}
+        for iid, inc in sorted(self.incidents.items()):
+            if iid not in self.active_or_closed():
+                continue
+            victims = [self.patients[p] for p in inc.true_victim_ids]
+            if iid not in self.active_incidents and not any(
+                    p.status in (PatientStatus.WAITING_ON_SCENE, PatientStatus.IN_TRANSPORT)
+                    for p in victims):
+                continue
+            reported = any(p.timestamps.unit_on_scene is not None for p in victims)
+            known = not partial or reported
+            patients = []
+            for p in victims if known else []:
+                status, amb = p.status.value, p.ambulance_id
+                if partial and p.walk_in and (p.timestamps.arrived_hospital or 0) > self.board_tick:
+                    status, amb = PatientStatus.WAITING_ON_SCENE.value, None  # not yet reported
+                sev = p.observed_severity if partial else p.true_severity
+                patients.append(ObsPatient(id=p.id, incident_id=iid, severity=sev,
+                                           needs=p.needs if sev is not None else None,
+                                           status=status, ambulance_id=amb))
+            incidents[iid] = ObsIncident(
+                id=iid, type=inc.type.value, location=inc.location, call_tick=inc.call_tick,
+                reported_victims=inc.reported_victims, narrative=inc.narrative,
+                violent=inc.violent, secured=inc.scene_secured,
+                needs_fire=inc.needs_fire_extrication, scene_reported=reported,
+                patients=patients)
+        units = {a.id: ObsUnit(
+            id=a.id, owner=a.owner.value, unit_type=a.unit_type.value, state=a.state.value,
+            location=self.position(a.id), home=a.home_station,
+            available=self.unit_available(a.id), reassignable=can_reassign(a),
+            assigned_incident=a.assigned_incident, patient_ids=list(a.assigned_patient_ids),
+            destination=a.destination_hospital) for a in sorted(self.ambulances.values(),
+                                                                key=lambda a: a.id)}
+        hospitals = {}
+        for hid, hs in sorted(self.hospitals.items()):
+            c, b = hs.config, self.board[hid]
+            hospitals[hid] = ObsHospital(
+                id=hid, name=c.name, location=c.location, owner=c.owner.value,
+                capabilities=sorted(c.capabilities), stabilization_only=c.stabilization_only,
+                contract=c.surge_contract.model_dump(mode="json") if c.surge_contract else None,
+                totals={r: hs.total(r) for r in RESOURCES}, free=dict(b["free"]),
+                er_occupancy=b["er_occupancy"], queue=b["queue"], boarding=b["boarding"],
+                board_tick=self.board_tick)
+        firms = {f.id: ObsFirm(id=f.id, unit_ids=list(f.unit_ids),
+                               max_units=f.max_mutual_aid_units,
+                               activation_minutes=f.activation_minutes,
+                               in_use=self.mutual_aid_units(f.id))
+                 for f in self.firms.values()}
+        rejections, self._rejections = self._rejections, []
+        return Observation(tick=self.tick, state_version=self.state_version, info=self.info,
+                           timing=self.timing, incidents=incidents, units=units,
+                           hospitals=hospitals, firms=firms, rejections=rejections,
+                           surge_active=surge_active(self))
+
+    def _drain_outbox(self, obs: Observation) -> None:
+        """Log protocol messages and LLM usage the policy produced while deciding."""
+        for m in obs.outbox:
+            self.send(m["sender"], m["recipient"], MessageType(m["type"]), m.get("reason", ""),
+                      incident_id=m.get("incident_id"), patient_ids=m.get("patient_ids"),
+                      proposed_action=m.get("proposed_action"),
+                      negotiation_round=m.get("negotiation_round", 0))
+        for call in obs.llm_calls:
+            self.log.emit(self.tick, EventType.LLM_CALL, call.get("agent", "agent"), call)
+        for event in obs.events:
+            self.log.emit(self.tick, EventType(event["type"]), event.get("actor", "policy"),
+                          event.get("payload", {}))
+
     def _events_and_decisions(self) -> None:
         self._scene_events()  # 5
         self._new_calls()
@@ -500,8 +605,9 @@ class Engine:
         self._close_incidents()
         if self.policy is not None:  # 6
             before = self._fingerprint()
+            obs = self.observe()
             started = time.perf_counter()
-            actions = self.policy.decide(self)
+            actions = self.policy.decide(obs)
             # Wall-clock decision time stays out of the deterministic log (PLAN §3.5).
             self.decision_timings.append({"tick": self.tick, "actions": len(actions),
                                           "ms": (time.perf_counter() - started) * 1000})
@@ -510,6 +616,7 @@ class Engine:
                               {"rule_id": "R9", "code": "STATE_MUTATED",
                                "reason": "policy modified engine state outside commit"})
                 raise R9Violation(f"{self.policy.name} mutated engine state at tick {self.tick}")
+            self._drain_outbox(obs)
             for action in actions:  # 7
                 self.commit(action, actor=self.policy.name)
         self._log_hospital_status()  # 8
@@ -671,6 +778,9 @@ class Engine:
                 self.log.emit(self.tick, EventType.PROPOSAL_REJECTED, "engine:revalidate",
                               {"action": route.model_dump(mode="json"), "rule_id": f.rule_id,
                                "code": f.code, "reason": f.reason})
+                self._rejections.append(Rejection(tick=self.tick,
+                                                  action=route.model_dump(mode="json"),
+                                                  rule_id=f.rule_id, code=f.code))
             amb.destination_hospital = None
             self.validated_dest.pop(amb.id, None)
         else:
