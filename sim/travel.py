@@ -6,7 +6,9 @@ lo == hi and `noise_sigma = 0` gives a fully deterministic configuration for han
 
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 from pydantic import BaseModel
@@ -64,6 +66,30 @@ class TimingConfig(BaseModel):
         fields["offload_bands"] = [(ub, (r[0], r[0])) for ub, r in base.offload_bands]
         fields.update(overrides)
         return cls(**fields)
+
+
+def load_timing(calibration_path: str | Path | None = None) -> TimingConfig:
+    """Default timing, with scene and handover times taken from `data/calibration.json` when
+    that file exists (see `sim/calibrate.py`). Travel keeps the distance model, because the
+    town's geography is fictional; the calibrated travel quantiles are reported for comparison.
+
+    - scene time: critical = (median, p90), other = (p25, p75) of on-scene -> transport
+    - handover: turnaround (hospital -> available) minus the minimum offload band
+    """
+    from config.settings import DATA_DIR
+
+    path = Path(calibration_path) if calibration_path else DATA_DIR / "calibration.json"
+    cfg = TimingConfig()
+    if not path.exists():
+        return cfg
+    q = json.loads(path.read_text())["intervals"]
+    scene, turn = q["scene"], q["turnaround"]
+    base = cfg.offload_bands[0][1][0]
+    return cfg.model_copy(update={
+        "scene_time_critical": (max(1, round(scene["median"])), max(1, round(scene["p90"]))),
+        "scene_time_other": (max(1, round(scene["p25"])), max(1, round(scene["p75"]))),
+        "handover": (max(1, round(turn["p25"] - base)), max(2, round(turn["median"] - base))),
+    })
 
 
 def haversine_km(a: Location, b: Location) -> float:
