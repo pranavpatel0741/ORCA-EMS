@@ -22,6 +22,7 @@ from app import panels  # noqa: E402
 from app.map_view import town_map  # noqa: E402
 from app.state import build_state  # noqa: E402
 from baselines.nearest import NearestPolicy  # noqa: E402
+from baselines.rule_based import RuleBasedPolicy  # noqa: E402
 from config.settings import LOG_DIR  # noqa: E402
 from sim.engine import Engine  # noqa: E402
 from sim.events import read_jsonl  # noqa: E402
@@ -29,7 +30,8 @@ from sim.generator import DEFAULT_POPULATION  # noqa: E402
 from sim.presets import PRESETS, build_preset  # noqa: E402
 from sim.town import TownProfile  # noqa: E402
 
-POLICIES = {"Nearest hospital (baseline)": NearestPolicy}
+POLICIES = {"Nearest hospital (baseline)": NearestPolicy,
+            "Rule-based (strong baseline)": RuleBasedPolicy}
 
 st.set_page_config(page_title="ORCA-EMS Dispatch", layout="wide",
                    initial_sidebar_state="collapsed")
