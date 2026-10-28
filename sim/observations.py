@@ -58,6 +58,7 @@ class ObsUnit(BaseModel):
     assigned_incident: str | None
     patient_ids: list[str]
     destination: str | None
+    pending_approval: bool = False  # a decision for this unit is awaiting review
 
 
 class ObsHospital(BaseModel):
@@ -104,6 +105,9 @@ class Observation(BaseModel):
     firms: dict[str, ObsFirm]
     rejections: list[Rejection] = Field(default_factory=list)
     surge_active: bool = False
+    # Each hospital's own live status. Only that hospital's agent may read its entry (PLAN §11);
+    # dispatchers and baselines use the (possibly stale) status board in `hospitals`.
+    own_status: dict[str, dict[str, Any]] = Field(default_factory=dict)
     # Policies may append protocol messages / LLM usage here; the engine logs them.
     outbox: list[dict[str, Any]] = Field(default_factory=list)
     llm_calls: list[dict[str, Any]] = Field(default_factory=list)
@@ -133,11 +137,13 @@ class Observation(BaseModel):
 
     def free_units(self) -> list[ObsUnit]:
         return [u for u in self.units.values()
-                if u.available and u.state in ("IDLE", "RETURNING") and u.reassignable]
+                if u.available and u.state in ("IDLE", "RETURNING") and u.reassignable
+                and not u.pending_approval]
 
     def units_needing_destination(self) -> list[ObsUnit]:
         return [u for u in self.units.values()
-                if u.state in ("ON_SCENE", "LOADING") and u.patient_ids and u.destination is None]
+                if u.state in ("ON_SCENE", "LOADING") and u.patient_ids and u.destination is None
+                and not u.pending_approval]
 
     def patient(self, pid: str) -> ObsPatient | None:
         for inc in self.incidents.values():

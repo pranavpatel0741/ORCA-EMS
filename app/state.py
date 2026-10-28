@@ -70,6 +70,7 @@ RULE_TEXT = {
     "OVER_CAPACITY": "an ambulance carries at most two patients",
     "UNKNOWN_ACTION": "that action is not allowed",
     "STATE_MUTATED": "the policy tried to change the world directly",
+    "PENDING_APPROVAL": "{unit} already has a decision waiting for human review",
 }
 FLAG_TEXT = {
     "STAGING": "Scene is not secure. {unit} will stage nearby until police clear it.",

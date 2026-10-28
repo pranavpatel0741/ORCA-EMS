@@ -23,6 +23,8 @@ class Dispatch(_Action):
     patient_ids: list[str] = Field(default_factory=list)
     target_hospital: str | None = None
     rationale: str = ""
+    confidence: float | None = None  # set by the agents' confidence gate (PLAN §14.5)
+    needs_review: bool = False  # the proposer asks for human review
 
 
 class RouteToHospital(_Action):
@@ -32,6 +34,8 @@ class RouteToHospital(_Action):
     unit_id: str
     hospital_id: str
     rationale: str = ""
+    confidence: float | None = None
+    needs_review: bool = False
 
 
 class LendStaff(_Action):

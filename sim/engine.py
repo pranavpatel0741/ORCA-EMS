@@ -21,6 +21,7 @@ import hashlib
 import json
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 import config.settings as settings
@@ -81,7 +82,14 @@ from sim.travel import (
     midpoint,
     offset_point,
 )
-from sim.validator import Validator, scene_entry_allowed, surge_active
+from sim.validator import (
+    Validator,
+    action_patients,
+    fully_capable,
+    hospital_can_take,
+    scene_entry_allowed,
+    surge_active,
+)
 
 A = AmbulanceState
 MOVING = {A.EN_ROUTE, A.TRANSPORTING, A.RETURNING}
@@ -94,6 +102,19 @@ class Policy(Protocol):
     name: str
 
     def decide(self, obs: Observation) -> list[Action]: ...
+
+
+@dataclass
+class PendingApproval:
+    id: str
+    action: Action
+    actor: str
+    reasons: list[str]
+    created: int
+    release: int
+    alternative: Action | None = None
+    decided: str | None = None  # "approve" | "alternative" (interactive)
+    approver: str | None = None
 
 
 class R9Violation(RuntimeError):
@@ -133,6 +154,7 @@ class Engine:
         run_id: str | None = None,
         tick_hook: Callable[[Engine], None] | None = None,
         info: str | None = None,
+        approval_mode: str | None = None,
     ) -> None:
         self.scenario = scenario
         self.policy = policy
@@ -186,6 +208,11 @@ class Engine:
         self.board: dict[str, dict[str, Any]] = {}  # hospital status board (PLAN §11)
         self.board_tick = -1
         self.monitor = Monitor()
+        # R6 / low-confidence decisions wait here for approval (PLAN §14.6)
+        self.approval_mode = approval_mode or settings.APPROVAL_MODE
+        self.pending_approvals: list[PendingApproval] = []
+        self.approving = False
+        self._approval_seq = 0
         self._rejections: list[Rejection] = []  # fed back to the policy as rule codes only
 
     # ==========================================================================================
@@ -304,11 +331,123 @@ class Engine:
             return False
         self.log.emit(self.tick, EventType.PROPOSAL_VALIDATED, actor,
                       {"action": dumped, "flags": flags})
+        reviews = [f for f in flags if f["level"] == "review"]
+        if (reviews or getattr(action, "needs_review", False)) and not self.approving:
+            self._hold_for_approval(action, actor, reviews)
+            return True
+        extra: dict[str, Any] = {}
+        confidence = getattr(action, "confidence", None)
+        if confidence is not None and isinstance(action, RouteToHospital):
+            extra = {"confidence": confidence, "hindsight_best": self.hindsight_best(action)}
         self._apply(action, actor)
         self.state_version += 1
         self.log.emit(self.tick, EventType.COMMITTED, actor,
-                      {"action": dumped, "state_version": self.state_version})
+                      {"action": dumped, "state_version": self.state_version, **extra})
         return True
+
+    # --- approval (PLAN §14.6): the same path for baselines and agents --------------------------
+
+    def awaiting_approval_units(self) -> set[str]:
+        return {p.action.unit_id for p in self.pending_approvals
+                if hasattr(p.action, "unit_id")}
+
+    def _hold_for_approval(self, action: Action, actor: str, reviews: list[dict]) -> None:
+        self._approval_seq += 1
+        delay = settings.POLICY_APPROVAL_DELAY_MIN if self.approval_mode == "policy" else 1
+        pending = PendingApproval(
+            id=f"AP-{self._approval_seq:03d}", action=action, actor=actor,
+            reasons=[f"{r['code']}: {r['reason']}" for r in reviews] or
+            ["low confidence: the proposer asked for review"],
+            created=self.tick, release=self.tick + delay,
+            alternative=self._alternative(action))
+        self.pending_approvals.append(pending)
+        self.log.emit(self.tick, EventType.ESCALATED, actor, {
+            "approval_id": pending.id, "action": action.model_dump(mode="json"),
+            "reasons": pending.reasons, "release_tick": pending.release,
+            "alternative": pending.alternative.model_dump(mode="json")
+            if pending.alternative else None,
+            "confidence": getattr(action, "confidence", None)})
+
+    def decide_approval(self, approval_id: str, choice: str) -> None:
+        """Interactive mode: a human picks "approve" or "alternative"."""
+        for p in self.pending_approvals:
+            if p.id == approval_id:
+                p.decided, p.approver = choice, "human"
+
+    def _alternative(self, action: Action) -> Action | None:
+        """Best other hospital for a reviewed route: can take the patients at ETA, nearest."""
+        if not isinstance(action, RouteToHospital):
+            return None
+        patients = action_patients(action, self)
+        options = []
+        for hid in sorted(self.hospitals):
+            if hid == action.hospital_id or not fully_capable(self, hid, patients):
+                continue
+            probe = RouteToHospital(unit_id=action.unit_id, hospital_id=hid)
+            eta = self.expected_arrival(probe, hid)
+            if hospital_can_take(self, hid, patients, eta):
+                options.append((eta, hid))
+        if not options:
+            return None
+        return RouteToHospital(unit_id=action.unit_id, hospital_id=min(options)[1],
+                               rationale="approval policy: better option with capacity")
+
+    def _policy_choice(self, p: PendingApproval) -> str:
+        """Fixed approval policy: pick the option with the better objective (earlier start of
+        definitive care), using the state at decision time."""
+        if p.alternative is None or not isinstance(p.action, RouteToHospital):
+            return "approve"
+        def start(a: RouteToHospital) -> int:
+            pats = action_patients(a, self)
+            eta = self.expected_arrival(a, a.hospital_id)
+            hs = self.hospitals[a.hospital_id]
+            incoming = self.incoming_demands(a.hospital_id, exclude={x.id for x in pats})
+            fit = max((hs.earliest_fit(self.demand_at(a.hospital_id, x), eta, incoming) or
+                       eta + 999) for x in pats) if pats else eta
+            return max(eta, fit)
+        return "alternative" if start(p.alternative) < start(p.action) else "approve"
+
+    def _process_approvals(self) -> None:
+        remaining = []
+        for p in self.pending_approvals:
+            due = p.decided is not None or self.tick >= p.release
+            if not due:
+                remaining.append(p)
+                continue
+            choice = p.decided or self._policy_choice(p)
+            chosen = p.alternative if choice == "alternative" and p.alternative else p.action
+            self.pending_approvals = [x for x in self.pending_approvals if x is not p]
+            self.approving = True
+            try:
+                ok = self.commit(chosen, actor=p.actor)
+            finally:
+                self.approving = False
+            kind = EventType.OVERRIDDEN if chosen is not p.action else EventType.APPROVED
+            self.log.emit(self.tick, kind, p.approver or "policy", {
+                "approval_id": p.id, "approver": p.approver or "policy",
+                "action": chosen.model_dump(mode="json"), "committed": ok,
+                "reason": "approved as proposed" if chosen is p.action
+                else "a better option was available",
+                "confidence": getattr(p.action, "confidence", None)})
+        self.pending_approvals = [p for p in self.pending_approvals if p in remaining]
+
+    def hindsight_best(self, action: RouteToHospital) -> bool:
+        """Deterministic evaluator (true state at decision time): was this the hospital with the
+        earliest start of definitive care?"""
+        patients = action_patients(action, self)
+        best = None
+        for hid in sorted(self.hospitals):
+            if not fully_capable(self, hid, patients) and hid != action.hospital_id:
+                continue
+            probe = RouteToHospital(unit_id=action.unit_id, hospital_id=hid)
+            eta = self.expected_arrival(probe, hid)
+            hs = self.hospitals[hid]
+            incoming = self.incoming_demands(hid, exclude={x.id for x in patients})
+            fits = [hs.earliest_fit(self.demand_at(hid, x), eta, incoming) for x in patients]
+            start = max([eta] + [f if f is not None else eta + 999 for f in fits])
+            if best is None or start < best[0]:
+                best = (start, hid)
+        return best is not None and best[1] == action.hospital_id
 
     def _apply(self, action: Action, actor: str) -> None:
         if isinstance(action, Dispatch):
@@ -555,13 +694,15 @@ class Engine:
                 violent=inc.violent, secured=inc.scene_secured,
                 needs_fire=inc.needs_fire_extrication, scene_reported=reported,
                 patients=patients)
+        pending = self.awaiting_approval_units()
         units = {a.id: ObsUnit(
             id=a.id, owner=a.owner.value, unit_type=a.unit_type.value, state=a.state.value,
             location=self.position(a.id), home=a.home_station,
             available=self.unit_available(a.id), reassignable=can_reassign(a),
             assigned_incident=a.assigned_incident, patient_ids=list(a.assigned_patient_ids),
-            destination=a.destination_hospital) for a in sorted(self.ambulances.values(),
-                                                                key=lambda a: a.id)}
+            destination=a.destination_hospital,
+            pending_approval=a.id in pending)
+            for a in sorted(self.ambulances.values(), key=lambda a: a.id)}
         hospitals = {}
         for hid, hs in sorted(self.hospitals.items()):
             c, b = hs.config, self.board[hid]
@@ -577,11 +718,15 @@ class Engine:
                                activation_minutes=f.activation_minutes,
                                in_use=self.mutual_aid_units(f.id))
                  for f in self.firms.values()}
+        own_status = {hid: {**hs.snapshot(), "free": {r: hs.free(r) for r in RESOURCES},
+                            "nurses_on_duty": hs.effective_nurses,
+                            "min_nurse_coverage": hs.config.min_nurse_coverage}
+                      for hid, hs in sorted(self.hospitals.items())}
         rejections, self._rejections = self._rejections, []
         return Observation(tick=self.tick, state_version=self.state_version, info=self.info,
                            timing=self.timing, incidents=incidents, units=units,
                            hospitals=hospitals, firms=firms, rejections=rejections,
-                           surge_active=surge_active(self))
+                           surge_active=surge_active(self), own_status=own_status)
 
     def _drain_outbox(self, obs: Observation) -> None:
         """Log protocol messages and LLM usage the policy produced while deciding."""
@@ -597,6 +742,7 @@ class Engine:
                           event.get("payload", {}))
 
     def _events_and_decisions(self) -> None:
+        self._process_approvals()
         self._scene_events()  # 5
         self._new_calls()
         self._walk_ins()

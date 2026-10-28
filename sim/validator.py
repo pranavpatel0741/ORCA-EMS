@@ -176,6 +176,8 @@ def r1_unit_assignable(action: Action, engine: Engine) -> CheckResult:
         return _block("R1", "UNKNOWN_UNIT", f"unknown unit {action.unit_id}")
     if action.unit_id in engine.committed_units_this_tick:
         return _block("R1", "ALREADY_COMMITTED", f"{amb.id} already committed this tick")
+    if action.unit_id in engine.awaiting_approval_units() and not engine.approving:
+        return _block("R1", "PENDING_APPROVAL", f"{amb.id} has a decision awaiting approval")
     if isinstance(action, Dispatch):
         if len(set(action.patient_ids)) != len(action.patient_ids):
             return _block("R1", "DUPLICATE_PATIENT", "duplicate patient ids")
