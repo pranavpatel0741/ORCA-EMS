@@ -142,6 +142,14 @@ def _speaker(actor: str) -> str:
     return actor
 
 
+def _action_line(a: dict[str, Any]) -> str:
+    if a.get("kind") == "route":
+        return f"{a.get('unit_id')} to {_hname(a.get('hospital_id'))}"
+    if a.get("kind") == "dispatch":
+        return f"{a.get('unit_id')} to {a.get('incident_id')}"
+    return a.get("kind", "action")
+
+
 def hospital_status_label(snapshot: dict[str, Any]) -> str:
     """Board label in the style of hospital status systems (display only)."""
     if snapshot["er_occupancy"] >= 1.0 or snapshot.get("boarding", 0) \
@@ -349,6 +357,20 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
                         "ALERT" if p.get("phase") == "RAISED" else "ALERT CLEARED",
                         p.get("message", ""), ALERT if p.get("phase") == "RAISED" else UNIT,
                         None, "system"))
+        elif t == EventType.ESCALATED:
+            a = p.get("action") or {}
+            alt = p.get("alternative") or {}
+            text = f"Waiting for review: {_action_line(a)}. " + "; ".join(p.get("reasons", []))
+            if alt:
+                text += f". Alternative: {_action_line(alt)}."
+            add(FeedRow(e.tick, "Safety rules", "Human reviewer", "NEEDS APPROVAL", text, FLAG,
+                        inc_of(a), "safety"))
+        elif t in (EventType.APPROVED, EventType.OVERRIDDEN):
+            a = p.get("action") or {}
+            who = "Human reviewer" if p.get("approver") == "human" else "Approval policy"
+            verb = "Approved" if t == EventType.APPROVED else "Changed to"
+            add(FeedRow(e.tick, who, "Dispatch", t.value, f"{verb}: {_action_line(a)}. "
+                        f"{p.get('reason', '')}", DECISION, inc_of(a), "safety"))
         elif t in (EventType.ESCALATED, EventType.APPROVED,
                    EventType.OVERRIDDEN, EventType.FALLBACK_USED, EventType.PRIORITY_REPORT):
             add(FeedRow(e.tick, _speaker(e.actor), str(p.get("recipient", "All")),

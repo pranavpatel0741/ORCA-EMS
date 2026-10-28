@@ -9,6 +9,7 @@ on screen is rebuilt from the event log, so a saved run replays exactly.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -18,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:  # `streamlit run` puts app/ on the path, not the repo root
     sys.path.insert(0, str(ROOT))
 
+import config.settings as settings  # noqa: E402
 from app import panels  # noqa: E402
 from app.map_view import town_map  # noqa: E402
 from app.state import build_state  # noqa: E402
@@ -30,8 +32,26 @@ from sim.generator import DEFAULT_POPULATION  # noqa: E402
 from sim.presets import PRESETS, build_preset  # noqa: E402
 from sim.town import TownProfile  # noqa: E402
 
+
+def _agents(negotiate: bool, offline: bool):
+    def make():
+        from orca_agents.llm_cache import LLMClient
+        from orca_agents.orchestrator import AgentPolicy, default_client
+        if offline:
+            from orca_agents.scripted import ScriptedBackend
+            return AgentPolicy(negotiate, LLMClient(ScriptedBackend(), mode="live",
+                                                    cache_dir=LOG_DIR / "dashboard_cache"))
+        return AgentPolicy(negotiate, default_client())
+    return make
+
+
+HAVE_LLM = bool(os.getenv("OPENAI_API_KEY") and settings.OPENAI_MODEL)
 POLICIES = {"Nearest hospital (baseline)": NearestPolicy,
             "Rule-based (strong baseline)": RuleBasedPolicy}
+if HAVE_LLM:
+    POLICIES["AI agents, negotiating (OpenAI)"] = _agents(True, False)
+    POLICIES["AI agents, no negotiation (OpenAI)"] = _agents(False, False)
+POLICIES["AI agents, negotiating (offline stand-in)"] = _agents(True, True)
 
 st.set_page_config(page_title="ORCA-EMS Dispatch", layout="wide",
                    initial_sidebar_state="collapsed")
@@ -46,7 +66,9 @@ def new_engine() -> None:
     cfg = (ss.get("preset", "School bus crash"), int(ss.get("seed", 7)),
            int(ss.get("population", DEFAULT_POPULATION)),
            ss.get("policy", next(iter(POLICIES))))
-    ss.engine = Engine(build_preset(cfg[0], cfg[1], cfg[2]), POLICIES[cfg[3]]())
+    mode = "interactive" if ss.get("human_approval") else "policy"
+    ss.engine = Engine(build_preset(cfg[0], cfg[1], cfg[2]), POLICIES[cfg[3]](),
+                       approval_mode=mode)
     ss.engine.initialize()
     ss.config = cfg
     ss.playing = False
@@ -72,8 +94,12 @@ with st.sidebar:
                     on_change=new_engine)
     st.number_input("Town population", 10_000, 1_000_000, DEFAULT_POPULATION, step=10_000,
                     key="population", on_change=new_engine)
-    st.selectbox("Who makes the decisions", list(POLICIES), key="policy", on_change=new_engine,
-                 help="The LLM agents join this list in milestones M6–M7.")
+    st.toggle("I approve risky decisions myself", key="human_approval", on_change=new_engine,
+              help="Decisions flagged for human review pause the run and wait for you. "
+                   "Off: a fixed approval policy decides after 2 simulated minutes.")
+    if not HAVE_LLM:
+        st.caption("No OpenAI key in .env: the agents run with an offline stand-in that "
+                   "follows their instructions with simple rules. It is not an LLM.")
     st.slider("Speed (simulated minutes per second)", 1, 15, 3, key="speed")
     replay = st.toggle("Replay a saved run", key="replay_mode")
     if st.button("Save this run", use_container_width=True) and "engine" in ss:
@@ -92,17 +118,43 @@ if "engine" not in ss:
 
 # --- top bar ----------------------------------------------------------------------------------
 st.markdown("### ORCA-EMS · Dispatch")
-pick, b1, b2, b3, b4 = st.columns([3, 1, 1, 1, 1], vertical_alignment="bottom")
-pick.selectbox("Incident", list(PRESETS), key="preset", on_change=new_engine,
-               label_visibility="collapsed")
+pick, who = st.columns([1, 1], vertical_alignment="bottom")
+pick.selectbox("Incident", list(PRESETS), key="preset", on_change=new_engine)
+who.selectbox("Who makes the decisions", list(POLICIES), key="policy", on_change=new_engine)
+b1, b2, b3, b4 = st.columns(4, vertical_alignment="bottom")
 b1.button("Pause" if ss.playing else "Start", type="primary", use_container_width=True,
           on_click=toggle_play)
 b2.button("+1 min", use_container_width=True, on_click=step, args=(1,))
 b3.button("+15 min", use_container_width=True, on_click=step, args=(15,))
 b4.button("Reset", use_container_width=True, on_click=new_engine)
 st.caption(PRESETS[ss.get("preset", "School bus crash")].description +
-           " · Town of 50,000 on a 20 × 20 km grid · decisions by "
-           f"{ss.get('policy', next(iter(POLICIES))).lower()}")
+           " · Town of 50,000 on a 20 × 20 km grid")
+
+
+def approval_cards() -> None:
+    """Interactive approval (PLAN §14.6): top option vs the best alternative."""
+    engine = ss.get("engine")
+    if engine is None or ss.get("replay_mode") or engine.approval_mode != "interactive":
+        return
+    for p in engine.pending_approvals:
+        if p.decided:
+            continue
+        a, alt = p.action, p.alternative
+        target = getattr(a, "hospital_id", None) or getattr(a, "incident_id", "")
+        with st.container(border=True):
+            st.markdown(f"**Needs your approval · {p.id}** — {a.unit_id} → "
+                        f"{'Hospital ' + target if getattr(a, 'hospital_id', None) else target}")
+            for r in p.reasons:
+                st.caption(r)
+            if getattr(a, "confidence", None) is not None:
+                st.caption(f"Agent confidence: {a.confidence:.2f}")
+            c1, c2 = st.columns(2)
+            c1.button("Approve", key=f"ok_{p.id}", type="primary", use_container_width=True,
+                      on_click=engine.decide_approval, args=(p.id, "approve"))
+            if alt is not None:
+                c2.button(f"Use Hospital {alt.hospital_id}", key=f"alt_{p.id}",
+                          use_container_width=True, on_click=engine.decide_approval,
+                          args=(p.id, "alternative"))
 
 
 def render(events, tick, timings) -> None:
@@ -124,6 +176,7 @@ def render(events, tick, timings) -> None:
         st.plotly_chart(town_map(state, town, focus_id, height=420), use_container_width=True,
                         config={"displayModeBar": False})
     with right:
+        approval_cards()
         st.selectbox("Show conversation for", options, key="focus")
         panels.conversation(state, focus_id, height=440)
 
@@ -146,7 +199,12 @@ else:
     def live_view() -> None:
         engine: Engine = ss.engine
         if ss.playing:
-            engine.run(until=engine.tick + ss.speed)
+            for _ in range(ss.speed):
+                engine.run(until=engine.tick + 1)
+                if engine.approval_mode == "interactive" and any(
+                        not p.decided for p in engine.pending_approvals):
+                    ss.playing = False  # wait for the human
+                    st.rerun(scope="app")
             if engine.tick >= engine.end_tick:
                 ss.playing = False
                 st.rerun(scope="app")
