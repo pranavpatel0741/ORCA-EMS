@@ -317,8 +317,8 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
             category = HOSPITAL if p["sender"].startswith("hospital") else AGENT
             # Agent messages written from an LLM answer in this minute. The confidence check
             # (ESCALATE) and pre-alerts are composed by code, not by an agent.
-            call = call_at.get((e.tick, p["sender"])) if mtype not in (
-                "ESCALATE", "PRE_ALERT") else None
+            call = None if p.get("by_code") or mtype in ("ESCALATE", "PRE_ALERT") \
+                else call_at.get((e.tick, p["sender"]))
             add(FeedRow(e.tick, sender, recipient, mtype.replace("_", " "), text, category,
                         p.get("incident_id"), _role(p["sender"]),
                         ai_source if call else "sim", call))
@@ -538,3 +538,65 @@ def transport_summary(state: DashState, incident_id: str | None = None) -> dict[
         row = out.setdefault(rec["hospital_id"], {c: 0 for c in TRIAGE.values()})
         row[rec["triage"]] += 1
     return dict(sorted(out.items()))
+
+
+# --- agent-to-agent communication -------------------------------------------------------------
+
+NEGOTIATION = {"PROPOSE", "ACCEPT", "COUNTER", "REJECT", "ESCALATE", "RESOLVE", "STATUS"}
+
+
+def speaker(actor: str) -> str:
+    """Display name of a message sender or recipient, grouping all ambulances together."""
+    if actor.startswith(("AMB", "PVT")):
+        return "Ambulances"
+    return {"agents": "Dispatch", "human": "Human reviewer", "all": "All"}.get(
+        actor, _speaker(actor))
+
+
+def talk_counts(events: list[Event]) -> Counter:
+    """Messages sent between participants: (sender, recipient) -> count."""
+    out: Counter = Counter()
+    for e in events:
+        if e.type == EventType.MESSAGE and e.payload["recipient"] != "all":
+            out[(speaker(e.payload["sender"]), speaker(e.payload["recipient"]))] += 1
+    return out
+
+
+def negotiation_threads(events: list[Event]) -> list[dict[str, Any]]:
+    """One thread per ambulance load: Dispatch's proposals, the hospitals' answers, any
+    escalation and the allocator's ruling, and where the ambulance finally went."""
+    calls = {(e.tick, e.payload["agent"]): e.payload for e in events
+             if e.type == EventType.LLM_CALL}
+    standin = bool(calls) and all(c["model"] == "scripted" for c in calls.values())
+    threads: list[dict[str, Any]] = []
+    open_: dict[str, dict[str, Any]] = {}
+    for e in events:
+        p = e.payload
+        if e.type == EventType.MESSAGE and p["type"] in NEGOTIATION:
+            units = [(p.get("proposed_action") or {}).get("unit_id")]
+            if p["type"] == "RESOLVE":
+                units = [r["unit_id"] for r in (p.get("proposed_action") or {}).get("routes", [])]
+            for uid in filter(None, units):
+                if p["type"] == "STATUS" and not p["recipient"].startswith("hospital"):
+                    continue
+                th = open_.get(uid)
+                if th is None or (p["type"] == "PROPOSE" and p.get("negotiation_round") == 0
+                                  and th["outcome"]):
+                    th = {"unit": uid, "start": e.tick, "incident": p.get("incident_id"),
+                          "patients": len(p.get("patient_ids") or []), "turns": [],
+                          "outcome": None}
+                    open_[uid] = th
+                    threads.append(th)
+                call = None if p.get("by_code") else calls.get((e.tick, p["sender"]))
+                src = ("standin" if standin else "ai") if call else "sim"
+                th["turns"].append({"tick": e.tick, "sender": speaker(p["sender"]),
+                                    "recipient": speaker(p["recipient"]), "type": p["type"],
+                                    "text": p.get("reason", ""), "source": src,
+                                    "round": p.get("negotiation_round"), "ai": call})
+        elif e.type == EventType.COMMITTED and p["action"].get("kind") == "route":
+            th = open_.get(p["action"]["unit_id"])
+            if th is not None and th["outcome"] is None:
+                by = p["action"].get("decided_by", "")
+                th["outcome"] = {"tick": e.tick, "hospital": p["action"]["hospital_id"],
+                                 "by": "rule backup" if by == "rules" else "agents"}
+    return threads

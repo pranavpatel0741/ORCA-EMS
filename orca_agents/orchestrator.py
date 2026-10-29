@@ -283,7 +283,7 @@ class AgentPolicy:
         for c in conflicts:
             obs.send("dispatch", "allocator", "ESCALATE",
                      f"{c['type'].replace('_', ' ')}: {c.get('unit_id')}",
-                     incident_id=c.get("to_call"), proposed_action=c)
+                     incident_id=c.get("to_call"), proposed_action=c, by_code=True)
         try:
             res: Resolution = self._call(obs, allocator.SPEC,
                                          allocator.payload(obs, conflicts, offers),
@@ -312,7 +312,8 @@ class AgentPolicy:
             live = obs.own_status[hid]["free"]
             obs.send("dispatch", f"hospital:{hid}", "STATUS",
                      f"Confidence {conf.score:.2f}; requesting your current status.",
-                     patient_ids=unit.patient_ids)
+                     patient_ids=unit.patient_ids, by_code=True,
+                     proposed_action={"unit_id": uid, "hospital_id": hid})
             conf = score(obs, uid, hid, patients, validator_clean=clean, live_free=live)
             verdict = "execute" if conf.decision() == "execute" else "escalate"
         review = force_review or verdict == "escalate"
@@ -320,7 +321,8 @@ class AgentPolicy:
             obs.send("dispatch", "human", "ESCALATE",
                      f"Confidence {conf.score:.2f} for {uid} → Hospital {hid}; asking for "
                      "review.", patient_ids=unit.patient_ids,
-                     incident_id=unit.assigned_incident)
+                     incident_id=unit.assigned_incident, by_code=True,
+                     proposed_action={"unit_id": uid, "hospital_id": hid})
         return RouteToHospital(unit_id=uid, hospital_id=hid, rationale=rationale,
                                confidence=conf.score, needs_review=review)
 
