@@ -390,6 +390,33 @@ def talk_graph(counts) -> None:
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 
+def run_results(events) -> None:
+    """Scorecard of the run so far, and all saved runs side by side."""
+    from eval.run_report import SCORECARD, _fmt, load_index, scorecard
+
+    if not events or events[-1].tick < 1:
+        st.caption("Start a run to see how well it is being handled.")
+    else:
+        card = scorecard(events)
+        h, d = card["headline"], card["decisions"]
+        rows = [{"Measure": label, "Value": _fmt(h.get(key), unit)}
+                for label, key, unit in SCORECARD]
+        rows += [{"Measure": "Decisions by AI agents", "Value": str(d["ai"])},
+                 {"Measure": "Decisions by the rule backup", "Value": str(d["rule_backup"])}]
+        st.markdown(f'<div class="cad-h">This run so far · minute {card["minutes"]} · '
+                    f'{html.escape(str(card["policy"]))}</div>', unsafe_allow_html=True)
+        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+    saved = load_index()
+    if saved:
+        st.markdown(f'<div class="cad-h">Saved runs ({len(saved)}) · results/runs_saved/'
+                    f'index.csv</div>', unsafe_allow_html=True)
+        cols = ["saved", "incident", "policy", "model", "deaths", "critical_on_time",
+                "critical_care_mean", "response_mean", "er_wait_over_base", "rejections",
+                "ai_decisions", "rule_backup_decisions", "llm_tokens", "folder"]
+        st.dataframe(pd.DataFrame(saved)[cols][::-1], hide_index=True,
+                     use_container_width=True, height=240)
+
+
 def ai_banner(state: DashState, policy: str) -> None:
     """One line saying who makes the decisions, and how many came from AI vs the backup."""
     k = state.kpis

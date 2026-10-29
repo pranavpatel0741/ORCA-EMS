@@ -81,6 +81,15 @@ PACE = {"Real time (1 min = 1 min)": 1 / 60, "Fast (1 min per second)": 1.0,
         "Faster (5 min per second)": 5.0, "Fastest (15 min per second)": 15.0}
 
 
+def save_current(note: bool = True) -> None:
+    """Save the run's log, transcript and scorecard to results/runs_saved/."""
+    from eval.run_report import save_run
+
+    folder = save_run(ss.engine.log.events, ss.config[0])
+    if note:
+        st.toast(f"Saved to results/runs_saved/{folder.name}")
+
+
 def toggle_play() -> None:
     if ss.engine.tick >= ss.engine.end_tick:
         new_engine()
@@ -108,12 +117,15 @@ with st.sidebar:
         st.caption("No OpenAI key in .env: the agents run with an offline stand-in that "
                    "follows their instructions with simple rules. It is not an LLM.")
     replay = st.toggle("Replay a saved run", key="replay_mode")
-    if st.button("Save this run", use_container_width=True) and "engine" in ss:
-        path = ss.engine.log.write_jsonl(LOG_DIR / f"run_{ss.engine.run_id}.jsonl")
-        st.success(f"Saved {path.name}")
+    st.toggle("Save each finished run (transcript + scorecard)", value=True, key="autosave",
+              help="When a run reaches its end it is saved to results/runs_saved/.")
     if replay:
-        logs = sorted(LOG_DIR.glob("run_*.jsonl"))
-        choice = st.selectbox("Saved run", logs, format_func=lambda p: p.name, key="replay_file")
+        from eval.run_report import SAVE_DIR
+        logs = sorted(SAVE_DIR.glob("*/events.jsonl"), reverse=True) + \
+            sorted(LOG_DIR.glob("run_*.jsonl"))
+        choice = st.selectbox("Saved run", logs, key="replay_file",
+                              format_func=lambda p: p.parent.name if p.name == "events.jsonl"
+                              else p.name)
         if choice is not None and ss.get("replay_path") != str(choice):
             ss.replay_events = read_jsonl(choice)
             ss.replay_path = str(choice)
@@ -210,12 +222,17 @@ def render(events, tick, timings) -> None:
         panels.unit_board(state)
 
     panels.hospital_board(state)
-    tabs = st.tabs(["AI activity", "Mass-casualty board", "Timeline and handling time"])
+    tabs = st.tabs(["How well it went", "AI activity", "Mass-casualty board",
+                    "Timeline and handling time"])
     with tabs[0]:
-        panels.ai_activity(state)
+        panels.run_results(events)
+        if not ss.get("replay_mode") and "engine" in ss:
+            st.button("Save this run now (log, transcript, scorecard)", on_click=save_current)
     with tabs[1]:
-        panels.mci_board(state)
+        panels.ai_activity(state)
     with tabs[2]:
+        panels.mci_board(state)
+    with tabs[3]:
         panels.timeline(state, events, timings, focus_id)
 
 
@@ -245,6 +262,9 @@ else:
                     st.rerun(scope="app")
             if engine.tick >= engine.end_tick:
                 ss.playing = False
+                if ss.get("autosave", True) and ss.get("autosaved_for") != id(engine):
+                    save_current(note=False)  # once per run
+                    ss.autosaved_for = id(engine)
                 st.rerun(scope="app")
         render(engine.log.events, engine.tick, engine.decision_timings)
 
