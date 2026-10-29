@@ -111,8 +111,10 @@ def wall_clock(tick: int) -> str:
     return f"{total // 60 % 24:02d}:{total % 60:02d}"
 
 
-def clock_html(tick: int) -> str:
-    return f'<div class="cad-clock">{wall_clock(tick)}<small>MINUTE {tick}</small></div>'
+def clock_html(tick: int, seconds: int | None = None) -> str:
+    """Time of day; in real-time pace the seconds tick too."""
+    secs = f'<span style="color:#7D8A97">:{seconds:02d}</span>' if seconds is not None else ""
+    return f'<div class="cad-clock">{wall_clock(tick)}{secs}<small>MINUTE {tick}</small></div>'
 
 
 def status_chips(state: DashState) -> None:
@@ -208,8 +210,17 @@ def _message(r: FeedRow) -> str:
             f'<div class="tx">{html.escape(r.text)}</div></div></div>')
 
 
-def conversation(state: DashState, focus: str | None, height: int = 600) -> None:
+AGENT_KINDS = {"PRIORITY REPORT", "PROPOSE", "ACCEPT", "COUNTER", "REJECT", "ESCALATE",
+               "RESOLVE", "STAFF REQUEST", "STAFF RESPONSE", "MUTUAL AID REQUEST",
+               "MUTUAL AID RESPONSE", "NEEDS APPROVAL", "APPROVED", "OVERRIDDEN", "AI NOT USED"}
+
+
+def conversation(state: DashState, focus: str | None, height: int = 600,
+                 agents_only: bool = False) -> None:
     rows = state.threads.get(focus, []) if focus else state.feed
+    if agents_only:  # the agents talking to each other, without crews, calls and status
+        rows = [r for r in rows if r.source in ("ai", "standin", "backup")
+                or r.kind in AGENT_KINDS]
     title = f"Conversation · {focus}" if focus else "Conversation · all incidents"
     st.markdown(f'<div class="cad-h">{html.escape(title)}</div>', unsafe_allow_html=True)
     with st.container(height=height, border=False):
@@ -293,6 +304,90 @@ AGENT_NAME = {"assessment": "Assessment", "dispatch": "Dispatch", "allocator": "
 def _agent_name(agent: str) -> str:
     return AGENT_NAME.get(agent) or ("Hospital " + agent.split(":")[-1]
                                      if agent.startswith("hospital") else agent)
+
+
+TYPE_COLOR = {"PROPOSE": "#4C9EFF", "ACCEPT": "#3DD68C", "COUNTER": "#F2A33A",
+              "REJECT": "#E5484D", "ESCALATE": "#B18CFF", "RESOLVE": "#2EC4B6",
+              "STATUS": "#7D8A97"}
+
+
+def negotiations(threads: list[dict], focus: str | None, height: int = 520) -> None:
+    """Each ambulance's negotiation as one thread: proposals, answers, rulings, outcome."""
+    shown = [t for t in threads if focus is None or t["incident"] == focus]
+    st.markdown(f'<div class="cad-h">Negotiations · {len(shown)} ambulance(s)</div>',
+                unsafe_allow_html=True)
+    with st.container(height=height, border=False):
+        if not shown:
+            st.caption("When an ambulance has patients, Dispatch proposes a hospital and the "
+                       "hospital agents accept, counter or reject. Each exchange appears here. "
+                       "Baselines do not negotiate.")
+        for t in reversed(shown):
+            out = t["outcome"]
+            end = (f'→ <b>Hospital {out["hospital"]}</b> at {wall_clock(out["tick"])} '
+                   f'(decided by {out["by"]})' if out else "→ still open")
+            rounds = 1 + max((x["round"] or 0 for x in t["turns"] if x["round"] is not None
+                              and x["round"] <= 3), default=0)
+            body = "".join(
+                f'<div class="msg"><div class="av" style="background:'
+                f'{TYPE_COLOR.get(x["type"], "#7D8A97")}">{html.escape(x["type"][:4])}</div>'
+                f'<div><div class="hd"><b>{html.escape(x["sender"])}</b><span>→ '
+                f'{html.escape(x["recipient"])}</span>'
+                + _source_chip(FeedRow(x["tick"], x["sender"], x["recipient"], x["type"],
+                                       x["text"], "agent", source=x["source"], ai=x["ai"]))
+                + f'<span class="t">{wall_clock(x["tick"])}</span></div>'
+                f'<div class="tx">{html.escape(x["text"])}</div></div></div>'
+                for x in t["turns"])
+            st.markdown(
+                f'<div style="border:1px solid rgba(140,160,180,.22);border-radius:.45rem;'
+                f'padding:.45rem .6rem;margin-bottom:.6rem"><div class="hd" style="font-size:'
+                f'.85rem;color:#E6EDF3"><b>{html.escape(t["unit"])}</b> · '
+                f'{t["patients"]} patient(s) · {html.escape(t["incident"] or "")} · '
+                f'{rounds} round(s) {end}</div>{body}</div>', unsafe_allow_html=True)
+
+
+NODE_POS = {"Assessment": (-1.6, 1.3), "Dispatch": (0, 0), "Allocator": (1.6, 1.3),
+            "Human reviewer": (0, 1.6), "Hospital A": (-1.8, -0.9), "Hospital B": (-0.6, -1.6),
+            "Hospital C": (0.6, -1.6), "Hospital D": (1.8, -0.9), "Ambulances": (-2.2, 0.3),
+            "Private firm": (2.2, 0.3)}
+
+
+def talk_graph(counts) -> None:
+    """Who talks to whom: one line per pair, thicker for more messages."""
+    import plotly.graph_objects as go
+
+    pairs: dict[tuple, int] = {}
+    for (a, b), n in counts.items():
+        a = "Private firm" if a.startswith("firm") or a == "MedRide" else a
+        b = "Private firm" if b.startswith("firm") or b == "MedRide" else b
+        if a in NODE_POS and b in NODE_POS and a != b:
+            key = tuple(sorted((a, b)))
+            pairs[key] = pairs.get(key, 0) + n
+    fig = go.Figure()
+    top = max(pairs.values(), default=1)
+    for (a, b), n in pairs.items():
+        (x0, y0), (x1, y1) = NODE_POS[a], NODE_POS[b]
+        fig.add_trace(go.Scatter(x=[x0, x1], y=[y0, y1], mode="lines", hoverinfo="skip",
+                                 line=dict(width=1.5 + 7 * n / top, color="rgba(76,158,255,.45)"),
+                                 showlegend=False))
+        fig.add_annotation(x=(x0 + x1) / 2, y=(y0 + y1) / 2, text=str(n), showarrow=False,
+                           font=dict(color="#E6EDF3", size=11), bgcolor="#0B1016")
+    used = {x for pair in pairs for x in pair} or {"Dispatch"}
+    names = [n for n in NODE_POS if n in used]
+    color = {"Dispatch": "#2EC4B6", "Assessment": "#4C9EFF", "Allocator": "#B18CFF",
+             "Human reviewer": "#F2A33A", "Ambulances": "#8B8D98", "Private firm": "#C9D3DD"}
+    fig.add_trace(go.Scatter(
+        x=[NODE_POS[n][0] for n in names], y=[NODE_POS[n][1] for n in names],
+        mode="markers+text", text=names, textposition="bottom center", showlegend=False,
+        marker=dict(size=34, color=[color.get(n, "#3DD68C") for n in names],
+                    line=dict(color="#0B1016", width=2)),
+        textfont=dict(color="#C9D3DD", size=11), hoverinfo="text"))
+    fig.update_layout(height=360, margin=dict(l=10, r=10, t=10, b=10),
+                      plot_bgcolor="#0B1016", paper_bgcolor="#0B1016",
+                      xaxis=dict(visible=False, range=[-2.8, 2.8], fixedrange=True),
+                      yaxis=dict(visible=False, range=[-2.1, 2.0], fixedrange=True))
+    st.markdown('<div class="cad-h">Who talks to whom (messages so far)</div>',
+                unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 
 def ai_banner(state: DashState, policy: str) -> None:

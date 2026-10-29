@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -22,7 +23,7 @@ if str(ROOT) not in sys.path:  # `streamlit run` puts app/ on the path, not the 
 import config.settings as settings  # noqa: E402
 from app import panels  # noqa: E402
 from app.map_view import town_map  # noqa: E402
-from app.state import build_state  # noqa: E402
+from app.state import build_state, negotiation_threads, talk_counts  # noqa: E402
 from baselines.nearest import NearestPolicy  # noqa: E402
 from baselines.rule_based import RuleBasedPolicy  # noqa: E402
 from config.settings import LOG_DIR  # noqa: E402
@@ -75,10 +76,16 @@ def new_engine() -> None:
     ss.focus = "All incidents"
 
 
+# Simulated minutes per real second. Real time: one simulated minute takes one real minute.
+PACE = {"Real time (1 min = 1 min)": 1 / 60, "Fast (1 min per second)": 1.0,
+        "Faster (5 min per second)": 5.0, "Fastest (15 min per second)": 15.0}
+
+
 def toggle_play() -> None:
     if ss.engine.tick >= ss.engine.end_tick:
         new_engine()
     ss.playing = not ss.playing
+    ss.last_wall, ss.budget = time.monotonic(), 0.0
 
 
 def step(minutes: int) -> None:
@@ -100,7 +107,6 @@ with st.sidebar:
     if not HAVE_LLM:
         st.caption("No OpenAI key in .env: the agents run with an offline stand-in that "
                    "follows their instructions with simple rules. It is not an LLM.")
-    st.slider("Speed (simulated minutes per second)", 1, 15, 3, key="speed")
     replay = st.toggle("Replay a saved run", key="replay_mode")
     if st.button("Save this run", use_container_width=True) and "engine" in ss:
         path = ss.engine.log.write_jsonl(LOG_DIR / f"run_{ss.engine.run_id}.jsonl")
@@ -121,12 +127,15 @@ st.markdown("### ORCA-EMS · Dispatch")
 pick, who = st.columns([1, 1], vertical_alignment="bottom")
 pick.selectbox("Incident", list(PRESETS), key="preset", on_change=new_engine)
 who.selectbox("Who makes the decisions", list(POLICIES), key="policy", on_change=new_engine)
-b1, b2, b3, b4 = st.columns(4, vertical_alignment="bottom")
+b1, b2, b3, b4, b5 = st.columns([1, 1, 1, 1, 1.4], vertical_alignment="bottom")
 b1.button("Pause" if ss.playing else "Start", type="primary", use_container_width=True,
           on_click=toggle_play)
 b2.button("+1 min", use_container_width=True, on_click=step, args=(1,))
 b3.button("+15 min", use_container_width=True, on_click=step, args=(15,))
 b4.button("Reset", use_container_width=True, on_click=new_engine)
+b5.selectbox("Pace", list(PACE), index=1, key="pace", label_visibility="collapsed",
+             help="Real time: one simulated minute takes one real minute, as in a real "
+                  "dispatch center. The faster paces compress time for demos.")
 st.caption(PRESETS[ss.get("preset", "School bus crash")].description +
            " · Town of 50,000 on a 20 × 20 km grid")
 
@@ -162,7 +171,9 @@ def render(events, tick, timings) -> None:
     chips, clock = st.columns([6, 1], vertical_alignment="center")
     with chips:
         panels.status_chips(state)
-    clock.markdown(panels.clock_html(tick), unsafe_allow_html=True)
+    real_time = PACE[ss.get("pace", next(iter(PACE)))] < 1 and ss.get("playing")
+    clock.markdown(panels.clock_html(tick, int(ss.get("budget", 0) * 60) if real_time
+                                     else None), unsafe_allow_html=True)
     options = ["All incidents"] + sorted(state.incidents)
     if ss.focus not in options:
         ss.focus = "All incidents"
@@ -181,9 +192,20 @@ def render(events, tick, timings) -> None:
     left, right = st.columns([1.15, 1], gap="medium")
     with left:
         approval_cards()
-        st.selectbox("Show conversation for", options, key="focus")
-        panels.conversation(state, focus_id, height=460)
+        f1, f2 = st.columns([1, 1.3], vertical_alignment="bottom")
+        f1.selectbox("Show conversation for", options, key="focus")
+        view = f2.segmented_control(
+            "View", ["Everything", "Agents only", "Negotiations"], default="Everything",
+            key="conv_view", help="Everything: calls, crews, hospitals and agents. Agents "
+            "only: just the agents talking. Negotiations: one thread per ambulance.")
+        if view == "Negotiations":
+            panels.negotiations(negotiation_threads(events), focus_id, height=460)
+        else:
+            panels.conversation(state, focus_id, height=460,
+                                agents_only=view == "Agents only")
     with right:
+        if ss.get("conv_view") in ("Agents only", "Negotiations"):
+            panels.talk_graph(talk_counts([e for e in events if e.tick <= tick]))
         st.markdown('<div class="cad-h">Ambulances</div>', unsafe_allow_html=True)
         panels.unit_board(state)
 
@@ -206,7 +228,16 @@ else:
     def live_view() -> None:
         engine: Engine = ss.engine
         if ss.playing:
-            for _ in range(ss.speed):
+            # Advance by elapsed wall time x pace, catching up on page-refresh time but at most
+            # ~3 s worth, so a slow AI call does not make the clock leap ahead afterwards.
+            rate = PACE[ss.get("pace", next(iter(PACE)))]
+            now = time.monotonic()
+            ss.budget = min(ss.get("budget", 0.0) + (now - ss.get("last_wall", now)) * rate,
+                            1.0 if rate < 1 else 3 * rate)
+            ss.last_wall = now
+            steps = int(ss.budget)
+            ss.budget -= steps
+            for _ in range(steps):
                 engine.run(until=engine.tick + 1)
                 if engine.approval_mode == "interactive" and any(
                         not p.decided for p in engine.pending_approvals):
