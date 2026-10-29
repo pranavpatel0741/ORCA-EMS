@@ -2,7 +2,8 @@
 mechanism, and no committed action violates a rule.
 
 Runs the agent orchestration with the scripted backend (no network). Hospital A is given a
-deliberately short nurse roster so a staff request happens; this fixture is test-only.
+deliberately short nurse roster so a staff request happens, and the city has one ambulance fewer
+so mutual aid is needed; both changes are test-only.
 """
 
 import pytest
@@ -22,6 +23,7 @@ def surge_log(tmp_path_factory):
     for h in scenario.hospitals:
         if h.id == "A":
             h.nurses_total, h.min_nurse_coverage = 1, 1
+    scenario.ambulances = [a for a in scenario.ambulances if a.id != "AMB-4"]
     policy = AgentPolicy(client=LLMClient(ScriptedBackend(), mode="live",
                                           cache_dir=tmp_path_factory.mktemp("cache")))
     engine = Engine(scenario, policy, info="partial", tick_hook=check_invariants)

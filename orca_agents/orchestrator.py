@@ -142,10 +142,18 @@ class AgentPolicy:
         free = {u.id for u in obs.free_units()}
         used: set[str] = set()
         for a in plan.assignments:
-            inc = obs.incidents.get(a.incident_id)
+            if not a.incident_id.strip():
+                continue  # the model listed a unit with no call: nothing to do
             unit = obs.units.get(a.unit_id)
+            if unit is not None and a.unit_id not in free and (
+                    unit.patient_ids or unit.state not in ("EN_ROUTE", "STAGING")):
+                continue  # restates a unit that is already busy with its patients: no-op
+            inc = obs.incidents.get(a.incident_id)
+            if inc is None and (p := obs.patient(a.incident_id)):
+                inc = obs.incidents.get(p.incident_id)  # a patient ID given as the call
             if inc is None or unit is None:
-                self._fallback(obs, "dispatch named an unknown unit or call", unit_id=a.unit_id)
+                self._fallback(obs, "dispatch named an unknown unit or call", unit_id=a.unit_id,
+                               incident_id=a.incident_id)
                 continue
             waiting = {p.id for p in obs.waiting(inc.id)}
             pids = [p for p in a.patient_ids if p in waiting]
@@ -341,10 +349,12 @@ class AgentPolicy:
             return self.fallback.decide(obs)
 
         actions, conflicts = self._assignments(obs, plan)
-        if plan.mutual_aid and plan.mutual_aid.firm_id in obs.firms:
-            actions.append(ActivateMutualAid(firm_id=plan.mutual_aid.firm_id,
-                                             units=plan.mutual_aid.units,
-                                             rationale=plan.rationale))
+        if plan.mutual_aid and (firm := obs.firms.get(plan.mutual_aid.firm_id)):
+            left = min(firm.max_units, len(firm.unit_ids)) - firm.in_use
+            if left > 0:  # ask for no more units than the firm still has
+                actions.append(ActivateMutualAid(firm_id=firm.id,
+                                                 units=min(plan.mutual_aid.units, left),
+                                                 rationale=plan.rationale))
 
         def allowed(uid: str, hid: str) -> bool:
             return hid in obs.hospitals and hid not in self._rule_rejected.get(uid, set())
