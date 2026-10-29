@@ -93,3 +93,17 @@ def test_incoming_count_drops_when_ambulance_arrives():
     events = run_lifecycle().log.events
     assert build_state(events, upto=30).hospitals["H"]["incoming"] == 1  # transporting 29..39
     assert build_state(events, upto=39).hospitals["H"]["incoming"] == 0
+
+
+def test_map_draws_stations_routes_and_respects_layers():
+    from app.map_view import town_map
+    from sim.town import TownProfile
+
+    state = build_state(surge_engine(until=40).log.events)
+    town = TownProfile()
+    assert all(u.get("home") for u in state.units.values())
+    full = town_map(state, town)
+    assert any(t.name == "Station" for t in full.data)
+    assert len(full.layout.shapes) > 40  # street grid
+    bare = town_map(state, town, layers=set())
+    assert not bare.layout.shapes and not any(t.name == "Station" for t in bare.data)

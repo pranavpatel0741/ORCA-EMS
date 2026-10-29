@@ -177,7 +177,8 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
     units: dict[str, dict[str, Any]] = {
         uid: {"id": uid, "kind": "AMBULANCE", "unit_type": a["unit_type"], "state": "IDLE",
               "since": 0, "incident_id": None, "hospital_id": None,
-              "location": a["home_station"], "activated": a["owner"] == "PUBLIC"}
+              "location": a["home_station"], "home": a["home_station"],
+              "activated": a["owner"] == "PUBLIC"}
         for uid, a in amb_cfg.items()
     }
     incidents: dict[str, dict[str, Any]] = {}
