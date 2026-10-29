@@ -14,13 +14,28 @@ SPEC = AgentSpec("dispatch", "dispatch.md", DispatchPlan, tools=DISPATCH_TOOLS)
 
 
 def hospital_rows(obs: Observation) -> list[dict[str, Any]]:
-    return [{"id": h.id, "capabilities": h.capabilities, "owner": h.owner,
-             "stabilization_only": h.stabilization_only, "contract": h.contract,
-             "free": {k: h.free[k] for k in ("er_bed", "trauma_bay", "surgeon", "or",
-                                             "ward_bed", "nurse_slot")},
-             "queue": h.queue, "boarding": h.boarding, "board_age_min": obs.tick - h.board_tick,
-             "already_sent": len(obs.incoming(h.id))}
-            for h in obs.hospitals.values()]
+    """The status board plus a few derived facts, stated plainly so the model does not have to
+    work them out (the baselines compute the same facts from the same board)."""
+    rows = []
+    for h in obs.hospitals.values():
+        sent = len(obs.incoming(h.id))
+        trauma = bool({"TRAUMA_L1", "TRAUMA_L2"} & set(h.capabilities)) and \
+            h.totals.get("surgeon", 0) > 0
+        if h.owner == "PRIVATE":
+            takes = ("now: stable SERIOUS non-trauma patients only" if obs.surge_active
+                     else "no: only during a mass-casualty surge")
+        else:
+            takes = "yes"
+        rows.append({
+            "id": h.id, "capabilities": h.capabilities, "owner": h.owner,
+            "trauma_center": trauma, "stabilization_only": h.stabilization_only,
+            "takes_ambulance_patients": takes, "contract": h.contract,
+            "free": {k: h.free[k] for k in ("er_bed", "trauma_bay", "surgeon", "or",
+                                            "ward_bed", "nurse_slot")},
+            "already_sent": sent,
+            "er_beds_left_after_ambulances_on_the_way": h.free["er_bed"] - sent,
+            "queue": h.queue, "boarding": h.boarding, "board_age_min": obs.tick - h.board_tick})
+    return rows
 
 
 def payload(obs: Observation, reports: dict[str, PriorityReport],
@@ -55,6 +70,7 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
     return {
         "minute": obs.tick, "information": obs.info, "surge_active": obs.surge_active,
         "calls": calls,
+        "free_unit_count": len(free),
         "free_units": [{"id": u.id, "type": u.unit_type,
                         "eta_to_calls_min": {c["id"]: obs.eta(u.location,
                                                              obs.incidents[c["id"]].location)

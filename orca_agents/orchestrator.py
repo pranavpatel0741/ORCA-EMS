@@ -335,9 +335,21 @@ class AgentPolicy:
     # --- decide --------------------------------------------------------------------------------
 
     def decide(self, obs: Observation) -> list[Action]:
-        """Agent decisions, each tagged with who made it: an LLM agent or the rule backup."""
+        """Agent decisions, each tagged with who made it: an LLM agent or the rule backup.
+
+        At most one order per ambulance per minute: a route beats a dispatch, and a later
+        order (e.g. the allocator's ruling) replaces an earlier one of the same kind."""
+        per_unit: dict[str, Action] = {}
+        other: list[Action] = []
+        for a in self._decide(obs):
+            uid = getattr(a, "unit_id", None)
+            if uid is None:
+                other.append(a)
+            elif not (a.kind == "dispatch" and getattr(per_unit.get(uid), "kind", "") ==
+                      "route"):
+                per_unit[uid] = a
         return [a.model_copy(update={"decided_by": "rules" if a.rationale.startswith(
-            ("rule-based", RULES_TAG)) else "ai"}) for a in self._decide(obs)]
+            ("rule-based", RULES_TAG)) else "ai"}) for a in [*per_unit.values(), *other]]
 
     def _decide(self, obs: Observation) -> list[Action]:
         self.fallback._note_rejections(obs)
