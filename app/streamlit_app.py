@@ -170,23 +170,27 @@ def render(events, tick, timings) -> None:
     town = TownProfile(population=state.run.get("population") or DEFAULT_POPULATION)
 
     panels.incident_table(state, focus_id)
-    left, right = st.columns([1, 1.1], gap="medium")
+    side, main = st.columns([1, 3.4], gap="medium")
+    with side:
+        layers = panels.map_sidebar(state, town.population, town.area_km)
+    with main:
+        st.plotly_chart(town_map(state, town, focus_id, height=660, layers=layers),
+                        use_container_width=True, config={"displayModeBar": False})
+
+    left, right = st.columns([1.15, 1], gap="medium")
     with left:
-        st.markdown('<div class="cad-h">Town map (km grid)</div>', unsafe_allow_html=True)
-        st.plotly_chart(town_map(state, town, focus_id, height=420), use_container_width=True,
-                        config={"displayModeBar": False})
-    with right:
         approval_cards()
         st.selectbox("Show conversation for", options, key="focus")
-        panels.conversation(state, focus_id, height=440)
+        panels.conversation(state, focus_id, height=460)
+    with right:
+        st.markdown('<div class="cad-h">Ambulances</div>', unsafe_allow_html=True)
+        panels.unit_board(state)
 
     panels.hospital_board(state)
-    tabs = st.tabs(["Ambulances", "Mass-casualty board", "Timeline and handling time"])
+    tabs = st.tabs(["Mass-casualty board", "Timeline and handling time"])
     with tabs[0]:
-        panels.unit_board(state)
-    with tabs[1]:
         panels.mci_board(state)
-    with tabs[2]:
+    with tabs[1]:
         panels.timeline(state, events, timings, focus_id)
 
 

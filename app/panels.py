@@ -77,6 +77,17 @@ CSS = """
   overflow-wrap:anywhere}
 .msg.reject .tx{color:#FFB4B6}
 .msg.flag .tx{color:#FFD9A0}
+.side-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.7rem}
+.side-tile{background:#111A23;border:1px solid rgba(140,160,180,.18);border-radius:.4rem;
+  padding:.4rem .55rem}
+.side-tile b{display:block;font-family:ui-monospace,Menlo,monospace;font-size:1.15rem;
+  color:#E6EDF3}
+.side-tile span{font-size:.7rem;color:#7D8A97}
+.legend-row{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:#C9D3DD;
+  padding:.12rem 0}
+.legend-row i{display:inline-block;width:.75rem;height:.75rem;flex:none}
+.side-h{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;
+  color:#E6EDF3;padding:.28rem 0;border-bottom:1px solid rgba(140,160,180,.10)}
 </style>
 """
 
@@ -185,7 +196,7 @@ def conversation(state: DashState, focus: str | None, height: int = 600) -> None
         st.markdown("".join(_message(r) for r in reversed(rows[-250:])), unsafe_allow_html=True)
 
 
-def _hospital_type(h: dict) -> str:
+def hospital_type(h: dict) -> str:
     caps = set(h.get("capabilities", []))
     if h.get("owner") == "PRIVATE":
         return "Private · surge contract"
@@ -223,7 +234,7 @@ def hospital_board(state: DashState) -> None:
         last = state.hospital_changes.get(hid, [])
         body.append(
             f'<tr><td><b>{html.escape(h.get("name", hid))}</b><div class="cad-sub">'
-            f'{_hospital_type(h)}</div></td>'
+            f'{hospital_type(h)}</div></td>'
             f'<td>{_pill(h["status"], HOSPITAL_STATUS_COLOR[h["status"]])}</td>'
             f'<td>{_free(h, "er_bed")}</td><td>{_free(h, "ward_bed")}</td>'
             f'<td>{_free(h, "trauma_bay")}</td><td>{_free(h, "surgeon")}</td>'
@@ -238,6 +249,40 @@ def hospital_board(state: DashState) -> None:
                         '<th>Surgical teams</th><th>ORs</th><th>ED nurses</th><th>Incoming</th>'
                         '<th>At door</th><th>Waiting</th><th>Boarding</th><th>Last change</th>'
                         '</tr>' + "".join(body) + "</table>"), unsafe_allow_html=True)
+
+
+LEGEND = [  # (shape css, color, label)
+    ("border-radius:50%", "#3DD68C", "Hospital (color = board status)"),
+    ("border-radius:50%", "#E5484D", "Call (size = victims, X = unsafe scene)"),
+    ("transform:rotate(45deg)", "#E6C229", "Ambulance station"),
+    ("clip-path:polygon(50% 0,100% 100%,0 100%)", "#4C9EFF", "Ambulance (color = status)"),
+    ("height:.15rem;border-radius:0", "#4C9EFF", "Going to call"),
+    ("height:.15rem;border-radius:0", "#E5484D", "Transporting to hospital"),
+]
+
+
+def map_sidebar(state: DashState, town_population: int, area_km: float) -> set[str]:
+    """Left panel beside the map: town facts, layer toggles, legend, hospitals. Returns layers."""
+    from app.map_view import LAYERS
+
+    units = [u for u in state.units.values() if u.get("activated")]
+    homes = {tuple(u["home"]) for u in units if u.get("home")}
+    tiles = [(f"{town_population:,}", "residents"), (len(state.hospitals), "hospitals"),
+             (len(units), "ambulances on duty"), (len(homes), "stations"),
+             (f"{area_km * area_km:.0f}", "km² town"), (state.kpis["active_calls"], "active calls")]
+    st.markdown('<div class="side-tiles">' + "".join(
+        f'<div class="side-tile"><b>{v}</b><span>{html.escape(str(label))}</span></div>'
+        for v, label in tiles) + "</div>", unsafe_allow_html=True)
+    st.markdown('<div class="cad-h">Layers</div>', unsafe_allow_html=True)
+    layers = {name for name in LAYERS if st.toggle(name, value=True, key=f"layer_{name}")}
+    st.markdown('<div class="cad-h" style="margin-top:.6rem">Legend</div>' + "".join(
+        f'<div class="legend-row"><i style="background:{c};{shape}"></i>{html.escape(t)}</div>'
+        for shape, c, t in LEGEND), unsafe_allow_html=True)
+    st.markdown('<div class="cad-h" style="margin-top:.7rem">Hospitals</div>' + "".join(
+        f'<div class="side-h"><span><b>{hid}</b> · {html.escape(hospital_type(h))}</span>'
+        f'{_pill(h["status"], HOSPITAL_STATUS_COLOR[h["status"]])}</div>'
+        for hid, h in sorted(state.hospitals.items())), unsafe_allow_html=True)
+    return layers
 
 
 def unit_board(state: DashState) -> None:
