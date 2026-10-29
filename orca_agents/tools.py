@@ -133,6 +133,8 @@ def get_offers(ctx: RunContextWrapper[AgentContext]) -> str:
 
 
 ASSESSMENT_TOOLS = (get_incident, get_scene_reports)
-DISPATCH_TOOLS = (get_available_units, estimate_eta, get_priority_queue, get_hospital_board)
+# No tools: the dispatch input already holds units, ETAs, patients and the board, and with tools
+# the model re-reads them turn after turn until it runs out of turns (seen in live MCI runs).
+DISPATCH_TOOLS: tuple = ()
 HOSPITAL_TOOLS = (get_my_status, get_my_staff, get_my_incoming)
 ALLOCATOR_TOOLS = (get_pending_conflicts, get_offers, estimate_eta)
