@@ -258,3 +258,21 @@ def test_failed_call_is_cached_and_replays_as_failure(tmp_path):
     replay = LLMClient(None, mode="cache_only", cache_dir=tmp_path, model_name="broken")
     with pytest.raises(RecordedFailure, match="model gave up"):
         replay.call(spec, {"x": 1})
+
+
+def test_assigning_a_crew_to_the_call_it_already_serves_is_a_no_op(tmp_path):
+    from baselines.nearest import NearestPolicy
+    from orca_agents.models import Assignment, DispatchPlan
+
+    engine = Engine(generate(7, "surge"), NearestPolicy())
+    engine.initialize()
+    while not any(u.state == "EN_ROUTE" for u in engine.observe().units.values()):
+        engine.step()
+    obs = engine.observe()
+    unit = next(u for u in obs.units.values() if u.state == "EN_ROUTE")
+    plan = DispatchPlan(assignments=[Assignment(unit_id=unit.id,
+                                                incident_id=unit.assigned_incident,
+                                                patient_ids=[], rationale="same call")],
+                        rationale="")
+    actions, conflicts = AgentPolicy(client=client(tmp_path))._assignments(obs, plan)
+    assert not actions and not conflicts

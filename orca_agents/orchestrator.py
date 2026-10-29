@@ -164,6 +164,8 @@ class AgentPolicy:
                 self._fallback(obs, "dispatch named an unknown unit or call", unit_id=a.unit_id,
                                incident_id=a.incident_id)
                 continue
+            if a.unit_id not in free and unit.assigned_incident == inc.id:
+                continue  # already heading there; the crew takes the most severe on scene
             waiting = {p.id for p in obs.waiting(inc.id)}
             pids = [p for p in a.patient_ids if p in waiting]
             if a.patient_ids and not pids:
