@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
+from openai import APIError
 from pydantic import BaseModel
 
 import config.settings as settings
@@ -77,6 +78,19 @@ class Backend(Protocol):
         """Return (typed output, tokens used)."""
 
 
+_LOOP: asyncio.AbstractEventLoop | None = None
+
+
+def _event_loop() -> asyncio.AbstractEventLoop:
+    """One event loop per process. The SDK's shared HTTP client binds to the first loop it runs
+    on, so a fresh loop per call or per backend fails ("Event loop is closed", "bound to a
+    different event loop"), e.g. when the dashboard resets a run."""
+    global _LOOP
+    if _LOOP is None or _LOOP.is_closed():
+        _LOOP = asyncio.new_event_loop()
+    return _LOOP
+
+
 class OpenAIAgentsBackend:
     """Runs an SDK `Agent` with structured output and read-only tools."""
 
@@ -87,15 +101,17 @@ class OpenAIAgentsBackend:
             raise RuntimeError("OPENAI_MODEL is not set (see .env.example)")
         self.max_turns = max_turns
         self.timeout_s = timeout_s
-        # One loop for the backend's lifetime: the SDK's HTTP client binds to the first loop it
-        # runs on, so a fresh loop per call (asyncio.run) fails with "Event loop is closed".
-        self._loop = asyncio.new_event_loop()
 
     def run(self, spec: AgentSpec, payload: dict[str, Any], context: Any) -> tuple[BaseModel, int]:
-        from agents import Agent, Runner
+        from agents import Agent, ModelSettings, Runner
+        from openai.types.shared import Reasoning
 
+        # GPT-5 models reason before answering; keep that minimal (cheaper, faster).
+        settings_ = ModelSettings(reasoning=Reasoning(effort="minimal")) \
+            if self.model.startswith("gpt-5") else ModelSettings()
         agent = Agent(name=spec.agent_id, instructions=spec.instructions, model=self.model,
-                      output_type=spec.output_type, tools=list(spec.tools))
+                      output_type=spec.output_type, tools=list(spec.tools),
+                      model_settings=settings_)
         prompt = json.dumps(payload, sort_keys=True, default=str)
 
         async def go():
@@ -103,7 +119,7 @@ class OpenAIAgentsBackend:
                 Runner.run(agent, prompt, context=context, max_turns=self.max_turns),
                 timeout=self.timeout_s)
 
-        result = self._loop.run_until_complete(go())
+        result = _event_loop().run_until_complete(go())
         usage = result.context_wrapper.usage
         return result.final_output_as(spec.output_type), int(usage.total_tokens or 0)
 
@@ -148,8 +164,11 @@ class LLMClient:
         try:
             out, tokens = self.backend.run(spec, payload, context)
         except Exception as exc:
-            # Save the failure too, so a cached replay takes the same fallback path instead of
-            # stopping with a cache miss.
+            # Save the model's failures too (ran out of turns, malformed output), so a cached
+            # replay takes the same fallback path instead of stopping with a cache miss. API
+            # errors (unknown model, network, rate limit) say nothing about the agent: not saved.
+            if isinstance(exc, APIError):
+                raise
             path.write_text(json.dumps({**record, "error": f"{type(exc).__name__}: {exc}"},
                                        indent=1, sort_keys=True, default=str))
             raise
