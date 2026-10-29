@@ -107,3 +107,30 @@ def test_map_draws_stations_routes_and_respects_layers():
     assert len(full.layout.shapes) > 40  # street grid
     bare = town_map(state, town, layers=set())
     assert not bare.layout.shapes and not any(t.name == "Station" for t in bare.data)
+
+
+def test_messages_are_labeled_with_who_produced_them(tmp_path):
+    from pathlib import Path
+
+    from orca_agents.llm_cache import LLMClient
+    from orca_agents.orchestrator import AgentPolicy
+    from orca_agents.scripted import ScriptedBackend
+
+    policy = AgentPolicy(client=LLMClient(ScriptedBackend(), mode="live",
+                                          cache_dir=Path(tmp_path)))
+    engine = Engine(generate(7, "surge"), policy)
+    engine.run(until=90)
+    state = build_state(engine.log.events)
+    assert len(state.ai_calls) == len(engine.log.of_type(EventType.LLM_CALL))
+    sources = {r.source for r in state.feed}
+    assert "standin" in sources and "ai" not in sources  # scripted agents are never "AI"
+    assert all(r.source == "sim" for r in state.feed if r.kind == "911 CALL")
+    backup = [r for r in state.feed if r.kind == "AI NOT USED"]
+    assert all(r.source == "backup" for r in backup)
+    assert state.kpis["ai_decisions"] > 0
+
+
+def test_baseline_run_has_no_ai_labels():
+    state = build_state(surge_engine(until=60).log.events)
+    assert not state.ai_calls
+    assert {r.source for r in state.feed} <= {"sim", "rules"}

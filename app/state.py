@@ -10,7 +10,7 @@ RESOLVE) arrive as protocol `MESSAGE` events and show up in the same conversatio
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -89,6 +89,11 @@ class FeedRow:
     category: str
     incident_id: str | None = None
     role: str = "system"  # caller | dispatch | unit | hospital | safety | police | fire | firm
+    # Who produced it: "ai" (LLM agent), "standin" (offline scripted agent, not AI), "backup"
+    # (rule-based backup inside the agent policy), "rules" (a baseline policy), "sim" (the
+    # simulation itself: calls, crews, hospitals, safety rules).
+    source: str = "sim"
+    ai: dict[str, Any] | None = None  # the LLM call behind an "ai" row: model, tokens, ...
 
 
 @dataclass
@@ -104,6 +109,7 @@ class DashState:
     handling: list[dict[str, Any]]
     patients: dict[str, dict[str, Any]] = field(default_factory=dict)
     kpis: dict[str, Any] = field(default_factory=dict)
+    ai_calls: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _hname(hid: str | None) -> str:
@@ -193,6 +199,19 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
     unit_incident: dict[str, str] = {}
     prealerts: dict[str, str] = {}  # patient -> hospital it is inbound to
 
+    # LLM calls by (minute, agent), so each agent message can show the call that produced it.
+    ai_calls = [{"tick": e.tick, **e.payload} for e in events if e.type == EventType.LLM_CALL]
+    call_at = {(c["tick"], c["agent"]): c for c in ai_calls}
+    ai_source = "standin" if ai_calls and all(c["model"] == "scripted" for c in ai_calls) \
+        else "ai"
+    decided = Counter()
+
+    def action_source(a: dict[str, Any]) -> str:
+        by = a.get("decided_by", "")
+        src = ai_source if by == "ai" else "backup" if by == "rules" else "rules"
+        decided[src] += 1
+        return src
+
     def add(row: FeedRow) -> None:
         feed.append(row)
         if row.incident_id:
@@ -243,19 +262,19 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
                 text = (f"{a['unit_id']}, respond to the {kind} at {inc.get('grid', '')} "
                         f"for {who}{dest}.")
                 add(FeedRow(e.tick, "Dispatch", a["unit_id"], "ORDER", text, DECISION,
-                            a["incident_id"], "dispatch"))
+                            a["incident_id"], "dispatch", action_source(a)))
             elif a.get("kind") == "route":
                 add(FeedRow(e.tick, "Dispatch", a["unit_id"], "ORDER",
                             f"{a['unit_id']}, transport to {_hname(a['hospital_id'])}.", DECISION,
-                            inc_of(a), "dispatch"))
+                            inc_of(a), "dispatch", action_source(a)))
             elif a.get("kind") == "lend_staff":
                 add(FeedRow(e.tick, _hname(a["lender_id"]), _hname(a["borrower_id"]), "STAFF",
                             f"Sending {a['nurses']} nurse(s) to help.", HOSPITAL, None,
-                            "hospital"))
+                            "hospital", action_source(a)))
             elif a.get("kind") == "mutual_aid":
                 add(FeedRow(e.tick, "Dispatch", a["firm_id"], "MUTUAL AID",
                             f"Requesting {a['units']} private ambulance(s).", DECISION, None,
-                            "dispatch"))
+                            "dispatch", action_source(a)))
         elif t == EventType.PROPOSAL_VALIDATED and p.get("flags"):
             a = p["action"]
             for f in p["flags"]:
@@ -296,8 +315,13 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
                 text = (f"{pid} moved up to a ward bed." if p["proposed_action"]["move"] == "ward"
                         else f"{pid} is boarding in the ER: no ward bed free.")
             category = HOSPITAL if p["sender"].startswith("hospital") else AGENT
+            # Agent messages written from an LLM answer in this minute. The confidence check
+            # (ESCALATE) and pre-alerts are composed by code, not by an agent.
+            call = call_at.get((e.tick, p["sender"])) if mtype not in (
+                "ESCALATE", "PRE_ALERT") else None
             add(FeedRow(e.tick, sender, recipient, mtype.replace("_", " "), text, category,
-                        p.get("incident_id"), _role(p["sender"])))
+                        p.get("incident_id"), _role(p["sender"]),
+                        ai_source if call else "sim", call))
         elif t == EventType.STAFF_LOAN:
             add(FeedRow(e.tick, _hname(p["lender"]), _hname(p["borrower"]),
                         f"STAFF {p['phase']}", f"{p['nurses']} nurse(s) {p['phase'].lower()}.",
@@ -372,8 +396,13 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
             verb = "Approved" if t == EventType.APPROVED else "Changed to"
             add(FeedRow(e.tick, who, "Dispatch", t.value, f"{verb}: {_action_line(a)}. "
                         f"{p.get('reason', '')}", DECISION, inc_of(a), "safety"))
+        elif t == EventType.FALLBACK_USED:
+            add(FeedRow(e.tick, "Rule backup", "Dispatch", "AI NOT USED",
+                        f"{_fallback_text(p.get('reason', ''))} The rule-based backup decided.",
+                        FLAG, p.get("incident_id") or unit_incident.get(p.get("unit_id", "")),
+                        "safety", "backup"))
         elif t in (EventType.ESCALATED, EventType.APPROVED,
-                   EventType.OVERRIDDEN, EventType.FALLBACK_USED, EventType.PRIORITY_REPORT):
+                   EventType.OVERRIDDEN, EventType.PRIORITY_REPORT):
             add(FeedRow(e.tick, _speaker(e.actor), str(p.get("recipient", "All")),
                         t.value.replace("_", " "), str(p.get("reason", p.get("message", ""))),
                         AGENT, p.get("incident_id"), _role(e.actor)))
@@ -433,11 +462,34 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
         "boarding": sum(h.get("boarding", 0) for h in hospitals.values()),
         "saturated": sum(1 for h in hospitals.values() if h.get("status") == "SATURATED"),
         "avg_call_to_care": round(sum(care) / len(care), 1) if care else None,
+        "ai_decisions": decided["ai"] + decided["standin"],
+        "backup_decisions": decided["backup"],
+        "ai_source": ai_source if ai_calls else None,
     }
     return DashState(tick=tick, run=started, hospitals=hospitals,
                      hospital_changes=dict(changes), units=units, incidents=incidents,
                      threads=dict(threads), feed=feed, handling=handling, patients=patients,
-                     kpis=kpis)
+                     kpis=kpis, ai_calls=ai_calls)
+
+
+def _fallback_text(reason: str) -> str:
+    """Plain-language reason an agent answer was not used."""
+    r = reason.lower()
+    if "max turns" in r:
+        return "The AI agent ran out of steps before answering."
+    if "unknown unit or call" in r:
+        return "The AI named an ambulance or call that does not exist or is not free."
+    if "no valid hospital" in r:
+        return "The AI gave no usable hospital for this ambulance."
+    if "safety-rule rejection" in r:
+        return "The AI's hospital was blocked by a safety rule."
+    if "unresolved" in r:
+        return "Dispatch and the hospitals did not agree after 3 rounds."
+    if "did not accept" in r:
+        return "The hospital did not accept and negotiation is off."
+    if "failed" in r:
+        return "The AI agent's answer was unusable."
+    return reason.capitalize() + "."
 
 
 def triage_counts(patients: dict[str, dict[str, Any]], pids: list[str]) -> dict[str, dict]:

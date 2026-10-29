@@ -77,6 +77,16 @@ CSS = """
   overflow-wrap:anywhere}
 .msg.reject .tx{color:#FFB4B6}
 .msg.flag .tx{color:#FFD9A0}
+.src{font-size:.62rem;font-weight:700;letter-spacing:.03em;padding:.04rem .4rem;
+  border-radius:.6rem;white-space:nowrap}
+.src.ai{background:rgba(61,214,140,.16);color:#3DD68C;border:1px solid rgba(61,214,140,.5)}
+.src.backup{background:rgba(242,163,58,.14);color:#F2A33A;border:1px solid rgba(242,163,58,.5)}
+.src.standin,.src.rules{background:rgba(139,141,152,.14);color:#AEB4BD;
+  border:1px solid rgba(139,141,152,.45)}
+.ai-banner{border-radius:.4rem;padding:.45rem .7rem;margin:.1rem 0 .6rem 0;font-size:.85rem;
+  border:1px solid rgba(140,160,180,.25);background:#111A23;color:#C9D3DD}
+.ai-banner b{color:#E6EDF3}
+.ai-banner.ai{border-color:rgba(61,214,140,.55)}
 .side-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.7rem}
 .side-tile{background:#111A23;border:1px solid rgba(140,160,180,.18);border-radius:.4rem;
   padding:.4rem .55rem}
@@ -172,6 +182,18 @@ def incident_table(state: DashState, focus: str | None) -> None:
                         "</table>"), unsafe_allow_html=True)
 
 
+def _source_chip(r: FeedRow) -> str:
+    if r.source == "ai":
+        ai = r.ai or {}
+        secs = f" · {ai['latency_ms'] / 1000:.1f}s" if ai.get("latency_ms") else ""
+        when = " · saved" if ai.get("cache_hit") else secs
+        text = f"AI · {ai.get('model', 'LLM')}{when}" if ai else "AI decision"
+    else:
+        text = {"standin": "offline stand-in · not AI", "backup": "rule backup",
+                "rules": "rule-based"}.get(r.source)
+    return f'<span class="src {r.source}">{html.escape(text)}</span>' if text else ""
+
+
 def _message(r: FeedRow) -> str:
     label, color = ROLE.get(r.role, ROLE["system"])
     if r.role == "hospital" and r.sender.startswith("Hospital "):
@@ -181,7 +203,8 @@ def _message(r: FeedRow) -> str:
     return (f'<div class="msg {cls}"><div class="av" style="background:{color}">{label}</div>'
             f'<div><div class="hd"><b>{html.escape(r.sender)}</b><span>→ '
             f'{html.escape(r.recipient)}</span><span class="tag" style="color:{tag_color}">'
-            f'{html.escape(r.kind)}</span><span class="t">{wall_clock(r.tick)}</span></div>'
+            f'{html.escape(r.kind)}</span>{_source_chip(r)}'
+            f'<span class="t">{wall_clock(r.tick)}</span></div>'
             f'<div class="tx">{html.escape(r.text)}</div></div></div>')
 
 
@@ -259,6 +282,91 @@ LEGEND = [  # (shape css, color, label)
     ("height:.15rem;border-radius:0", "#4C9EFF", "Going to call"),
     ("height:.15rem;border-radius:0", "#E5484D", "Transporting to hospital"),
 ]
+
+
+# USD per 1M tokens, input / output (OpenAI list prices; an estimate, check before relying on it).
+PRICE = {"gpt-4.1-nano": (0.10, 0.40), "gpt-4o-mini": (0.15, 0.60),
+         "gpt-4.1-mini": (0.40, 1.60), "gpt-5-nano": (0.05, 0.40)}
+AGENT_NAME = {"assessment": "Assessment", "dispatch": "Dispatch", "allocator": "Allocator"}
+
+
+def _agent_name(agent: str) -> str:
+    return AGENT_NAME.get(agent) or ("Hospital " + agent.split(":")[-1]
+                                     if agent.startswith("hospital") else agent)
+
+
+def ai_banner(state: DashState, policy: str) -> None:
+    """One line saying who makes the decisions, and how many came from AI vs the backup."""
+    k = state.kpis
+    if "agents" not in policy.lower():
+        line, cls = f"<b>{html.escape(policy)}</b>: fixed rules, no AI agents.", ""
+    elif "offline" in policy.lower():
+        line, cls = ("<b>Offline stand-in</b>: the agents are played by simple rules so the "
+                     "app works without OpenAI. This is not AI."), ""
+    else:
+        models = sorted({c["model"] for c in state.ai_calls}) or ["GPT"]
+        saved = sum(1 for c in state.ai_calls if c.get("cache_hit"))
+        line = (f"<b>Live AI agents ({html.escape(', '.join(models))})</b>: "
+                f"{len(state.ai_calls)} AI calls so far"
+                + (f", {saved} replayed from saved answers (free)" if saved else "")
+                + f". Decisions by AI <b>{k['ai_decisions']}</b> · by rule backup "
+                  f"<b>{k['backup_decisions']}</b>.")
+        cls = "ai"
+    st.markdown(f'<div class="ai-banner {cls}">{line}</div>', unsafe_allow_html=True)
+
+
+def ai_activity(state: DashState) -> None:
+    """Every LLM call: summary, table, and the exact input and answer of a chosen call."""
+    import json
+
+    from orca_agents.llm_cache import CACHE_DIR
+
+    calls = state.ai_calls
+    if not calls:
+        st.caption("No AI calls in this run. Pick an \"AI agents\" option to see them here.")
+        return
+    tokens = sum(c.get("tokens", 0) for c in calls)
+    live = [c for c in calls if not c.get("cache_hit")]
+    model = calls[0]["model"]
+    p_in, p_out = PRICE.get(model, (0.15, 0.60))
+    cost = sum(c.get("tokens", 0) for c in live) * (0.9 * p_in + 0.1 * p_out) / 1e6
+    k = state.kpis
+    st.markdown(
+        f'<div class="ai-banner">{len(calls)} AI calls · {tokens:,} tokens · '
+        f'{len(calls) - len(live)} replayed free · about ${cost:.3f} for the live calls '
+        f'(estimate) · decisions by AI {k["ai_decisions"]}, by rule backup '
+        f'{k["backup_decisions"]}</div>', unsafe_allow_html=True)
+    rows = [{"Minute": c["tick"], "Time": wall_clock(c["tick"]),
+             "Agent": _agent_name(c["agent"]), "Model": c["model"],
+             "Tokens": c.get("tokens", 0),
+             "Seconds": round(c.get("latency_ms", 0) / 1000, 1) if not c.get("cache_hit")
+             else None, "Answer": "saved (replay)" if c.get("cache_hit") else "live"}
+            for c in calls]
+    st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, height=260)
+    labels = [f"{r['Time']} · {r['Agent']} · {c['key'][:8]}"
+              for r, c in zip(rows, calls, strict=True)]
+    pick = st.selectbox("Open an AI call to see exactly what the agent saw and answered",
+                        range(len(calls)), index=len(calls) - 1,
+                        format_func=lambda i: labels[i], key="ai_call_pick")
+    c = calls[pick]
+    path = CACHE_DIR / c["agent"].replace(":", "_") / f"{c['key']}.json"
+    if not path.exists():
+        st.caption("The saved answer for this call is not on this machine.")
+        return
+    rec = json.loads(path.read_text())
+    left, right = st.columns(2)
+    with left:
+        st.markdown('<div class="cad-h">What the agent was given</div>',
+                    unsafe_allow_html=True)
+        st.json(rec.get("input", {}), expanded=1)
+    with right:
+        st.markdown('<div class="cad-h">What the agent answered</div>', unsafe_allow_html=True)
+        if "error" in rec:
+            st.error(f"No usable answer: {rec['error']}")
+        else:
+            st.json(rec.get("output", {}), expanded=True)
+        st.caption(f"Model {rec.get('model')} · prompt version {rec.get('prompt_version')} · "
+                   f"{rec.get('tokens', 0)} tokens")
 
 
 def map_sidebar(state: DashState, town_population: int, area_km: float) -> set[str]:

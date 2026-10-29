@@ -169,6 +169,7 @@ def render(events, tick, timings) -> None:
     focus_id = None if ss.focus == "All incidents" else ss.focus
     town = TownProfile(population=state.run.get("population") or DEFAULT_POPULATION)
 
+    panels.ai_banner(state, ss.config[3] if "config" in ss else "")
     panels.incident_table(state, focus_id)
     side, main = st.columns([1, 3.4], gap="medium")
     with side:
@@ -187,10 +188,12 @@ def render(events, tick, timings) -> None:
         panels.unit_board(state)
 
     panels.hospital_board(state)
-    tabs = st.tabs(["Mass-casualty board", "Timeline and handling time"])
+    tabs = st.tabs(["AI activity", "Mass-casualty board", "Timeline and handling time"])
     with tabs[0]:
-        panels.mci_board(state)
+        panels.ai_activity(state)
     with tabs[1]:
+        panels.mci_board(state)
+    with tabs[2]:
         panels.timeline(state, events, timings, focus_id)
 
 
