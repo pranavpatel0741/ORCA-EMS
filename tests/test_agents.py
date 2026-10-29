@@ -239,3 +239,22 @@ def test_needs_review_flag_escalates_any_action():
     engine.step()
     engine.step()
     assert engine.log.of_type(EventType.APPROVED) or engine.log.of_type(EventType.OVERRIDDEN)
+
+
+def test_failed_call_is_cached_and_replays_as_failure(tmp_path):
+    from orca_agents.llm_cache import AgentSpec, LLMClient, RecordedFailure
+    from orca_agents.models import PriorityReport
+
+    class Broken:
+        model = "broken"
+
+        def run(self, spec, payload, context):
+            raise RuntimeError("model gave up")
+
+    spec = AgentSpec("assessment", "assessment.md", PriorityReport)
+    live = LLMClient(Broken(), mode="live", cache_dir=tmp_path)
+    with pytest.raises(RuntimeError):
+        live.call(spec, {"x": 1})
+    replay = LLMClient(None, mode="cache_only", cache_dir=tmp_path, model_name="broken")
+    with pytest.raises(RecordedFailure, match="model gave up"):
+        replay.call(spec, {"x": 1})

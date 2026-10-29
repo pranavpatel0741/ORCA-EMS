@@ -51,6 +51,10 @@ class AgentSpec:
         return first.split(":", 1)[1].strip() if first.startswith("Version:") else "0"
 
 
+class RecordedFailure(RuntimeError):
+    """A cached agent call that failed when it was recorded."""
+
+
 @dataclass
 class CallRecord:
     agent: str
@@ -131,16 +135,25 @@ class LLMClient:
         path = self._path(spec, key)
         if self.mode in ("live", "cache_only") and path.exists():
             stored = json.loads(path.read_text())
+            if "error" in stored:  # a recorded failure replays as the same failure
+                raise RecordedFailure(f"{spec.agent_id}: {stored['error']}")
             out = spec.output_type.model_validate(stored["output"])
             return out, CallRecord(spec.agent_id, self.model, key, True, stored.get("tokens", 0))
         if self.mode == "cache_only" or self.backend is None:
             raise CacheMiss(f"{spec.agent_id}: no cached response for key {key}")
         started = time.perf_counter()
-        out, tokens = self.backend.run(spec, payload, context)
-        latency = (time.perf_counter() - started) * 1000
+        record = {"agent": spec.agent_id, "model": self.model, "prompt_version": spec.version,
+                  "input": payload}
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({"agent": spec.agent_id, "model": self.model,
-                                    "prompt_version": spec.version, "input": payload,
-                                    "output": out.model_dump(mode="json"), "tokens": tokens},
-                                   indent=1, sort_keys=True, default=str))
+        try:
+            out, tokens = self.backend.run(spec, payload, context)
+        except Exception as exc:
+            # Save the failure too, so a cached replay takes the same fallback path instead of
+            # stopping with a cache miss.
+            path.write_text(json.dumps({**record, "error": f"{type(exc).__name__}: {exc}"},
+                                       indent=1, sort_keys=True, default=str))
+            raise
+        latency = (time.perf_counter() - started) * 1000
+        path.write_text(json.dumps({**record, "output": out.model_dump(mode="json"),
+                                    "tokens": tokens}, indent=1, sort_keys=True, default=str))
         return out, CallRecord(spec.agent_id, self.model, key, False, tokens, latency)
