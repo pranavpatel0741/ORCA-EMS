@@ -144,7 +144,13 @@ class AgentPolicy:
         conflicts: list[dict[str, Any]] = []
         free = {u.id for u in obs.free_units()}
         used: set[str] = set()
+        invented = sorted({a.unit_id for a in plan.assignments if a.unit_id not in obs.units})
+        if invented:  # one note per plan, not one per made-up unit
+            self._fallback(obs, "dispatch named ambulances that do not exist: "
+                           + ", ".join(invented), unit_id="")
         for a in plan.assignments:
+            if a.unit_id in invented:
+                continue
             if not a.incident_id.strip():
                 continue  # the model listed a unit with no call: nothing to do
             unit = obs.units.get(a.unit_id)

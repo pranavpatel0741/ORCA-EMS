@@ -398,7 +398,7 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
                         f"{p.get('reason', '')}", DECISION, inc_of(a), "safety"))
         elif t == EventType.FALLBACK_USED:
             add(FeedRow(e.tick, "Rule backup", "Dispatch", "AI NOT USED",
-                        f"{_fallback_text(p.get('reason', ''))} The rule-based backup decided.",
+                        _fallback_text(p.get("reason", "")),
                         FLAG, p.get("incident_id") or unit_incident.get(p.get("unit_id", "")),
                         "safety", "backup"))
         elif t in (EventType.ESCALATED, EventType.APPROVED,
@@ -474,6 +474,13 @@ def build_state(events: list[Event], upto: int | None = None) -> DashState:
 
 def _fallback_text(reason: str) -> str:
     """Plain-language reason an agent answer was not used."""
+    if "do not exist" in reason.lower():
+        return (f"The AI assigned ambulances that do not exist "
+                f"({reason.split(': ', 1)[-1]}); those assignments were ignored.")
+    return f"{_fallback_reason(reason)} The rule-based backup decided."
+
+
+def _fallback_reason(reason: str) -> str:
     r = reason.lower()
     if "max turns" in r:
         return "The AI agent ran out of steps before answering."
