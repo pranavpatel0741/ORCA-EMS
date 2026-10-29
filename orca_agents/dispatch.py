@@ -9,6 +9,7 @@ from orca_agents.models import DispatchPlan, PriorityReport
 from orca_agents.tools import DISPATCH_TOOLS, patient_brief
 from sim.observations import Observation
 
+SEVERITY_ORDER = {"CRITICAL": 0, "SERIOUS": 1, "MINOR": 2, "EXPECTANT": 3}
 SPEC = AgentSpec("dispatch", "dispatch.md", DispatchPlan, tools=DISPATCH_TOOLS)
 
 
@@ -27,8 +28,15 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
     """Compact decision input. `focus_units` limits routing to units being renegotiated."""
     calls = []
     for inc in sorted(obs.incidents.values(), key=lambda i: (i.call_tick, i.id)):
-        waiting = obs.waiting(inc.id)
-        unknown = 0 if inc.patients else obs.unassigned_victims(inc.id)
+        # Crews already sent with no patient list load waiting patients themselves on scene
+        # (most severe first), so those patients are not offered to Dispatch again.
+        crews = [u for u in obs.units.values() if u.assigned_incident == inc.id
+                 and not u.patient_ids and u.state in ("EN_ROUTE", "STAGING", "ON_SCENE")]
+        waiting = sorted(obs.waiting(inc.id), key=lambda p: SEVERITY_ORDER.get(p.severity, 1))
+        critical = any(p.severity == "CRITICAL" for p in waiting)
+        covered = sum(1 if critical else 2 for _ in crews)
+        waiting = waiting[covered:]
+        unknown = 0 if inc.patients else max(0, obs.unassigned_victims(inc.id))
         if not waiting and not unknown:
             continue
         rep = reports.get(inc.id)
@@ -37,6 +45,7 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
                       "mode": rep.mode if rep else None,
                       "waiting_patients": [patient_brief(p) for p in waiting],
                       "victims_not_yet_seen": unknown,
+                      "crews_already_assigned": [{"id": u.id, "state": u.state} for u in crews],
                       "unsafe_scene": inc.violent and not inc.secured})
     free = obs.free_units()
     busy = [u for u in obs.units.values() if u.state in ("EN_ROUTE", "STAGING")
