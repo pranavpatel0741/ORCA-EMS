@@ -56,10 +56,15 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--population", type=int, default=DEFAULT_POPULATION)
     ap.add_argument("--json", action="store_true", help="print all metrics as JSON")
+    ap.add_argument("--save", action="store_true",
+                    help="also save transcript + scorecard to results/runs_saved/")
     args = ap.parse_args(argv)
     engine, path, metrics = run_once(args.policy, args.demand, args.info, args.seed,
                                      args.population, args.preset)
     print(f"log: {path}")
+    if args.save:
+        from eval.run_report import save_run
+        print(f"saved: {save_run(engine.log.events, args.preset or args.demand)}")
     if args.json:
         print(json.dumps(metrics, indent=2))
         return
