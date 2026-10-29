@@ -13,6 +13,10 @@ from pydantic import BaseModel, ConfigDict, Field
 class _Action(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    # Who made the choice inside the agent policy: "ai" (an LLM agent) or "rules" (the
+    # rule-based backup). Empty for the baselines. Display only; the engine ignores it.
+    decided_by: Literal["", "ai", "rules"] = ""
+
 
 class Dispatch(_Action):
     """Send a unit to an incident, optionally for specific patients and a target hospital."""

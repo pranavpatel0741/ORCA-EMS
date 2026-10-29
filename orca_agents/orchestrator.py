@@ -51,6 +51,9 @@ def default_client() -> LLMClient:
     return LLMClient(backend=backend, mode=mode)
 
 
+RULES_TAG = "[rule backup]"  # marks rationales of actions the rule-based backup chose
+
+
 class AgentPolicy:
     def __init__(self, negotiate: bool = True, client: LLMClient | None = None) -> None:
         self.negotiate = negotiate
@@ -324,6 +327,11 @@ class AgentPolicy:
     # --- decide --------------------------------------------------------------------------------
 
     def decide(self, obs: Observation) -> list[Action]:
+        """Agent decisions, each tagged with who made it: an LLM agent or the rule backup."""
+        return [a.model_copy(update={"decided_by": "rules" if a.rationale.startswith(
+            ("rule-based", RULES_TAG)) else "ai"}) for a in self._decide(obs)]
+
+    def _decide(self, obs: Observation) -> list[Action]:
         self.fallback._note_rejections(obs)
         for r in obs.rejections:
             if r.action.get("kind") == "route":
@@ -346,7 +354,8 @@ class AgentPolicy:
             plan = self._plan(obs)
         except AgentFailure as exc:
             self._fallback(obs, f"dispatch failed: {exc}")
-            return self.fallback.decide(obs)
+            return [a.model_copy(update={"rationale": f"{RULES_TAG} {a.rationale}".strip()})
+                    for a in self.fallback.decide(obs)]
 
         actions, conflicts = self._assignments(obs, plan)
         if plan.mutual_aid and (firm := obs.firms.get(plan.mutual_aid.firm_id)):
