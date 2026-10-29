@@ -76,13 +76,16 @@ class Backend(Protocol):
 class OpenAIAgentsBackend:
     """Runs an SDK `Agent` with structured output and read-only tools."""
 
-    def __init__(self, model: str | None = None, max_turns: int = 6,
+    def __init__(self, model: str | None = None, max_turns: int = 10,
                  timeout_s: float = 60.0) -> None:
         self.model = model or settings.OPENAI_MODEL
         if not self.model:
             raise RuntimeError("OPENAI_MODEL is not set (see .env.example)")
         self.max_turns = max_turns
         self.timeout_s = timeout_s
+        # One loop for the backend's lifetime: the SDK's HTTP client binds to the first loop it
+        # runs on, so a fresh loop per call (asyncio.run) fails with "Event loop is closed".
+        self._loop = asyncio.new_event_loop()
 
     def run(self, spec: AgentSpec, payload: dict[str, Any], context: Any) -> tuple[BaseModel, int]:
         from agents import Agent, Runner
@@ -96,7 +99,7 @@ class OpenAIAgentsBackend:
                 Runner.run(agent, prompt, context=context, max_turns=self.max_turns),
                 timeout=self.timeout_s)
 
-        result = asyncio.run(go())
+        result = self._loop.run_until_complete(go())
         usage = result.context_wrapper.usage
         return result.final_output_as(spec.output_type), int(usage.total_tokens or 0)
 
