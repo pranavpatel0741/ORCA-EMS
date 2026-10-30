@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from baselines.nearest import can_treat
 from orca_agents.llm_cache import AgentSpec
 from orca_agents.models import DispatchPlan, PriorityReport
 from orca_agents.tools import DISPATCH_TOOLS, patient_brief
@@ -38,8 +39,24 @@ def hospital_rows(obs: Observation) -> list[dict[str, Any]]:
     return rows
 
 
+def hospital_options(obs: Observation, unit_id: str,
+                     declined: set[str] = frozenset()) -> list[dict[str, Any]]:
+    """Hospitals that can structurally treat everyone on board (capability, trauma center,
+    private-hospital contract) and have not already said no to this ambulance, nearest first.
+    The same check the safety rules and baselines use; capacity is reported, not filtered."""
+    u = obs.units[unit_id]
+    patients = [p for pid in u.patient_ids if (p := obs.patient(pid))]
+    rows = [{"id": h.id, "eta_min": obs.eta(u.location, h.location),
+             "er_beds_left_after_ambulances_on_the_way": h.free["er_bed"]
+             - len(obs.incoming(h.id))}
+            for h in obs.hospitals.values()
+            if h.id not in declined and can_treat(h, patients, obs.surge_active)]
+    return sorted(rows, key=lambda r: (r["eta_min"], r["id"]))
+
+
 def payload(obs: Observation, reports: dict[str, PriorityReport],
-            feedback: list[dict[str, Any]], focus_units: set[str] | None = None) -> dict:
+            feedback: list[dict[str, Any]], focus_units: set[str] | None = None,
+            declined: dict[str, set[str]] | None = None) -> dict:
     """Compact decision input. `focus_units` limits routing to units being renegotiated."""
     calls = []
     for inc in sorted(obs.incidents.values(), key=lambda i: (i.call_tick, i.id)):
@@ -80,7 +97,10 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
                           "patients": [patient_brief(p) for pid in u.patient_ids
                                        if (p := obs.patient(pid))],
                           "eta_to_hospitals_min": {h.id: obs.eta(u.location, h.location)
-                                                   for h in obs.hospitals.values()}}
+                                                   for h in obs.hospitals.values()},
+                          "hospitals_that_can_treat": hospital_options(
+                              obs, u.id, (declined or {}).get(u.id, set())),
+                          "already_declined_by": sorted((declined or {}).get(u.id, set()))}
                          for u in loaded],
         "hospitals": hospital_rows(obs),
         "private_firms": [{"id": f.id, "units_left": min(f.max_units, len(f.unit_ids))

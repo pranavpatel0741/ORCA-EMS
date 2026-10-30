@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from baselines.nearest import can_treat
 from baselines.rule_based import RuleBasedPolicy
 from orca_agents import allocator, assessment, dispatch, hospital_agent
 from orca_agents.confidence import score
@@ -276,3 +277,14 @@ def test_assigning_a_crew_to_the_call_it_already_serves_is_a_no_op(tmp_path):
                         rationale="")
     actions, conflicts = AgentPolicy(client=client(tmp_path))._assignments(obs, plan)
     assert not actions and not conflicts
+
+
+def test_hospital_options_skip_incapable_and_declined(surge_obs):
+    obs = obs_with(surge_obs, lambda o: o.units_needing_destination())
+    unit = obs.units_needing_destination()[0]
+    patients = [p for pid in unit.patient_ids if (p := obs.patient(pid))]
+    opts = dispatch.hospital_options(obs, unit.id)
+    ids = [o["id"] for o in opts]
+    assert ids and all(can_treat(obs.hospitals[h], patients, obs.surge_active) for h in ids)
+    assert [o["eta_min"] for o in opts] == sorted(o["eta_min"] for o in opts)
+    assert ids[0] not in [o["id"] for o in dispatch.hospital_options(obs, unit.id, {ids[0]})]

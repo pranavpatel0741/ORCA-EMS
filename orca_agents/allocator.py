@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from orca_agents.dispatch import hospital_rows
+from orca_agents.dispatch import hospital_options, hospital_rows
 from orca_agents.llm_cache import AgentSpec
 from orca_agents.models import Resolution
 from orca_agents.tools import ALLOCATOR_TOOLS, patient_brief
@@ -14,7 +14,8 @@ SPEC = AgentSpec("allocator", "allocator.md", Resolution, tools=ALLOCATOR_TOOLS)
 
 
 def payload(obs: Observation, conflicts: list[dict[str, Any]],
-            offers: list[dict[str, Any]]) -> dict[str, Any]:
+            offers: list[dict[str, Any]],
+            declined: dict[str, set[str]] | None = None) -> dict[str, Any]:
     units = sorted({c["unit_id"] for c in conflicts if c.get("unit_id")})
     return {
         "minute": obs.tick,
@@ -24,7 +25,10 @@ def payload(obs: Observation, conflicts: list[dict[str, Any]],
                    "patients": [patient_brief(p) for pid in obs.units[uid].patient_ids
                                 if (p := obs.patient(pid))],
                    "eta_to_hospitals_min": {h.id: obs.eta(obs.units[uid].location, h.location)
-                                            for h in obs.hospitals.values()}}
+                                            for h in obs.hospitals.values()},
+                   "hospitals_that_can_treat": hospital_options(
+                       obs, uid, (declined or {}).get(uid, set())),
+                   "already_declined_by": sorted((declined or {}).get(uid, set()))}
                   for uid in units if uid in obs.units],
         "hospitals": hospital_rows(obs),
     }

@@ -136,7 +136,12 @@ class AgentPolicy:
     def _plan(self, obs: Observation, focus: set[str] | None = None) -> DispatchPlan:
         fb = [f for unit, items in self.feedback.items() for f in items
               if focus is None or unit in focus]
-        return self._call(obs, dispatch.SPEC, dispatch.payload(obs, self.reports, fb, focus))
+        return self._call(obs, dispatch.SPEC,
+                          dispatch.payload(obs, self.reports, fb, focus, self._declined()))
+
+    def _declined(self) -> dict[str, set[str]]:
+        """Hospitals that already said no (counter, reject, or safety rule) to each ambulance."""
+        return {u: {f["hospital_id"] for f in items} for u, items in self.feedback.items()}
 
     def _assignments(self, obs: Observation, plan: DispatchPlan
                      ) -> tuple[list[Action], list[dict[str, Any]]]:
@@ -294,7 +299,8 @@ class AgentPolicy:
                      incident_id=c.get("to_call"), proposed_action=c, by_code=True)
         try:
             res: Resolution = self._call(obs, allocator.SPEC,
-                                         allocator.payload(obs, conflicts, offers),
+                                         allocator.payload(obs, conflicts, offers,
+                                                           self._declined()),
                                          extra={"conflicts": conflicts, "offers": offers})
         except AgentFailure as exc:
             self._fallback(obs, f"allocator failed: {exc}")
@@ -390,6 +396,11 @@ class AgentPolicy:
         def allowed(uid: str, hid: str) -> bool:
             return hid in obs.hospitals and hid not in self._rule_rejected.get(uid, set())
 
+        def fresh_offer(uid: str, hid: str) -> bool:
+            """Dispatch may not re-propose a hospital that already said no to this ambulance;
+            that goes to the Allocator instead of repeating the same question."""
+            return allowed(uid, hid) and hid not in self._declined().get(uid, set())
+
         # A unit whose agreed destination was later rejected by the safety rules is not
         # renegotiated every minute: the rule-based choice (which skips rejected hospitals)
         # takes over.
@@ -442,7 +453,7 @@ class AgentPolicy:
                 self._fallback(obs, f"dispatch revision failed: {exc}")
                 revised = DispatchPlan(rationale="")
             proposals = {r.unit_id: r.hospital_id for r in revised.routes
-                         if r.unit_id in remaining and allowed(r.unit_id, r.hospital_id)}
+                         if r.unit_id in remaining and fresh_offer(r.unit_id, r.hospital_id)}
             rationale.update({r.unit_id: r.rationale for r in revised.routes})
             for uid in sorted(set(remaining) - set(proposals)):
                 conflicts.append({"type": "route_unresolved", "unit_id": uid,
