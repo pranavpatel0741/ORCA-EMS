@@ -139,7 +139,7 @@ class ScriptedBackend:
         if uncovered_critical and firms:
             aid = MutualAid(firm_id=firms[0]["id"],
                             units=min(firms[0]["units_left"], len(uncovered_critical)))
-        routes = [self._route(u, pl, surge) for u in pl["loaded_units"]]
+        routes = [self._route(u, pl, surge) for u in pl["ambulances_needing_a_hospital"]]
         return DispatchPlan(assignments=assignments, routes=[r for r in routes if r],
                             mutual_aid=aid, rationale="severity first, nearest capable "
                                                       "hospital with space on the board")

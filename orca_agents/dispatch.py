@@ -42,8 +42,8 @@ def hospital_rows(obs: Observation) -> list[dict[str, Any]]:
 def hospital_options(obs: Observation, unit_id: str,
                      declined: set[str] = frozenset()) -> list[dict[str, Any]]:
     """Hospitals that can structurally treat everyone on board (capability, trauma center,
-    private-hospital contract) and have not already said no to this ambulance, nearest first.
-    The same check the safety rules and baselines use; capacity is reported, not filtered."""
+    private-hospital contract) and have not already said no to this ambulance: those with an
+    ER bed left first, then nearest. The same check the safety rules and baselines use."""
     u = obs.units[unit_id]
     patients = [p for pid in u.patient_ids if (p := obs.patient(pid))]
     rows = [{"id": h.id, "eta_min": obs.eta(u.location, h.location),
@@ -51,7 +51,8 @@ def hospital_options(obs: Observation, unit_id: str,
              - len(obs.incoming(h.id))}
             for h in obs.hospitals.values()
             if h.id not in declined and can_treat(h, patients, obs.surge_active)]
-    return sorted(rows, key=lambda r: (r["eta_min"], r["id"]))
+    return sorted(rows, key=lambda r: (r["er_beds_left_after_ambulances_on_the_way"] <= 0,
+                                       r["eta_min"], r["id"]))
 
 
 def payload(obs: Observation, reports: dict[str, PriorityReport],
@@ -79,7 +80,9 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
                       "victims_not_yet_seen": unknown,
                       "crews_already_assigned": [{"id": u.id, "state": u.state} for u in crews],
                       "unsafe_scene": inc.violent and not inc.secured})
-    free = obs.free_units()
+    # Free units matter only when someone is waiting; listing them otherwise invites the model
+    # to route them in place of the ambulances actually carrying patients.
+    free = obs.free_units() if calls else []
     busy = [u for u in obs.units.values() if u.state in ("EN_ROUTE", "STAGING")
             and u.reassignable and not u.patient_ids]
     loaded = [u for u in obs.units_needing_destination()
@@ -93,7 +96,8 @@ def payload(obs: Observation, reports: dict[str, PriorityReport],
                                                              obs.incidents[c["id"]].location)
                                              for c in calls}} for u in free],
         "en_route_units": [{"id": u.id, "going_to": u.assigned_incident} for u in busy],
-        "loaded_units": [{"id": u.id,
+        "route_these_unit_ids": [u.id for u in loaded],
+        "ambulances_needing_a_hospital": [{"id": u.id,
                           "patients": [patient_brief(p) for pid in u.patient_ids
                                        if (p := obs.patient(pid))],
                           "eta_to_hospitals_min": {h.id: obs.eta(u.location, h.location)
