@@ -143,6 +143,8 @@ def _speaker(actor: str) -> str:
         return "Safety rules"
     if actor == "police":
         return "Police"
+    if actor in ("assessment", "allocator"):
+        return actor.title()
     if _role(actor) == "dispatch":
         return "Dispatch"
     return actor
