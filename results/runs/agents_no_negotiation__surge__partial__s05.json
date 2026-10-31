@@ -1,0 +1,111 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "partial",
+ "key": "agents_no_negotiation__surge__partial__s05",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 436.0,
+  "approvals": 1,
+  "calls": 3,
+  "confidence_calibration": [
+   {
+    "bin": "0.00-0.75",
+    "decisions": 1,
+    "matched_hindsight_best": 0.0
+   }
+  ],
+  "critical_on_time_rate": 0.667,
+  "critical_patients": 3,
+  "deaths": 0,
+  "escalations": 1,
+  "fallback_rate": 0.368,
+  "fallbacks": 14,
+  "hospital_overload_minutes": 893,
+  "incidents": 3,
+  "llm_cache_hit_rate": 0.115,
+  "llm_calls": 52,
+  "llm_latency_ms": 72200.7,
+  "llm_tokens": 108553,
+  "mean_rounds_per_resolution": 0,
+  "negotiation": {
+   "ACCEPT": 4,
+   "COUNTER": 5,
+   "ESCALATE": 1,
+   "MUTUAL_AID_REQUEST": 1,
+   "PROPOSE": 12,
+   "REJECT": 3,
+   "STAFF_REQUEST": 2,
+   "STAFF_RESPONSE": 2
+  },
+  "outcome_score": 33.003,
+  "overrides": 0,
+  "patients": 35,
+  "patients_not_in_care_at_end": 3,
+  "rejections_by_rule": {
+   "R2": 3
+  },
+  "response_time": {
+   "mean": 61.3,
+   "median": 23,
+   "n": 3,
+   "p90": 153
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 15.5,
+    "median": 15.5,
+    "n": 2,
+    "p90": 23
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "SERIOUS": {
+    "mean": 153,
+    "median": 153,
+    "n": 1,
+    "p90": 153
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 69.3,
+    "median": 60,
+    "n": 3,
+    "p90": 95
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 143,
+    "median": 109,
+    "n": 15,
+    "p90": 259
+   },
+   "SERIOUS": {
+    "mean": 126.3,
+    "median": 140.5,
+    "n": 14,
+    "p90": 190
+   }
+  },
+  "unserved_calls_30min": 1
+ },
+ "policy": "agents_no_negotiation",
+ "seed": 5,
+ "wall_seconds": 132.92
+}

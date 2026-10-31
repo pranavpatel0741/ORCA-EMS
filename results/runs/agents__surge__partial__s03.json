@@ -1,0 +1,118 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "partial",
+ "key": "agents__surge__partial__s03",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 360.0,
+  "approvals": 5,
+  "calls": 6,
+  "confidence_calibration": [
+   {
+    "bin": "0.00-0.75",
+    "decisions": 1,
+    "matched_hindsight_best": 0.0
+   },
+   {
+    "bin": "0.90-1.00",
+    "decisions": 2,
+    "matched_hindsight_best": 1.0
+   }
+  ],
+  "critical_on_time_rate": 0.167,
+  "critical_patients": 6,
+  "deaths": 4,
+  "escalations": 5,
+  "fallback_rate": 0.15,
+  "fallbacks": 9,
+  "hospital_overload_minutes": 695,
+  "incidents": 6,
+  "llm_cache_hit_rate": 0.14,
+  "llm_calls": 121,
+  "llm_latency_ms": 175120.2,
+  "llm_tokens": 249676,
+  "mean_rounds_per_resolution": 2.56,
+  "negotiation": {
+   "ACCEPT": 10,
+   "COUNTER": 6,
+   "ESCALATE": 26,
+   "MUTUAL_AID_REQUEST": 1,
+   "PROPOSE": 24,
+   "REJECT": 8,
+   "RESOLVE": 17
+  },
+  "outcome_score": 28.858,
+  "overrides": 0,
+  "patients": 35,
+  "patients_not_in_care_at_end": 3,
+  "rejections_by_rule": {
+   "R2": 8,
+   "R3": 2,
+   "R4": 2,
+   "R7": 1
+  },
+  "response_time": {
+   "mean": 84.3,
+   "median": 59.5,
+   "n": 6,
+   "p90": 147
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 43.5,
+    "median": 43.5,
+    "n": 2,
+    "p90": 54
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 115,
+    "median": 115.0,
+    "n": 2,
+    "p90": 165
+   },
+   "SERIOUS": {
+    "mean": 94.5,
+    "median": 94.5,
+    "n": 2,
+    "p90": 147
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 58.5,
+    "median": 58.5,
+    "n": 2,
+    "p90": 63
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 148.9,
+    "median": 167,
+    "n": 15,
+    "p90": 227
+   },
+   "SERIOUS": {
+    "mean": 174.6,
+    "median": 183,
+    "n": 11,
+    "p90": 204
+   }
+  },
+  "unserved_calls_30min": 6
+ },
+ "policy": "agents",
+ "seed": 3,
+ "wall_seconds": 175.83
+}

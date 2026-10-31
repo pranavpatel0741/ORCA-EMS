@@ -1,0 +1,110 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "complete",
+ "key": "agents_no_negotiation__surge__complete__s01",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 602.0,
+  "approvals": 4,
+  "calls": 5,
+  "confidence_calibration": [
+   {
+    "bin": "0.90-1.00",
+    "decisions": 1,
+    "matched_hindsight_best": 1.0
+   }
+  ],
+  "critical_on_time_rate": 0.286,
+  "critical_patients": 7,
+  "deaths": 4,
+  "escalations": 4,
+  "fallback_rate": 0.368,
+  "fallbacks": 21,
+  "hospital_overload_minutes": 542,
+  "incidents": 5,
+  "llm_cache_hit_rate": 0.101,
+  "llm_calls": 69,
+  "llm_latency_ms": 111883.1,
+  "llm_tokens": 164263,
+  "mean_rounds_per_resolution": 0,
+  "negotiation": {
+   "ACCEPT": 4,
+   "COUNTER": 4,
+   "MUTUAL_AID_REQUEST": 1,
+   "PROPOSE": 16,
+   "REJECT": 8
+  },
+  "outcome_score": 31.186,
+  "overrides": 0,
+  "patients": 39,
+  "patients_not_in_care_at_end": 7,
+  "rejections_by_rule": {
+   "R2": 7,
+   "R4": 1,
+   "R7": 7
+  },
+  "response_time": {
+   "mean": 70.2,
+   "median": 44.0,
+   "n": 4,
+   "p90": 177
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 34.7,
+    "median": 21,
+    "n": 3,
+    "p90": 67
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "SERIOUS": {
+    "mean": 177,
+    "median": 177,
+    "n": 1,
+    "p90": 177
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 85.4,
+    "median": 103,
+    "n": 5,
+    "p90": 138
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 105.7,
+    "median": 112.5,
+    "n": 10,
+    "p90": 202
+   },
+   "SERIOUS": {
+    "mean": 154.8,
+    "median": 168,
+    "n": 13,
+    "p90": 189
+   }
+  },
+  "unserved_calls_30min": 3
+ },
+ "policy": "agents_no_negotiation",
+ "seed": 1,
+ "wall_seconds": 112.43
+}

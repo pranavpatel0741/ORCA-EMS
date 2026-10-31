@@ -1,0 +1,109 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "complete",
+ "key": "agents_no_negotiation__surge__complete__s03",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 532.0,
+  "approvals": 4,
+  "calls": 6,
+  "confidence_calibration": [
+   {
+    "bin": "0.90-1.00",
+    "decisions": 1,
+    "matched_hindsight_best": 1.0
+   }
+  ],
+  "critical_on_time_rate": 0.333,
+  "critical_patients": 6,
+  "deaths": 1,
+  "escalations": 4,
+  "fallback_rate": 0.411,
+  "fallbacks": 23,
+  "hospital_overload_minutes": 713,
+  "incidents": 6,
+  "llm_cache_hit_rate": 0.111,
+  "llm_calls": 90,
+  "llm_latency_ms": 139043.6,
+  "llm_tokens": 205692,
+  "mean_rounds_per_resolution": 0,
+  "negotiation": {
+   "ACCEPT": 7,
+   "COUNTER": 7,
+   "MUTUAL_AID_REQUEST": 1,
+   "PROPOSE": 18,
+   "REJECT": 4
+  },
+  "outcome_score": 29.074,
+  "overrides": 0,
+  "patients": 35,
+  "patients_not_in_care_at_end": 3,
+  "rejections_by_rule": {
+   "R2": 11,
+   "R7": 1
+  },
+  "response_time": {
+   "mean": 76,
+   "median": 44.0,
+   "n": 6,
+   "p90": 138
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 29,
+    "median": 29.0,
+    "n": 2,
+    "p90": 33
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 79,
+    "median": 79.0,
+    "n": 2,
+    "p90": 138
+   },
+   "SERIOUS": {
+    "mean": 120,
+    "median": 120.0,
+    "n": 2,
+    "p90": 185
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 87.8,
+    "median": 94,
+    "n": 5,
+    "p90": 130
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 155,
+    "median": 171,
+    "n": 15,
+    "p90": 247
+   },
+   "SERIOUS": {
+    "mean": 166.8,
+    "median": 167,
+    "n": 11,
+    "p90": 208
+   }
+  },
+  "unserved_calls_30min": 4
+ },
+ "policy": "agents_no_negotiation",
+ "seed": 3,
+ "wall_seconds": 139.68
+}
