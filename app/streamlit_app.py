@@ -46,7 +46,9 @@ def _agents(negotiate: bool, offline: bool):
     return make
 
 
-HAVE_LLM = bool(os.getenv("OPENAI_API_KEY") and settings.OPENAI_MODEL)
+# A key for live calls, or cache-only replay of saved answers (no key needed).
+HAVE_LLM = bool(settings.OPENAI_MODEL and (os.getenv("OPENAI_API_KEY")
+                                          or settings.LLM_MODE == "cache_only"))
 POLICIES = {"Nearest hospital (baseline)": NearestPolicy,
             "Rule-based (strong baseline)": RuleBasedPolicy}
 if HAVE_LLM:
