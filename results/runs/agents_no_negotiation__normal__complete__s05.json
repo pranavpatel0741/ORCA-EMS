@@ -16,10 +16,10 @@
   "fallbacks": 0,
   "hospital_overload_minutes": 376,
   "incidents": 1,
-  "llm_cache_hit_rate": 0.0,
+  "llm_cache_hit_rate": 1.0,
   "llm_calls": 5,
-  "llm_latency_ms": 8755.5,
-  "llm_tokens": 6725,
+  "llm_latency_ms": 0.0,
+  "llm_tokens": 6618,
   "mean_rounds_per_resolution": 0,
   "negotiation": {
    "ACCEPT": 1,
@@ -83,10 +83,10 @@
     "p90": null
    },
    "SERIOUS": {
-    "mean": 34,
-    "median": 34,
+    "mean": 32,
+    "median": 32,
     "n": 1,
-    "p90": 34
+    "p90": 32
    }
   },
   "unserved_calls_30min": 0

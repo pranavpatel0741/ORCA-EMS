@@ -16,10 +16,10 @@
   "fallbacks": 1,
   "hospital_overload_minutes": 253,
   "incidents": 3,
-  "llm_cache_hit_rate": 0.211,
+  "llm_cache_hit_rate": 1.0,
   "llm_calls": 19,
-  "llm_latency_ms": 21927.8,
-  "llm_tokens": 27591,
+  "llm_latency_ms": 0.0,
+  "llm_tokens": 27588,
   "mean_rounds_per_resolution": 0,
   "negotiation": {
    "ACCEPT": 2,

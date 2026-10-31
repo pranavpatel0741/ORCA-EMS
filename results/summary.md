@@ -74,5 +74,5 @@ Paired comparisons on identical scenarios (same seed). With few seeds this is de
 |---|---|---|---|
 | nearest | 0 | 0 | 0.1 |
 | rule_based | 0 | 0 | 0.1 |
-| agents_no_negotiation | 42 | 88047 | 66.0 |
+| agents_no_negotiation | 42 | 88042 | 66.0 |
 | agents | 64 | 135170 | 83.3 |
