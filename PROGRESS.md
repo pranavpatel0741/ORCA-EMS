@@ -185,8 +185,14 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
   ATTRIBUTION, FUTURE_WORK, a report draft, and extended ASSUMPTIONS.
 - **Cut, per PLAN's cut list:** LLM-written caller narratives (templates are used) and
   consistency sampling k > 1.
-- **Remaining for the owner:**
-  - add `OPENAI_API_KEY` / `OPENAI_MODEL` to `.env`
-  - do a one-run live check: `LLM_MODE=record python run.py --policy agents --preset "Cardiac arrest"`
-  - record the grid: `LLM_MODE=record python eval/run_experiments.py --seeds 5`
-  - put the results into `docs/REPORT.md` §5
+- **Live agents (2026-10-29 – 10-31):** gpt-4o-mini. Fixes from reading transcripts: one
+  shared event loop, dispatch without tools, hospitals each ambulance can be treated at,
+  no re-proposing a hospital that declined, explicit list of ambulances to route, failed calls
+  cached. Dashboard: source label on every message (AI / rule backup / stand-in / sim), AI
+  activity tab with each call's input and answer, negotiation threads, talk graph, real-time
+  and fast paces, saved runs with transcript and scorecard (`results/runs_saved/`).
+- **M9 accepted (2026-10-31):** 5-seed grid with gpt-4o-mini, 80 runs, about $0.80.
+  `results/summary.md`; REPORT §5 filled in, including where agents did not help. A clean
+  clone replays the grid with `LLM_MODE=cache_only` and no key.
+- **Demo:** Cardiac arrest, Shooting, School bus crash are cached for the dashboard's
+  "AI agents, negotiating (OpenAI)" setting and replay free.

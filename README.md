@@ -74,7 +74,22 @@ bus crash plus shooting, normal day) and who decides. Then press Start and watch
 - the conversation between caller, dispatch, ambulances, hospitals and safety rules
 - the hospital status board, the ambulance board, the mass-casualty board, and handling times
 
-To replay a run, write a log with `run.py` and open it via **Advanced → Replay a saved run**.
+Every message carries a label saying who produced it: the real AI agent, the rule backup, the
+offline stand-in, or the simulation. The **AI activity** tab lists each model call with exactly
+what the agent was given and what it answered.
+
+To replay a run, write a log with `run.py` (add `--save` for a transcript and scorecard in
+`results/runs_saved/`) and open it via **Advanced → Replay a saved run**.
+
+**No API key?** The saved agent answers in `data/llm_cache/` are committed. With
+`LLM_MODE=cache_only` and `OPENAI_MODEL=gpt-4o-mini` in `.env`, the dashboard replays the
+Cardiac arrest, Shooting and School bus crash incidents with the real agents' answers, and
+`eval/run_experiments.py --seeds 5` reproduces `results/summary.md`, all without network calls.
+
+**Results (5 seeds, gpt-4o-mini).** With incomplete hospital information on a normal day, the
+agents got every critical patient into care within 60 minutes (both baselines: none). In a
+mass-casualty surge they match the baselines on deaths but send the first ambulance later.
+Details, including where agents did not help, are in [docs/REPORT.md](docs/REPORT.md) §5.
 
 **Experiments.** Four policies (`nearest`, `rule_based`, `agents_no_negotiation`, `agents`)
 × 2 information settings × 2 demand levels × N seeds, on identical scenarios. LLM runs need

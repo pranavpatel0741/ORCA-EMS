@@ -73,3 +73,15 @@ Derived values for the default town (50,000 people, 20 × 20 km):
   defaults.
 - **Offline stand-in.** `orca_agents/scripted.py` follows the agent instructions with simple
   rules. It is used for tests and labeled dry runs only, never reported as LLM results.
+- **LLM model.** All reported agent runs use `gpt-4o-mini` (chosen for cost; about 2–3 cents per
+  surge run). `gpt-5-nano` was tried and did worse; `gpt-4.1-nano` is no longer served. Other
+  models may behave differently.
+- **Derived facts in agent inputs.** Agents receive the same status board as the baselines plus
+  facts computed from it: which hospitals can structurally treat each ambulance's patients
+  (capability, trauma center, private contract; the same check as the safety rules), ER beds
+  left after ambulances already on the way, and which hospitals already declined an ambulance.
+  The agents still choose; these facts only save the model from re-deriving them.
+- **Dispatch has no tools.** Its input already holds every ETA and hospital fact, and tool use
+  made the small model loop until it ran out of turns.
+- **Failed agent calls are cached** like successful ones, so a replay reproduces the same rule
+  backup decisions. API errors (network, quota) are not cached.

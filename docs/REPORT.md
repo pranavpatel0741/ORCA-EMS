@@ -99,10 +99,54 @@ minutes waiting at ER doors, because it serves mass-casualty patients first and 
 patients to hospitals that were farther away. On a normal day the two baselines perform almost
 the same. This is the bar the agents must clear.
 
-**Agents.** *Pending the recorded LLM runs* (`LLM_MODE=record python eval/run_experiments.py
---seeds 5`). The H1–H3 verdicts in `results/summary.md` are computed automatically from paired
-runs. An offline dry run with a deterministic stand-in only validates the pipeline. It is not
-an LLM result and is not reported here.
+**Agents (gpt-4o-mini, 5 seeds, 40 LLM runs).** Mean values; full tables with spreads are in
+`results/summary.md`. Every LLM answer is saved in `data/llm_cache/`, so the runs replay exactly
+with `LLM_MODE=cache_only` and no API key.
+
+| | Critical on time | Critical: call to care (min) | Response (min) | ER minutes over base | Deaths |
+|---|---|---|---|---|---|
+| *Normal day, partial info* | | | | | |
+| Nearest | 0% | 84 | 9.6 | 37 | 0 |
+| Rule-based | 0% | 68 | 9.6 | 9.8 | 0 |
+| Agents, no negotiation | 100% | 56 | 11 | 10 | 0 |
+| Agents, negotiating | 100% | 56 | 11 | 10 | 0 |
+| *Surge, partial info* | | | | | |
+| Nearest | 37% | 63 | 25 | 288 | 3.8 |
+| Rule-based | 37% | 63 | 48 | 536 | 3.6 |
+| Agents, no negotiation | 36% | 69 | 60 | 533 | 3.4 |
+| Agents, negotiating | 37% | 58 | 57 | 483 | 4.0 |
+| *Surge, complete info* | | | | | |
+| Nearest | 33% | 62 | 32 | 299 | 3.6 |
+| Rule-based | 33% | 67 | 46 | 548 | 3.0 |
+| Agents, no negotiation | 33% | 69 | 56 | 540 | 3.4 |
+| Agents, negotiating | 33% | 69 | 54 | 538 | 3.0 |
+
+Where the agents helped:
+- **Incomplete information on a normal day.** Every critical patient reached care within 60
+  minutes (both baselines: none), and 12–28 minutes sooner on average. The agents read the
+  scene and hospital facts and avoided the hospitals that turned out to be full.
+- **Negotiation under surge with partial information.** Compared with the same agents without
+  negotiation, critical patients reached care 11 minutes sooner and ambulances waited less at
+  ER doors (483 vs 533 minutes). Paired by seed, negotiation was better for critical care in
+  6 of 10 surge runs and worse in 1.
+
+Where they did not:
+- **Response time in a surge.** The first ambulance reached calls later (54–60 minutes against
+  25–48 for the baselines), because the agents commit units to mass-casualty patients first.
+  Deaths and the outcome score are about the same as the baselines.
+- **Complete information.** With an accurate status board, the agents add nothing over the
+  rule-based policy.
+- **Hypotheses.** H1 (fewer capacity failures with negotiation) is mixed. H2 (faster critical
+  care in scarcity) is mixed, leaning positive. H3 (a larger benefit under surge and partial
+  information) is not supported: the gain appears under partial information on a normal day,
+  not under surge.
+
+Cost: 64 LLM calls and about 135k tokens per negotiated run (88k without negotiation), around
+2–3 US cents on gpt-4o-mini; the whole grid cost about $0.80. When an agent's answer was unusable, the
+rule backup decided and the log and dashboard label it as such: 8% of decisions per negotiated
+run on average (21% without negotiation, where a hospital's counter or rejection always goes to
+the backup by design). Five seeds and one model make this descriptive evidence, not a significance
+test.
 
 ## 6. Limitations
 
