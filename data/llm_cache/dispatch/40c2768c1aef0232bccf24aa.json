@@ -1,0 +1,194 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [],
+  "calls": [
+   {
+    "called_min": 132,
+    "crews_already_assigned": [],
+    "id": "I-004",
+    "mode": "SINGLE",
+    "type": "MEDICAL_STROKE",
+    "unsafe_scene": false,
+    "urgency": 0.8,
+    "victims_not_yet_seen": 1,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_unit_count": 5,
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "I-004": 22.6
+    },
+    "id": "AMB-2",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-004": 2.5
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-004": 3.8
+    },
+    "id": "AMB-4",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-004": 18.5
+    },
+    "id": "PVT-1",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-004": 18.5
+    },
+    "id": "PVT-2",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 10
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 6
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "no: only during a mass-casualty surge",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 132,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "route_these_unit_ids": [],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-004",
+    "patient_ids": [],
+    "rationale": "AMB-3 has the shortest ETA of 2.5 minutes to the medical stroke call and is free to respond.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "AMB-3 is assigned to the stroke call, ensuring timely response without the need for mutual aid.",
+  "routes": []
+ },
+ "prompt_version": "8",
+ "tokens": 2127
+}

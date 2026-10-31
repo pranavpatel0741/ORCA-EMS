@@ -1,0 +1,199 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P08",
+     "MCI-2-P09"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   },
+   {
+    "patient_ids": [
+     "I-004-P0"
+    ],
+    "to_call": "I-004",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 6
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 4,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 146,
+  "offers": [],
+  "units": [
+   {
+    "already_declined_by": [],
+    "eta_to_hospitals_min": {
+     "A": 1.0,
+     "B": 11.1,
+     "C": 13.5,
+     "D": 12.5
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 3,
+      "eta_min": 11.1,
+      "id": "B"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 2,
+      "eta_min": 13.5,
+      "id": "C"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 1.0,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 12.5,
+      "id": "D"
+     }
+    ],
+    "id": "AMB-3",
+    "patients": [],
+    "state": "RETURNING"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P08",
+     "MCI-2-P09"
+    ],
+    "rationale": "MCI-2 patients are now being assigned to AMB-3 for transport.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "escalate": false,
+  "rationale": "AMB-3 will transport patients MCI-2-P08 and MCI-2-P09 to Hospital B due to available ER beds, while I-004-P0 remains unassigned.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "AMB-3 has capacity to transport patients to Hospital B, which has remaining ER beds and can accommodate them.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "unassigned_patient_ids": [
+   "I-004-P0"
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 1844
+}

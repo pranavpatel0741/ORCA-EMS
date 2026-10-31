@@ -1,0 +1,208 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P06",
+     "MCI-2-P07"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P08",
+     "MCI-2-P09"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-4"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P10",
+     "MCI-2-P11"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P12"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 3,
+  "offers": [],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 11.1,
+     "B": 1.0,
+     "C": 24.5,
+     "D": 14.0
+    },
+    "id": "AMB-3",
+    "patients": [],
+    "state": "IDLE"
+   },
+   {
+    "eta_to_hospitals_min": {
+     "A": 11.1,
+     "B": 17.3,
+     "C": 17.3,
+     "D": 23.5
+    },
+    "id": "AMB-4",
+    "patients": [],
+    "state": "IDLE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P06",
+     "MCI-2-P07",
+     "MCI-2-P10",
+     "MCI-2-P11"
+    ],
+    "rationale": "Assigned to AMB-3 due to proximity to Hospital B.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P08",
+     "MCI-2-P09",
+     "MCI-2-P12"
+    ],
+    "rationale": "Assigned to AMB-4 to utilize available transport capacity effectively.",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Both AMB-3 and AMB-4 are assigned to Hospital B to prevent overloading while ensuring all patients are transported without any unassigned.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "AMB-3 is best suited to transport patients where wait times are shortest, as Hospital B is the nearest.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "AMB-4 should also transport patients to Hospital B, maximizing utilization of available resources.",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "2",
+ "tokens": 1651
+}

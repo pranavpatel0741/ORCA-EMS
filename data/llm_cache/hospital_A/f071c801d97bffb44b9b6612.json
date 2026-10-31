@@ -1,0 +1,84 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P17",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   },
+   {
+    "id": "MCI-2-P18",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   }
+  ],
+  "hospital": "A",
+  "minute": 94,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 0.833,
+   "free": {
+    "er_bed": 1,
+    "nurse_slot": 9,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 13
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 15.9,
+    "patients": [
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "We can only take patients with minor needs at the moment due to staff coverage; we currently have 4 nurses on duty and 2 are required for minimum coverage. We can accept other patients later when our capacity allows. We suggest transferring MCI-2-P12 to another hospital better suited for serious cases.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "Currently, our nurse coverage does not allow us to accept additional serious patients without compromising safety.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "Hospital B or other nearby hospitals"
+ },
+ "prompt_version": "2",
+ "tokens": 1025
+}

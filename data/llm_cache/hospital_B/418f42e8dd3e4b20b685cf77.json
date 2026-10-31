@@ -1,0 +1,72 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [],
+  "hospital": "B",
+  "minute": 266,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 1.333,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 5
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 2,
+   "stabilization_only": true,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 9.1,
+    "patients": [
+     {
+      "id": "I-003-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-003-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-003-P0"
+  ],
+  "counter_offer": "I-003-P1 cannot be accepted due to full ER capacity at arrival. Patient I-003-P1 will require care that we cannot provide right away.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "We can accept the minor severity patient I-003-P0, but we cannot accommodate the serious severity patient I-003-P1 due to lack of available beds.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 992
+}

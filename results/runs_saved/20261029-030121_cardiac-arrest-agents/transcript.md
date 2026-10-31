@@ -1,0 +1,48 @@
+# Cardiac arrest · agents
+
+Policy: agents · model: gpt-4o-mini · information: complete · seed 7 · 120 simulated minutes
+
+## How well it went
+
+| Measure | Value |
+|---|---|
+| Deaths | 0 |
+| Critical patients in care within 60 min | 100% |
+| Critical patients: call to definitive care (mean) | 40 min |
+| Call to first ambulance on scene (mean) | 7 min |
+| Ambulance minutes waiting at ER doors (beyond 10 min) | 0.0 min |
+| Hospital minutes over capacity | 25 min |
+| Calls with no ambulance after 30 min | 0 |
+| Patients still not in care at the end | 0 |
+| Proposals blocked by safety rules | 0 |
+| Decisions sent for human review | 0 |
+| Synthetic outcome score (higher is better) | 0.9 |
+| AI calls | 5 |
+| AI tokens | 7080 |
+| Decisions by AI agents | 1 |
+| Decisions by the rule backup | 1 |
+
+## Negotiations
+
+No negotiations (baselines do not negotiate).
+
+## Full conversation
+
+-   0 min · Monitor → Dispatch · ALERT [sim]: No free ambulance in the SW district
+-   2 min · 911 caller → Dispatch · 911 CALL [sim]: “Someone's having chest pain, they can barely breathe.” (medical cardiac, about 1 hurt, grid 4,3)
+-   2 min · Dispatch → Dispatch · PRIORITY REPORT [AI]: SINGLE: about 1 critical, 0 serious, 0 minor; urgency 0.8. The caller reports chest pain and difficulty breathing, indicating a high urgency situation consistent with cardiac issues.
+-   2 min · Dispatch → AMB-1 · STATUS [AI]: Unit AMB-1 is the fastest free unit available and will arrive at the scene in 7 minutes to assess the patient.
+-   2 min · Dispatch → dispatch · PRIORITY REPORT [sim]: The caller reports chest pain and difficulty breathing, indicating a high urgency situation consistent with cardiac issues.
+-   2 min · Dispatch → AMB-1 · ORDER [AI]: AMB-1, respond to the medical cardiac at grid 4,3 for patients, triage on arrival.
+-   7 min · Monitor → Dispatch · ALERT [sim]: Hospital A ER at 100% of capacity
+-   9 min · AMB-1 → Dispatch · SCENE REPORT [sim]: On scene. 1 patient(s): 1 red.
+-   9 min · Dispatch → Dispatch · PRIORITY REPORT [AI]: SINGLE: about 1 critical, 0 serious, 0 minor; urgency 1.0. The caller reports severe chest pain and difficulty breathing, indicating a critical condition that requires immediate medical intervention.
+-   9 min · Dispatch → dispatch · PRIORITY REPORT [sim]: The caller reports severe chest pain and difficulty breathing, indicating a critical condition that requires immediate medical intervention.
+-  22 min · Rule backup → Dispatch · AI NOT USED [rule backup]: The AI gave no usable hospital for this ambulance. The rule-based backup decided.
+-  22 min · Dispatch → AMB-1 · ORDER [rule backup]: AMB-1, transport to Hospital C.
+-  27 min · Monitor → Dispatch · ALERT CLEARED [sim]: Cleared: Hospital A ER at 100% of capacity
+-  28 min · AMB-1 → Hospital C · PRE ALERT [sim]: Inbound with 1 red, ETA 14 min.
+-  42 min · Hospital C → Dispatch · IN CARE [sim]: I-CARDIAC-P0 (red) is in a treatment bed.
+-  64 min · Monitor → Dispatch · ALERT [sim]: Hospital C ER at 100% of capacity
+-  69 min · Monitor → Dispatch · ALERT CLEARED [sim]: Cleared: Hospital C ER at 100% of capacity
+-  76 min · Monitor → Dispatch · ALERT CLEARED [sim]: Cleared: No free ambulance in the SW district

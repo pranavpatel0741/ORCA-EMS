@@ -1,0 +1,378 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [
+   {
+    "called_min": 2,
+    "crews_already_assigned": [],
+    "id": "MCI-2",
+    "mode": "MCI",
+    "type": "BUS_CRASH",
+    "unsafe_scene": false,
+    "urgency": 0.92,
+    "victims_not_yet_seen": 0,
+    "waiting_patients": [
+     {
+      "id": "MCI-2-P06",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P07",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P08",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P17",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P18",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P19",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P20",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P21",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P25",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P26",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [
+   {
+    "counter": "safety rule R2 (NO_CAPACITY_AT_ETA)",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "type": "RULE",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 1,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 9,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 5,
+    "stabilization_only": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "id": "AMB-4",
+    "patients": [
+     {
+      "id": "MCI-2-P02",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P05",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ]
+   }
+  ],
+  "minute": 68,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-5-nano",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P06",
+     "MCI-2-P07"
+    ],
+    "rationale": "Two SERIOUS GENERAL-patients grouped under one unit only if allowed; no current scene reports, but level of care is GENERAL; load patients onto AMB-1 for rapid transport to a capable hospital with space.",
+    "unit_id": "AMB-1"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P08",
+     "MCI-2-P09"
+    ],
+    "rationale": "Pair two SERIOUS GENERAL patients on another available unit to balance load and expedite transport.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P10",
+     "MCI-2-P11"
+    ],
+    "rationale": "Continue even distribution of SERIOUS GENERAL patients across units.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P12",
+     "MCI-2-P17",
+     "MCI-2-P18",
+     "MCI-2-P19"
+    ],
+    "rationale": "Load four patients only if allowed; otherwise defer to two-patient limit per ambulance; here grouped to balance loads given current capacity.",
+    "unit_id": "AMB-5"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "No private mutual aid needed at this moment; city units available but none have capacity to spare without violating two-patient rule and current hospital space.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Nearest capable with available trauma bays and general wards; A has er_bed 0 and trauma_bay 2, suitable for serious patients.",
+    "unit_id": "AMB-1"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "C has trauma BAY 0, er_bed 1, general capacity; balance load and proximity.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "B has er_bed 3, general beds, stabilisation_only but can accept SERIOUS patients; disperses load.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Private D accepts only stable SERIOUS patients; if surge requires, D can take up to 4 but currently queue 5; use only if surge pressure or if other hospitals at capacity.",
+    "unit_id": "AMB-5"
+   }
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 2751
+}

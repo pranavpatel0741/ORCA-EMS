@@ -1,0 +1,34 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-002",
+   "narrative": "Someone fainted, they're awake now but confused.",
+   "reported_victims": 2,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": {
+   "minor": 1,
+   "serious": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 1
+  },
+  "incident_id": "I-002",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The patient fainted and is now confused, both of which indicate potential underlying issues, but no immediate life-threatening conditions are reported.",
+  "urgency": 0.6
+ },
+ "prompt_version": "2",
+ "tokens": 732
+}

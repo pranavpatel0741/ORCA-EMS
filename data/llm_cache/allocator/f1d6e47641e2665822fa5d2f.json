@@ -1,0 +1,164 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P21",
+     "MCI-2-P25"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-1"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P26"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 1,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 5,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 79,
+  "offers": [],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 10.5,
+     "B": 1.0,
+     "C": 23.8,
+     "D": 12.9
+    },
+    "id": "AMB-1",
+    "patients": [],
+    "state": "RETURNING"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P25"
+    ],
+    "rationale": "MCI-2-P25 is prioritized for transport due to its critical nature.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "escalate": false,
+  "rationale": "AMB-1 is allocated to Hospital B for patient MCI-2-P25, while MCI-2-P21 and MCI-2-P26 remain unassigned due to hospital capacity limitations.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "AMB-1 is assigned to Hospital B due to its proximity and availability of resources, despite its stabilization-only status.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "unassigned_patient_ids": [
+   "MCI-2-P21",
+   "MCI-2-P26"
+  ]
+ },
+ "prompt_version": "2",
+ "tokens": 1419
+}

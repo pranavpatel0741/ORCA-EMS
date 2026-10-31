@@ -1,0 +1,185 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "A",
+    "type": "route_unresolved",
+    "unit_id": "PVT-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 4,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 1,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 7,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 74,
+  "offers": [
+   {
+    "counter": "Currently, I cannot accept any new trauma patients due to full capacity. I have one critical patient coming in and only one trauma bay available shortly after that.",
+    "decision": "COUNTER",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "unit_id": "PVT-1"
+   },
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "PVT-1"
+   }
+  ],
+  "units": [
+   {
+    "already_declined_by": [
+     "A",
+     "C"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 12.4,
+     "B": 23.4,
+     "C": 1.2,
+     "D": 18.3
+    },
+    "hospitals_that_can_treat": [],
+    "id": "PVT-1",
+    "patients": [
+     {
+      "id": "MCI-2-P00",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "state": "LOADING"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [],
+  "escalate": true,
+  "rationale": "No hospital can accept the critical trauma patient due to capacity limitations, requiring escalation for further decision-making.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B can treat stable SERIOUS non-trauma patients, but it was unable to accept critical trauma patients due to its capacity constraints. Hospital A and C have already declined.",
+    "unit_id": "PVT-1"
+   }
+  ],
+  "unassigned_patient_ids": [
+   "MCI-2-P00"
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 1771
+}

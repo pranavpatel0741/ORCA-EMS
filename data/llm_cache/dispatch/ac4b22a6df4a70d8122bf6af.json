@@ -1,0 +1,692 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [
+   {
+    "called_min": 2,
+    "crews_already_assigned": [],
+    "id": "MCI-2",
+    "mode": "MCI",
+    "type": "BUS_CRASH",
+    "unsafe_scene": false,
+    "urgency": 0.9,
+    "victims_not_yet_seen": 0,
+    "waiting_patients": [
+     {
+      "id": "MCI-2-P00",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     },
+     {
+      "id": "MCI-2-P01",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     },
+     {
+      "id": "MCI-2-P07",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P08",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P13",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P14",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P15",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P16",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P17",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P18",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P19",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P20",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P21",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P22",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P23",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P24",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P25",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P26",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P27",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P28",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [],
+  "minute": 4,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P00"
+    ],
+    "rationale": "Assigning Unit1 to transport the first critical trauma patient (MCI-2-P00) to the nearest trauma center with available resources.",
+    "unit_id": "Unit1"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P01"
+    ],
+    "rationale": "Assigning Unit2 to transport the second critical trauma patient (MCI-2-P01) to ensure both receive timely care.",
+    "unit_id": "Unit2"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P07"
+    ],
+    "rationale": "Assigning Unit3 to take the serious patient (MCI-2-P07) to Hospital C, which can handle general cases.",
+    "unit_id": "Unit3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P08"
+    ],
+    "rationale": "Assigning Unit4 to transport another serious patient (MCI-2-P08) to Hospital C to balance the load.",
+    "unit_id": "Unit4"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P09"
+    ],
+    "rationale": "Assigning Unit5 to take another serious patient (MCI-2-P09) to Hospital C to utilize available capacity.",
+    "unit_id": "Unit5"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P10"
+    ],
+    "rationale": "Assigning Unit6 to transport another serious patient (MCI-2-P10) to Hospital C to distribute serious patients evenly.",
+    "unit_id": "Unit6"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P11"
+    ],
+    "rationale": "Assigning Unit7 to transport another serious patient (MCI-2-P11) to Hospital C to optimize resource use.",
+    "unit_id": "Unit7"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P12"
+    ],
+    "rationale": "Assigning Unit8 to transport another serious patient (MCI-2-P12) to Hospital C.",
+    "unit_id": "Unit8"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P13"
+    ],
+    "rationale": "Assigning Unit9 to transport a minor patient (MCI-2-P13) to distribute the load effectively.",
+    "unit_id": "Unit9"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P14"
+    ],
+    "rationale": "Assigning Unit10 to transport another minor patient (MCI-2-P14) to balance the distribution.",
+    "unit_id": "Unit10"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P15"
+    ],
+    "rationale": "Assigning Unit11 to transport a minor patient (MCI-2-P15) to alleviate congestion on other units.",
+    "unit_id": "Unit11"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P16"
+    ],
+    "rationale": "Assigning Unit12 to transport another minor patient (MCI-2-P16) to ensure all patients are attended to.",
+    "unit_id": "Unit12"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P17"
+    ],
+    "rationale": "Assigning Unit13 to transport another minor patient (MCI-2-P17) to provide timely care.",
+    "unit_id": "Unit13"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P18"
+    ],
+    "rationale": "Assigning Unit14 to transport a minor patient (MCI-2-P18) for effective distribution.",
+    "unit_id": "Unit14"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P19"
+    ],
+    "rationale": "Assigning Unit15 to transport a minor patient (MCI-2-P19) to manage patient load.",
+    "unit_id": "Unit15"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P20"
+    ],
+    "rationale": "Assigning Unit16 to transport a minor patient (MCI-2-P20) to facilitate efficient service.",
+    "unit_id": "Unit16"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P21"
+    ],
+    "rationale": "Assigning Unit17 to transport a minor patient (MCI-2-P21) ensuring all are addressed.",
+    "unit_id": "Unit17"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P22"
+    ],
+    "rationale": "Assigning Unit18 to transport a minor patient (MCI-2-P22) for effective handling.",
+    "unit_id": "Unit18"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P23"
+    ],
+    "rationale": "Assigning Unit19 to transport a minor patient (MCI-2-P23) to ensure effective support.",
+    "unit_id": "Unit19"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P24"
+    ],
+    "rationale": "Assigning Unit20 to transport a minor patient (MCI-2-P24) to manage the distribution effectively.",
+    "unit_id": "Unit20"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P25"
+    ],
+    "rationale": "Assigning Unit21 to take care of a minor patient (MCI-2-P25) ensuring timely assistance.",
+    "unit_id": "Unit21"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P26"
+    ],
+    "rationale": "Assigning Unit22 to transport a minor patient (MCI-2-P26) for efficient delivery.",
+    "unit_id": "Unit22"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P27"
+    ],
+    "rationale": "Assigning Unit23 to transport a minor patient (MCI-2-P27) to support care.",
+    "unit_id": "Unit23"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P28"
+    ],
+    "rationale": "Assigning Unit24 to provide transportation for a minor patient (MCI-2-P28) to complete the distribution.",
+    "unit_id": "Unit24"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "Prioritize critical patients to trauma facilities while distributing serious and minor patients across available hospitals effectively.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "Unit1 is transporting a critical trauma patient to Hospital C, which has trauma capabilities.",
+    "unit_id": "Unit1"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit2 is taking the second critical trauma patient to Hospital C to ensure quick care.",
+    "unit_id": "Unit2"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit3 is transporting a serious patient to Hospital C where there is capacity.",
+    "unit_id": "Unit3"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit4 is taking another serious patient to Hospital C to spread the load.",
+    "unit_id": "Unit4"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit5 is transporting a serious patient to Hospital C to utilize available resources.",
+    "unit_id": "Unit5"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit6 is taking a serious patient to Hospital C to efficiently handle patient loads.",
+    "unit_id": "Unit6"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit7 is transporting a serious patient to Hospital C where patient capacity is available.",
+    "unit_id": "Unit7"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Unit8 is taking a serious patient to Hospital C for timely care.",
+    "unit_id": "Unit8"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit9 is transporting a minor patient to Hospital A for proper allocation.",
+    "unit_id": "Unit9"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit10 is taking another minor patient to Hospital A to distribute effectively.",
+    "unit_id": "Unit10"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit11 is transporting a minor patient to Hospital A to manage patient distribution.",
+    "unit_id": "Unit11"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit12 is taking care of a minor patient to Hospital A for efficient care.",
+    "unit_id": "Unit12"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit13 is transporting a minor patient to Hospital A to ensure timely attention.",
+    "unit_id": "Unit13"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit14 is taking a minor patient to Hospital A, adhering to effective distribution.",
+    "unit_id": "Unit14"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit15 is transporting a minor patient to Hospital A to evenly distribute the load.",
+    "unit_id": "Unit15"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit16 is taking a minor patient to Hospital A for effective handling.",
+    "unit_id": "Unit16"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit17 is transporting a minor patient to Hospital A to support service.",
+    "unit_id": "Unit17"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit18 is taking care of a minor patient to Hospital A for compliance with load management.",
+    "unit_id": "Unit18"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit19 is transporting a minor patient to Hospital A to ensure care availability.",
+    "unit_id": "Unit19"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit20 is taking a minor patient to Hospital A to meet effective distribution needs.",
+    "unit_id": "Unit20"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit21 is transporting a minor patient to Hospital A to balance care.",
+    "unit_id": "Unit21"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit22 is taking a minor patient to Hospital A for timely assistance.",
+    "unit_id": "Unit22"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit23 is offering transportation for a minor patient to Hospital A to optimize distribution.",
+    "unit_id": "Unit23"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Unit24 is transporting a minor patient to Hospital A to finalize distribution.",
+    "unit_id": "Unit24"
+   }
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 4582
+}

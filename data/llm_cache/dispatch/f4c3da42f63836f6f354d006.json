@@ -1,0 +1,228 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [
+   {
+    "already_declined_by": [
+     "D"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 9.9,
+     "B": 9.1,
+     "C": 20.1,
+     "D": 4.8
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 9.1,
+      "id": "B"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": -1,
+      "eta_min": 9.9,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 20.1,
+      "id": "C"
+     }
+    ],
+    "id": "PVT-1",
+    "patients": [
+     {
+      "id": "I-003-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-003-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "calls": [
+   {
+    "called_min": 137,
+    "crews_already_assigned": [],
+    "id": "I-004",
+    "mode": "SINGLE",
+    "type": "MEDICAL_GENERAL",
+    "unsafe_scene": false,
+    "urgency": 0.4,
+    "victims_not_yet_seen": 1,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [
+   {
+    "counter": "I can accept one patient with minor severity. I can take the second patient with serious severity if a bed becomes available shortly, but currently, I cannot accommodate them due to capacity constraints.",
+    "hospital_id": "D",
+    "suggested_hospital": null,
+    "type": "COUNTER",
+    "unit_id": "PVT-1"
+   }
+  ],
+  "free_unit_count": 0,
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 1,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": -1,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 16
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 4
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 2,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 9,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "no: only during a mass-casualty surge",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 282,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "route_these_unit_ids": [
+   "PVT-1"
+  ],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-004",
+    "patient_ids": [
+     "I-003-P1"
+    ],
+    "rationale": "Patient I-003-P1 is serious and cannot be left waiting.",
+    "unit_id": "PVT-1"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "No free units are available, and the only waiting patients are being assigned based on hospital capacity.",
+  "routes": [
+   {
+    "hospital_id": "D",
+    "rationale": "Hospital D can currently take one serious patient due to a bed becoming available shortly.",
+    "unit_id": "PVT-1"
+   }
+  ]
+ },
+ "prompt_version": "8",
+ "tokens": 2342
+}

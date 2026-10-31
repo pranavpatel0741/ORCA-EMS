@@ -1,0 +1,74 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [],
+  "hospital": "C",
+  "minute": 162,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 0.833,
+   "free": {
+    "er_bed": 1,
+    "nurse_slot": 9,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 6
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 19.7,
+    "patients": [
+     {
+      "id": "MCI-2-P08",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-4"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P08"
+  ],
+  "counter_offer": "I can only accept one patient at this time due to current capacity. The second patient can be transferred to another facility if necessary.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "I have one ER bed available, but I need to maintain minimal nurse coverage, so I can only accept one patient.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "null"
+ },
+ "prompt_version": "3",
+ "tokens": 990
+}

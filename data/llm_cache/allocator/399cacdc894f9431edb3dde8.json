@@ -1,0 +1,151 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P01"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 4,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 33,
+  "offers": [
+   {
+    "counter": "",
+    "decision": "ACCEPT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-2"
+   }
+  ],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 13.5,
+     "B": 17.3,
+     "C": 17.3,
+     "D": 3.9
+    },
+    "id": "AMB-1",
+    "patients": [],
+    "state": "IDLE"
+   }
+  ]
+ },
+ "model": "gpt-5-nano",
+ "output": {
+  "assignments": [],
+  "escalate": false,
+  "rationale": "Assign AMB-1 to Hospital A (A has available capacity across OR, ER bed, ward beds, and no ongoing overload). No other units conflict; all critical constraints satisfied.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "AMB-1 prefers the accepting hospital A per current offer; A has available OR and beds and can handle the MCI-2 case given its capabilities (CARDIAC_CATH, GENERAL, STROKE, TRAUMA_L1) and no critical overload.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "2",
+ "tokens": 1395
+}

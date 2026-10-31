@@ -1,0 +1,93 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P10",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P11",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "B",
+  "minute": 164,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.333,
+   "free": {
+    "er_bed": 4,
+    "nurse_slot": 14,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 8
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 23.4,
+    "patients": [
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P13",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-4"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P12"
+  ],
+  "counter_offer": "We cannot accept MCI-2-P13 due to nurse coverage leaving us below minimum requirements.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "We can accept one patient, but accepting both would compromise our minimum nurse coverage.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1067
+}

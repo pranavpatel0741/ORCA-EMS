@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-003",
+   "narrative": "My coworker is really sick and dizzy, I don't know what's wrong.",
+   "reported_victims": 2,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": null
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 2,
+   "serious": 0
+  },
+  "incident_id": "I-003",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The caller reports their coworker is very sick and dizzy, which is concerning but does not indicate an immediate life-threatening situation. Therefore, the urgency is moderate.",
+  "urgency": 0.4
+ },
+ "prompt_version": "2",
+ "tokens": 732
+}

@@ -1,0 +1,35 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "MCI-2",
+   "narrative": "Bus crash, lots of people hurt, maybe 25 or so, some can't move.",
+   "reported_victims": 27,
+   "trapped_victims": true,
+   "type": "BUS_CRASH",
+   "violent": false
+  },
+  "scene_report": {
+   "critical": 4,
+   "minor": 15,
+   "serious": 10
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 4,
+   "expectant": 0,
+   "minor": 15,
+   "serious": 10
+  },
+  "incident_id": "MCI-2",
+  "mode": "MCI",
+  "needs_fire": true,
+  "needs_police": false,
+  "rationale": "This is a serious bus crash with a significant number of reported injuries, including trapped victims, necessitating fire services for rescue.",
+  "urgency": 0.9
+ },
+ "prompt_version": "2",
+ "tokens": 747
+}

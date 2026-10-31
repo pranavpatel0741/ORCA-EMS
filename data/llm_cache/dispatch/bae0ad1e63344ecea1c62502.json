@@ -1,0 +1,193 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [],
+  "calls": [
+   {
+    "called_min": 97,
+    "crews_already_assigned": [],
+    "id": "I-002",
+    "mode": "SINGLE",
+    "type": "MEDICAL_GENERAL",
+    "unsafe_scene": false,
+    "urgency": 0.5,
+    "victims_not_yet_seen": 2,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_unit_count": 4,
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "I-002": 24.5
+    },
+    "id": "AMB-2",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-002": 9.3
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-002": 10.9
+    },
+    "id": "AMB-4",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-002": 24.3
+    },
+    "id": "PVT-1",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 1,
+    "board_age_min": 7,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 7,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 7,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 7,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 7,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "no: only during a mass-casualty surge",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 97,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 1
+   }
+  ],
+  "route_these_unit_ids": [],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-002",
+    "patient_ids": [],
+    "rationale": "AMB-3 has the shortest estimated arrival time and is assigned to a waiting call with two victims pending triage.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "I-002",
+    "patient_ids": [],
+    "rationale": "AMB-4 is also available to support the call for additional resources as patient needs are determined.",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "Two free ambulances are assigned to the call for additional support as there are two waiting patients; no critical patients currently require mutual aid.",
+  "routes": []
+ },
+ "prompt_version": "8",
+ "tokens": 2140
+}

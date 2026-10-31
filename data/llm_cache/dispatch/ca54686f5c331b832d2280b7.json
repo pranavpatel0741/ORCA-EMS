@@ -1,0 +1,238 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [
+   {
+    "called_min": 2,
+    "crews_already_assigned": [],
+    "id": "I-CRASH",
+    "mode": "MCI",
+    "type": "VEHICLE_CRASH",
+    "unsafe_scene": false,
+    "urgency": 0.7,
+    "victims_not_yet_seen": 0,
+    "waiting_patients": [
+     {
+      "id": "I-CRASH-P0",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     },
+     {
+      "id": "I-CRASH-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-CRASH-P2",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "I-CRASH": 22.5
+    },
+    "id": "AMB-1",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CRASH": 17.4
+    },
+    "id": "AMB-2",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CRASH": 19.0
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CRASH": 1.7
+    },
+    "id": "AMB-4",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [],
+  "minute": 2,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-CRASH",
+    "patient_ids": [
+     "I-CRASH-P0"
+    ],
+    "rationale": "AMB-4 is the nearest unit and must transport the critical trauma patient to a facility with a trauma bay and surgeon.",
+    "unit_id": "AMB-4"
+   },
+   {
+    "incident_id": "I-CRASH",
+    "patient_ids": [
+     "I-CRASH-P1"
+    ],
+    "rationale": "AMB-2 will transport the serious patient to the nearest capable hospital that can treat a SERIOUS patient.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "incident_id": "I-CRASH",
+    "patient_ids": [
+     "I-CRASH-P2"
+    ],
+    "rationale": "AMB-3 will transport the minor patient to distribute the load across units and hospitals.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "Each ambulance is assigned to a specific patient based on severity, with necessary routes chosen to ensure proper care while balancing the load among available hospitals.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C has a trauma bay free and is the most suitable for the critical patient.",
+    "unit_id": "AMB-4"
+   },
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A is available and capable for handling SERIOUS cases.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B can take the minor patient and is available with the required facilities.",
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 1907
+}

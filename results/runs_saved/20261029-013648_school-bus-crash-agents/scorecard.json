@@ -1,0 +1,130 @@
+{
+ "run_id": "s07_School bus crash_partial_agents",
+ "policy": "agents",
+ "info": "complete",
+ "seed": 7,
+ "model": "gpt-4o-mini",
+ "minutes": 270,
+ "headline": {
+  "deaths": 0,
+  "outcome_score": 28.183,
+  "critical_on_time": 0.5,
+  "critical_care_mean": 59,
+  "response_mean": 5,
+  "overload_min": 784,
+  "er_wait_over_base": 395.0,
+  "unserved_calls": 0,
+  "not_in_care_end": 0,
+  "rejections": 24,
+  "escalations": 0,
+  "fallback_rate": 0.283,
+  "llm_calls": 86,
+  "llm_tokens": 157437
+ },
+ "decisions": {
+  "ai": 20,
+  "rule_backup": 9,
+  "baseline_rules": 0
+ },
+ "metrics": {
+  "calls": 1,
+  "patients": 29,
+  "response_time": {
+   "n": 1,
+   "mean": 5,
+   "median": 5,
+   "p90": 5
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "n": 1,
+    "mean": 5,
+    "median": 5,
+    "p90": 5
+   },
+   "SERIOUS": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "MINOR": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "n": 2,
+    "mean": 59,
+    "median": 59.0,
+    "p90": 62
+   },
+   "SERIOUS": {
+    "n": 11,
+    "mean": 104.2,
+    "median": 106,
+    "p90": 160
+   },
+   "MINOR": {
+    "n": 16,
+    "mean": 137.9,
+    "median": 167.5,
+    "p90": 240
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "critical_on_time_rate": 0.5,
+  "critical_patients": 2,
+  "stabilization_only_admissions": 0,
+  "hospital_overload_minutes": 784,
+  "ambulance_minutes_at_er_over_base": 395.0,
+  "unserved_calls_30min": 0,
+  "patients_not_in_care_at_end": 0,
+  "deaths": 0,
+  "outcome_score": 28.183,
+  "negotiation": {
+   "PROPOSE": 27,
+   "ACCEPT": 5,
+   "REJECT": 2,
+   "COUNTER": 20,
+   "ESCALATE": 22,
+   "RESOLVE": 11,
+   "STAFF_REQUEST": 1,
+   "STAFF_RESPONSE": 1,
+   "MUTUAL_AID_REQUEST": 1
+  },
+  "mean_rounds_per_resolution": 2.75,
+  "rejections_by_rule": {
+   "R1": 5,
+   "R2": 10,
+   "R3": 2,
+   "R4": 5,
+   "R7": 2
+  },
+  "escalations": 0,
+  "approvals": 0,
+  "overrides": 0,
+  "fallbacks": 15,
+  "fallback_rate": 0.283,
+  "confidence_calibration": [],
+  "llm_calls": 86,
+  "llm_tokens": 157437,
+  "llm_latency_ms": 191110.2,
+  "llm_cache_hit_rate": 0.198,
+  "incidents": 1
+ }
+}

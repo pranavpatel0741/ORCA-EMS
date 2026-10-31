@@ -1,0 +1,216 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [],
+  "en_route_units": [],
+  "feedback": [],
+  "free_unit_count": 3,
+  "free_units": [
+   {
+    "eta_to_calls_min": {},
+    "id": "AMB-2",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {},
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {},
+    "id": "AMB-4",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 4,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "no: only during a mass-casualty surge",
+    "trauma_center": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [
+   {
+    "already_declined_by": [],
+    "eta_to_hospitals_min": {
+     "A": 17.3,
+     "B": 20.8,
+     "C": 19.4,
+     "D": 6.9
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 17.3,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 4,
+      "eta_min": 19.4,
+      "id": "C"
+     }
+    ],
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "I-CARDIAC-P0",
+      "needs": {
+       "capability": "CARDIAC_CATH",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "CRITICAL"
+     }
+    ]
+   }
+  ],
+  "minute": 9,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-CARDIAC-P0",
+    "patient_ids": [
+     "I-CARDIAC-P0"
+    ],
+    "rationale": "Unit AMB-2 is assigned to the critical cardiac patient, who requires cardiac catheterization immediately.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "incident_id": "",
+    "patient_ids": [],
+    "rationale": "Unit AMB-3 is on standby for any incoming calls or waiting patients.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "",
+    "patient_ids": [],
+    "rationale": "Unit AMB-4 is also on standby for potential patients.",
+    "unit_id": "AMB-4"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "There is one critical patient that requires immediate transport to the nearest capable hospital, Hospital A, while the remaining units are available for other incoming calls.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A is the nearest trauma center capable of treating the critical patient.",
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "prompt_version": "7",
+ "tokens": 2150
+}

@@ -1,0 +1,106 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P01",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   },
+   {
+    "id": "MCI-2-P06",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P07",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "A",
+  "minute": 102,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 0.833,
+   "free": {
+    "er_bed": 1,
+    "nurse_slot": 11,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 13
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 15.9,
+    "patients": [
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P10"
+  ],
+  "counter_offer": "The hospital can only accept one additional general patient (MCI-2-P10) at this time. We recommend that MCI-2-P11 be redirected to another facility with greater capacity.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "Currently, we have one available ER bed but are already managing incoming critical and serious cases. We cannot accommodate MCI-2-P11 without exceeding capacity.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "Hospital B"
+ },
+ "prompt_version": "2",
+ "tokens": 1123
+}

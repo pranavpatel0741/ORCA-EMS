@@ -1,0 +1,141 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 3
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 2,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 124,
+  "offers": [],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 13.5,
+     "B": 17.3,
+     "C": 17.3,
+     "D": 3.9
+    },
+    "id": "AMB-1",
+    "patients": [],
+    "state": "IDLE"
+   }
+  ]
+ },
+ "model": "gpt-5-nano",
+ "output": {
+  "assignments": [],
+  "escalate": false,
+  "rationale": "Resolve conflict by routing AMB-1 to Hospital A based on shortest ETA and sufficient capacity.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "A has the shortest median ETA (13.5 min) and available resources (OR, ward beds, nurses). D is for private with stabilization limitations and longer ETA. Selecting A minimizes severity-weighted time to definitive care without overloading a hospital.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "2",
+ "tokens": 6887
+}

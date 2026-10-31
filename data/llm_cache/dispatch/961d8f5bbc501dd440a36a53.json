@@ -1,0 +1,180 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [
+   {
+    "called_min": 2,
+    "crews_already_assigned": [],
+    "id": "I-CARDIAC",
+    "mode": "SINGLE",
+    "patients_still_needing_a_unit": 1,
+    "type": "MEDICAL_CARDIAC",
+    "unsafe_scene": false,
+    "urgency": 0.8,
+    "victims_not_yet_seen": 1,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "I-CARDIAC": 7.0
+    },
+    "id": "AMB-1",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CARDIAC": 19.4
+    },
+    "id": "AMB-2",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CARDIAC": 20.8
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "I-CARDIAC": 28.2
+    },
+    "id": "AMB-4",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 2,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 2,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 2,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 2,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "information": "partial",
+  "loaded_units": [],
+  "minute": 2,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-CARDIAC",
+    "patient_ids": [],
+    "rationale": "AMB-1 is the nearest available ALS unit to respond to the cardiac emergency.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "The selected unit and hospital maximize the chances for rapid and appropriate care without exceeding hospital capacity.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A has the capabilities for cardiac care and has available ER beds.",
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "prompt_version": "3",
+ "tokens": 1748
+}

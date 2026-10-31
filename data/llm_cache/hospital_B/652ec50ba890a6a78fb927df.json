@@ -1,0 +1,72 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [],
+  "hospital": "B",
+  "minute": 237,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 1.167,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 5
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.1,
+    "patients": [
+     {
+      "id": "I-003-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-003-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-003-P0"
+  ],
+  "counter_offer": "We can accept 1 patient, I-003-P0, but I-003-P1 requires a trauma bay which is currently held for critical cases. We recommend taking I-003-P1 to a facility with trauma capabilities.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "We can only accept patients within our stabilization capabilities, and we need to reserve our trauma bay for more critical cases.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "Hospital A"
+ },
+ "prompt_version": "3",
+ "tokens": 997
+}

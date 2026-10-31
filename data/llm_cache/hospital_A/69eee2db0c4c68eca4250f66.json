@@ -1,0 +1,86 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "I-001-P0",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   },
+   {
+    "id": "MCI-2-P00",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   }
+  ],
+  "hospital": "A",
+  "minute": 79,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 6,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 10
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 3,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 8.5,
+    "patients": [
+     {
+      "id": "MCI-2-P02",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": 60,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "AMB-4"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P02"
+  ],
+  "counter_offer": "I can accept MCI-2-P02 right away, but I need to keep the trauma bay available for critical cases. I cannot accept another trauma patient at this time due to overall capacity constraints and the presence of an already incoming patient needing a similar setup. My facility can accommodate the necessary requirements after the arrival of the patients currently in transit, but I must be cautious regarding my total bed and nurse capacity.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "I can accept MCI-2-P02 because I have a trauma bay available, but I'm unable to take any more due to current occupancy and capacity limits.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1116
+}

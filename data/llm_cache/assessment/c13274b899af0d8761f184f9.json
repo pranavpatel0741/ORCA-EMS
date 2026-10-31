@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-CRASH",
+   "narrative": "There's been a crash at the intersection, 3 people hurt.",
+   "reported_victims": 3,
+   "trapped_victims": true,
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  "scene_report": null
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 1,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 1
+  },
+  "incident_id": "I-CRASH",
+  "mode": "MCI",
+  "needs_fire": true,
+  "needs_police": false,
+  "rationale": "There are 3 people hurt and at least one is trapped, indicating a potentially serious situation requiring fire crews for rescue.",
+  "urgency": 0.7
+ },
+ "prompt_version": "2",
+ "tokens": 726
+}

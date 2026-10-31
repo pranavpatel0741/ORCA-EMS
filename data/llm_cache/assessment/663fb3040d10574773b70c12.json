@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-002",
+   "narrative": "My friend grabbed his chest and collapsed, he's sweating a lot.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  "scene_report": {
+   "critical": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 1,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 0
+  },
+  "incident_id": "I-002",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The caller reported a cardiac event with collapse and sweating, indicating high urgency. The scene report confirms one critical patient.",
+  "urgency": 1.0
+ },
+ "prompt_version": "2",
+ "tokens": 727
+}

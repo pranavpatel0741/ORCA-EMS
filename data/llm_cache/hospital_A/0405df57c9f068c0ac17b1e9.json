@@ -1,0 +1,86 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P21",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   },
+   {
+    "id": "MCI-2-P22",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   }
+  ],
+  "hospital": "A",
+  "minute": 269,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.5,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 6,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 16
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 3,
+   "queue_scenario": 1,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 12.9,
+    "patients": [
+     {
+      "id": "I-005-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-4"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-005-P0"
+  ],
+  "counter_offer": "Unfortunately, we cannot accept this patient immediately due to our current bed capacity. However, we can accept them once one of the beds opens up shortly, as we currently have one patient to arrive shortly.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We can only accept one additional patient at the moment due to our current ER bed occupancy. We still maintain sufficient nurse capacity to manage the incoming patients.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1064
+}

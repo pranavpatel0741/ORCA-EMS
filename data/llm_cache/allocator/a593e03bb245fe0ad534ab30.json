@@ -1,0 +1,189 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "A",
+    "type": "route_unresolved",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 4,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 89,
+  "offers": [
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-3"
+   },
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-3"
+   },
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-3"
+   },
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-3"
+   }
+  ],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "id": "AMB-3",
+    "patients": [
+     {
+      "id": "MCI-2-P01",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2-P01",
+    "patient_ids": [
+     "MCI-2-P01"
+    ],
+    "rationale": "Assigned the critical trauma patient MCI-2-P01 to AMB-3 for transfer to Hospital A where appropriate care can be provided.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "escalate": false,
+  "rationale": "AMB-3 is assigned to Hospital A as it can accommodate the critical trauma patient, satisfying their needs and avoiding overload on other facilities.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A is the preferred choice for accepting the critical trauma patient due to its capabilities.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "2",
+ "tokens": 1538
+}

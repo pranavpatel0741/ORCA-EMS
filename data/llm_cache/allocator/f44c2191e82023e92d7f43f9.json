@@ -1,0 +1,169 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "A",
+    "type": "route_unresolved",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 10,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 10,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 10,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 10,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 7,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 25,
+  "offers": [
+   {
+    "counter": "I can only accept patients with lower severity or from another hospital.",
+    "decision": "COUNTER",
+    "hospital_id": "A",
+    "suggested_hospital": "Hospital B",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "retry": 1,
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 17.3,
+     "B": 20.8,
+     "C": 19.4,
+     "D": 6.9
+    },
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "I-CARDIAC-P0",
+      "needs": {
+       "capability": "CARDIAC_CATH",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "I-CARDIAC-P0",
+    "patient_ids": [
+     "I-CARDIAC-P0"
+    ],
+    "rationale": "Assigned to Hospital D, which can accommodate the patient's critical condition.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Assigned AMB-1 to Hospital D due to its capacity and faster estimated arrival time, ensuring the critical patient receives timely care.",
+  "routes": [
+   {
+    "hospital_id": "D",
+    "rationale": "Hospital D has the necessary resources and a shorter ETA for the critical cardiac patient.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "1",
+ "tokens": 2978
+}

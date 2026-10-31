@@ -1,0 +1,622 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [
+   {
+    "called_min": 2,
+    "crews_already_assigned": [],
+    "id": "MCI-2",
+    "mode": "MCI",
+    "type": "BUS_CRASH",
+    "unsafe_scene": false,
+    "urgency": 1.0,
+    "victims_not_yet_seen": 0,
+    "waiting_patients": [
+     {
+      "id": "MCI-2-P01",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     },
+     {
+      "id": "MCI-2-P06",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P07",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P13",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P14",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P17",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P18",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P19",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P20",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P21",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P22",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P23",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P25",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P26",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P27",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [
+   {
+    "counter": "We can only accept MCI-2-P02 at this time due to current capacity constraints. We do not have capacity to take in MCI-2-P03 as we need to reserve a trauma bay for the incoming critical patient (MCI-2-P00).",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "type": "COUNTER",
+    "unit_id": "AMB-3"
+   },
+   {
+    "counter": "We can only accept MCI-2-P02 at this time due to current capacity constraints. We do not have capacity to take in MCI-2-P03 as we need to reserve a trauma bay for the incoming critical patient (MCI-2-P00).",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "type": "COUNTER",
+    "unit_id": "AMB-3"
+   },
+   {
+    "counter": "We can only accept MCI-2-P02 at this time due to current capacity constraints. We do not have capacity to take in MCI-2-P03 as we need to reserve a trauma bay for the incoming critical patient (MCI-2-P00).",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "type": "COUNTER",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 2,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 1,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 1,
+    "stabilization_only": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "id": "AMB-3",
+    "patients": [
+     {
+      "id": "MCI-2-P02",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P03",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ]
+   }
+  ],
+  "minute": 23,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 2
+   }
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P02",
+     "MCI-2-P03"
+    ],
+    "rationale": "The patients are serious but stable, and they can be transported together to Hospital C, which can accommodate them.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P01"
+    ],
+    "rationale": "MCI-2-P01 is critical and requires individual transport to a trauma center.",
+    "unit_id": "AMB-4"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P06"
+    ],
+    "rationale": "MCI-2-P06, a serious patient, can be sent to Hospital B which can accept him.",
+    "unit_id": "AMB-5"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P07"
+    ],
+    "rationale": "MCI-2-P07 is also serious and will be assigned to Hospital B which has capacity.",
+    "unit_id": "AMB-6"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P10"
+    ],
+    "rationale": "MCI-2-P10 is serious and can be transported to Hospital B which can accommodate him.",
+    "unit_id": "AMB-7"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P11"
+    ],
+    "rationale": "MCI-2-P11, a serious patient, will also go to Hospital B as it is the nearest available option.",
+    "unit_id": "AMB-8"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P12"
+    ],
+    "rationale": "MCI-2-P12 is serious and can be sent to Hospital B which has the capacity.",
+    "unit_id": "AMB-9"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P13"
+    ],
+    "rationale": "MCI-2-P13 is minor and can be sent to Hospital D as it can still accommodate additional patients.",
+    "unit_id": "AMB-10"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P14"
+    ],
+    "rationale": "MCI-2-P14 is minor and can be sent to Hospital D, ensuring proper distribution.",
+    "unit_id": "AMB-11"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P17"
+    ],
+    "rationale": "MCI-2-P17 is minor and can be sent to Hospital D to utilize available capacity.",
+    "unit_id": "AMB-12"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P18"
+    ],
+    "rationale": "MCI-2-P18 is minor and can be sent to Hospital D for treatment.",
+    "unit_id": "AMB-13"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P19"
+    ],
+    "rationale": "MCI-2-P19, a minor patient, will also be directed to Hospital D.",
+    "unit_id": "AMB-14"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P20"
+    ],
+    "rationale": "MCI-2-P20 is minor and will be assigned to Hospital D, maintaining the load balance.",
+    "unit_id": "AMB-15"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P21"
+    ],
+    "rationale": "MCI-2-P21 is minor and can be sent to Hospital D for care.",
+    "unit_id": "AMB-16"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P22"
+    ],
+    "rationale": "MCI-2-P22 is minor and can be appropriately treated at Hospital D.",
+    "unit_id": "AMB-17"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P23"
+    ],
+    "rationale": "MCI-2-P23 is minor and will also go to Hospital D, ensuring optimal patient flow.",
+    "unit_id": "AMB-18"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P25"
+    ],
+    "rationale": "MCI-2-P25 is minor and will be sent to Hospital D.",
+    "unit_id": "AMB-19"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P26"
+    ],
+    "rationale": "MCI-2-P26 is minor, and Hospital D remains suitable for their transport.",
+    "unit_id": "AMB-20"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P27"
+    ],
+    "rationale": "MCI-2-P27 is minor, and we will send them to Hospital D for treatment.",
+    "unit_id": "AMB-21"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "The plan addresses critical and serious patients by assigning a trauma unit while using mutual aid for minor patients to balance the load across various hospitals.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C is the nearest facility with the capacity to accept MCI-2-P02 and MCI-2-P03.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C is the trauma center available for critical patient MCI-2-P01.",
+    "unit_id": "AMB-4"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B can accept serious patient MCI-2-P06.",
+    "unit_id": "AMB-5"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B is suitable for serious patient MCI-2-P07.",
+    "unit_id": "AMB-6"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B has space available for MCI-2-P10.",
+    "unit_id": "AMB-7"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "MCI-2-P11 can be taken to Hospital B, which accommodates serious patients.",
+    "unit_id": "AMB-8"
+   },
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B is available for MCI-2-P12.",
+    "unit_id": "AMB-9"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Hospital D can receive minor patient MCI-2-P13.",
+    "unit_id": "AMB-10"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Sending MCI-2-P14 to Hospital D will keep load balanced.",
+    "unit_id": "AMB-11"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Hospital D is a good match for MCI-2-P17.",
+    "unit_id": "AMB-12"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P18 can be transported to Hospital D, where space is available.",
+    "unit_id": "AMB-13"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P19 is minor and can be sent to Hospital D.",
+    "unit_id": "AMB-14"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P20 will also go to Hospital D, continuing efficient loading.",
+    "unit_id": "AMB-15"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P21 fits into the load plan for Hospital D.",
+    "unit_id": "AMB-16"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P22 is minor and suitable for Hospital D's capacity.",
+    "unit_id": "AMB-17"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Efficiency continues with MCI-2-P23 to Hospital D.",
+    "unit_id": "AMB-18"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Sending minor MCI-2-P25 to Hospital D will continue flow.",
+    "unit_id": "AMB-19"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P26 will also find care at Hospital D.",
+    "unit_id": "AMB-20"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "MCI-2-P27 fits the load for Hospital D.",
+    "unit_id": "AMB-21"
+   }
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 4272
+}

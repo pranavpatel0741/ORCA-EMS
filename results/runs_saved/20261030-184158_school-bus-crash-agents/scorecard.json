@@ -1,0 +1,136 @@
+{
+ "run_id": "s07_School bus crash_complete_agents",
+ "policy": "agents",
+ "info": "complete",
+ "seed": 7,
+ "model": "gpt-4o-mini",
+ "minutes": 270,
+ "headline": {
+  "deaths": 0,
+  "outcome_score": 27.367,
+  "critical_on_time": 0.5,
+  "critical_care_mean": 99.5,
+  "response_mean": 8,
+  "overload_min": 680,
+  "er_wait_over_base": 287.0,
+  "unserved_calls": 0,
+  "not_in_care_end": 0,
+  "rejections": 7,
+  "escalations": 2,
+  "fallback_rate": 0.625,
+  "llm_calls": 99,
+  "llm_tokens": 221250
+ },
+ "decisions": {
+  "ai": 20,
+  "rule_backup": 3,
+  "baseline_rules": 0
+ },
+ "metrics": {
+  "calls": 1,
+  "patients": 29,
+  "response_time": {
+   "n": 1,
+   "mean": 8,
+   "median": 8,
+   "p90": 8
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "n": 1,
+    "mean": 8,
+    "median": 8,
+    "p90": 8
+   },
+   "SERIOUS": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "MINOR": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "n": 2,
+    "mean": 99.5,
+    "median": 99.5,
+    "p90": 141
+   },
+   "SERIOUS": {
+    "n": 11,
+    "mean": 102,
+    "median": 65,
+    "p90": 169
+   },
+   "MINOR": {
+    "n": 16,
+    "mean": 146.5,
+    "median": 161.5,
+    "p90": 266
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "critical_on_time_rate": 0.5,
+  "critical_patients": 2,
+  "stabilization_only_admissions": 0,
+  "hospital_overload_minutes": 680,
+  "ambulance_minutes_at_er_over_base": 287.0,
+  "unserved_calls_30min": 0,
+  "patients_not_in_care_at_end": 0,
+  "deaths": 0,
+  "outcome_score": 27.367,
+  "negotiation": {
+   "PROPOSE": 27,
+   "ACCEPT": 4,
+   "REJECT": 3,
+   "COUNTER": 20,
+   "ESCALATE": 12,
+   "RESOLVE": 11
+  },
+  "mean_rounds_per_resolution": 3,
+  "rejections_by_rule": {
+   "R2": 5,
+   "R4": 1,
+   "R7": 1
+  },
+  "escalations": 2,
+  "approvals": 2,
+  "overrides": 0,
+  "fallbacks": 20,
+  "fallback_rate": 0.625,
+  "confidence_calibration": [
+   {
+    "bin": "0.00-0.75",
+    "decisions": 1,
+    "matched_hindsight_best": 0.0
+   },
+   {
+    "bin": "0.90-1.00",
+    "decisions": 1,
+    "matched_hindsight_best": 1.0
+   }
+  ],
+  "llm_calls": 99,
+  "llm_tokens": 221250,
+  "llm_latency_ms": 280676.1,
+  "llm_cache_hit_rate": 0.02,
+  "incidents": 1
+ }
+}

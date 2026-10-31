@@ -1,0 +1,95 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P19",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   },
+   {
+    "id": "MCI-2-P20",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   }
+  ],
+  "hospital": "C",
+  "minute": 143,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 1,
+    "surgeon": 1,
+    "trauma_bay": 1,
+    "ward_bed": 3
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 15.3,
+    "patients": [
+     {
+      "id": "MCI-2-P21",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P25",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P21"
+  ],
+  "counter_offer": "I can accept one patient (MCI-2-P21) now, but will not have capacity for MCI-2-P25 until a bed frees up in about 15 minutes when my current incoming patients arrive.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "With one ambulance already at the door and my current ER fully occupied, I can only accommodate one more patient.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1108
+}

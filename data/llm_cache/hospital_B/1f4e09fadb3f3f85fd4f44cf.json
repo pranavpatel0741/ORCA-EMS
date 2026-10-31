@@ -1,0 +1,83 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "I-002-P0",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "B",
+  "minute": 259,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.667,
+   "free": {
+    "er_bed": 2,
+    "nurse_slot": 12,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 5
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 7.6,
+    "patients": [
+     {
+      "id": "MCI-2-P23",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P24",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P23"
+  ],
+  "counter_offer": "I can only accept MCI-2-P23 due to current capacity. I recommend taking MCI-2-P24 to another facility as I have only one bed available at the moment.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "I have two patients already incoming and only one available bed, so I can accept only one of the new patients.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "null"
+ },
+ "prompt_version": "3",
+ "tokens": 1041
+}

@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-004",
+   "narrative": "My coworker is really sick and dizzy, I don't know what's wrong.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": null
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 0
+  },
+  "incident_id": "I-004",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The reported symptoms indicate general illness with dizziness but lack specific red flags for higher urgency. Thus, I assessed it as a lower urgency call.",
+  "urgency": 0.4
+ },
+ "prompt_version": "2",
+ "tokens": 728
+}

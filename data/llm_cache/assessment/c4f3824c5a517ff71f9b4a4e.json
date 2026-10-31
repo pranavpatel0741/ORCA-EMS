@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-002",
+   "narrative": "My friend is really sick and dizzy, I don't know what's wrong.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": {
+   "serious": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 1
+  },
+  "incident_id": "I-002",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call indicates a sick person with dizziness, which typically suggests a lower urgency unless other symptoms are present. The scene report confirms one serious case, supporting an increased urgency but still within the moderate range.",
+  "urgency": 0.5
+ },
+ "prompt_version": "2",
+ "tokens": 744
+}

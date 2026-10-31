@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-003",
+   "narrative": "My friend fell off a ladder, there's some blood.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "FALL",
+   "violent": false
+  },
+  "scene_report": {
+   "minor": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 0
+  },
+  "incident_id": "I-003",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call reports a fall with minor bleeding, which generally suggests a lower urgency. The scene report confirms one minor injury, reinforcing the assessment.",
+  "urgency": 0.4
+ },
+ "prompt_version": "2",
+ "tokens": 727
+}

@@ -1,0 +1,204 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [],
+  "calls": [
+   {
+    "called_min": 30,
+    "crews_already_assigned": [],
+    "id": "MCI-1",
+    "mode": "MCI",
+    "type": "SHOOTING",
+    "unsafe_scene": true,
+    "urgency": 0.9,
+    "victims_not_yet_seen": 2,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [
+   {
+    "going_to": "I-002",
+    "id": "AMB-2"
+   }
+  ],
+  "feedback": [],
+  "free_unit_count": 4,
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "MCI-1": 18.6
+    },
+    "id": "AMB-1",
+    "type": "ALS"
+   },
+   {
+    "eta_to_calls_min": {
+     "MCI-1": 25.8
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "MCI-1": 9.9
+    },
+    "id": "PVT-1",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {
+     "MCI-1": 9.9
+    },
+    "id": "PVT-2",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 1,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 16
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 7,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 30,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "route_these_unit_ids": [],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-1",
+    "patient_ids": [],
+    "rationale": "Assigned the nearest available ALS unit to the critical MCI scene to triage and manage victims as they arrive.",
+    "unit_id": "AMB-1"
+   },
+   {
+    "incident_id": "MCI-1",
+    "patient_ids": [],
+    "rationale": "Assigned a private BLS unit, which is available and nearby, to assist with additional triage at the MCI site.",
+    "unit_id": "PVT-1"
+   },
+   {
+    "incident_id": "MCI-1",
+    "patient_ids": [],
+    "rationale": "Assigned another private BLS unit to the MCI site to ensure adequate support as more victims may be present.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "Four units dispatched to the MCI scene to ensure adequate coverage and triage for potential victims, given their proximity and availability.",
+  "routes": []
+ },
+ "prompt_version": "8",
+ "tokens": 2214
+}

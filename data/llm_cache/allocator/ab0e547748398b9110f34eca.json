@@ -1,0 +1,201 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "B",
+    "type": "route_unresolved",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 3,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 2,
+    "stabilization_only": false
+   }
+  ],
+  "minute": 102,
+  "offers": [
+   {
+    "counter": "The hospital can only accept one additional general patient (MCI-2-P10) at this time. We recommend that MCI-2-P11 be redirected to another facility with greater capacity.",
+    "decision": "COUNTER",
+    "hospital_id": "A",
+    "suggested_hospital": "Hospital B",
+    "unit_id": "AMB-2"
+   },
+   {
+    "counter": "We can accept one patient now, but we recommend taking the other to a facility with more capacity.",
+    "decision": "COUNTER",
+    "hospital_id": "B",
+    "suggested_hospital": "null",
+    "unit_id": "AMB-2"
+   },
+   {
+    "counter": "The hospital can only accept one additional general patient (MCI-2-P10) at this time. We recommend that MCI-2-P11 be redirected to another facility with greater capacity.",
+    "decision": "COUNTER",
+    "hospital_id": "A",
+    "suggested_hospital": "Hospital B",
+    "unit_id": "AMB-2"
+   },
+   {
+    "counter": "We can accept one patient now, but we recommend taking the other to a facility with more capacity.",
+    "decision": "COUNTER",
+    "hospital_id": "B",
+    "suggested_hospital": "null",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "id": "AMB-2",
+    "patients": [
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2-P10",
+    "patient_ids": [
+     "MCI-2-P10"
+    ],
+    "rationale": "MCI-2-P10 is assigned to Hospital A due to its available capacity.",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Patient MCI-2-P10 is assigned to Hospital A due to available capacity; MCI-2-P11 remains unassigned as no hospital can accept additional patients.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A can accommodate one patient immediately, while Hospital B lacks capacity for additional patients.",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "unassigned_patient_ids": [
+   "MCI-2-P11"
+  ]
+ },
+ "prompt_version": "2",
+ "tokens": 1713
+}

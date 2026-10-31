@@ -1,0 +1,74 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [],
+  "hospital": "C",
+  "minute": 254,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 1.5,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 9,
+    "or": 1,
+    "surgeon": 1,
+    "trauma_bay": 1,
+    "ward_bed": 3
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 1.2,
+    "patients": [
+     {
+      "id": "MCI-2-P22",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P24",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P22"
+  ],
+  "counter_offer": "I can accept 1 patient now but can only take one more after a bed frees up shortly.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "We currently have one bed available due to an incoming patient but can accept 1 additional patient right now.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 981
+}

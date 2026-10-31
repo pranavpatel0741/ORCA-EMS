@@ -1,0 +1,73 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "I-001-P0",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   }
+  ],
+  "hospital": "B",
+  "minute": 110,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.667,
+   "free": {
+    "er_bed": 2,
+    "nurse_slot": 12,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 7
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 25.2,
+    "patients": [
+     {
+      "id": "I-002-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "PVT-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-002-P0"
+  ],
+  "counter_offer": "We can accept one more patient, but we ask you to consider sending the other patients elsewhere due to our current capacity.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "We currently have limited capacity but can accept one patient while still maintaining critical care capacity.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "N/A"
+ },
+ "prompt_version": "3",
+ "tokens": 970
+}

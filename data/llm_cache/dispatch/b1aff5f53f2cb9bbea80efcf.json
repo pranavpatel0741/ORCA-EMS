@@ -1,0 +1,170 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [],
+  "en_route_units": [],
+  "feedback": [],
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 11
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 2,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 8
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 3
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 4,
+    "stabilization_only": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false
+   }
+  ],
+  "information": "complete",
+  "loaded_units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "MCI-2-P25",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P26",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "minute": 193,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-5-nano",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "",
+    "patient_ids": [],
+    "rationale": "AMB-1 is loaded with two minor general patients (MINOR) from the scene; since scene report exists but patient IDs are loaded as MCI-2-P25 and MCI-2-P26, we\u2019ll assign them to a suitable hospital route now.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "Assigned AMB-1 to transport two minor GENERAL patients to Hospital C (nearest capable facility with available OR and ward beds). Awaiting any additional scene reports to potentially load more patients or re-route if hospital C rejects load.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "AMB-1 has two MINOR GENERAL patients; hospital C has CARDIAC_CATH, GENERAL, TRAUMA_L2 capabilities, OR 1, trauma bay 1 and 3 ward beds; closest with spaces and sufficient capability. ETA to C is 15.3 minutes, within acceptable transport time. Given multiple hospitals have space, choose nearest capable option to balance load.",
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 1699
+}

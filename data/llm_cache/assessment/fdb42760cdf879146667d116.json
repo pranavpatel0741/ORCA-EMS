@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-004",
+   "narrative": "He's slurring his words and can't stand up.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_STROKE",
+   "violent": false
+  },
+  "scene_report": null
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 1
+  },
+  "incident_id": "I-004",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The caller reports slurred speech and inability to stand, which are indicative of a possible stroke, warranting a high urgency level.",
+  "urgency": 0.8
+ },
+ "prompt_version": "2",
+ "tokens": 723
+}

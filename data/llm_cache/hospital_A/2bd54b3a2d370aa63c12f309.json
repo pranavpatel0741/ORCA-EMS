@@ -1,0 +1,76 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "I-CRASH-P0",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   }
+  ],
+  "hospital": "A",
+  "minute": 19,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 12
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 12.5,
+    "patients": [
+     {
+      "id": "I-CRASH-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-CRASH-P1"
+  ],
+  "counter_offer": "Due to a critical incoming patient requiring L2 trauma care, we can only accept one additional patient at this time. The accepted patient will be in a general capacity.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "While we have nurses and capacity for a serious case, we need to prioritize the critical incoming patient.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "2",
+ "tokens": 952
+}

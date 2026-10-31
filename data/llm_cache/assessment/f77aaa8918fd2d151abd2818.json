@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "MCI-1",
+   "narrative": "I heard gunshots, people are down, I'm hiding.",
+   "reported_victims": 2,
+   "trapped_victims": false,
+   "type": "SHOOTING",
+   "violent": true
+  },
+  "scene_report": null
+ },
+ "model": "gpt-5-nano",
+ "output": {
+  "estimated": {
+   "critical": 2,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 0
+  },
+  "incident_id": "MCI-1",
+  "mode": "MCI",
+  "needs_fire": true,
+  "needs_police": true,
+  "rationale": "Shooting with two victims, gunfire ongoing and armed threat; violent scene requires police presence. Fire response is needed for possible trapped or wounded victims; two reported critical patients on-scene. Given this is an active shooter scenario, treat as MCI with high priority and plan for rapid police, trauma care, and incident scene management.",
+  "urgency": 0.92
+ },
+ "prompt_version": "2",
+ "tokens": 2674
+}

@@ -1,0 +1,220 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "calls": [],
+  "en_route_units": [],
+  "feedback": [],
+  "free_unit_count": 2,
+  "free_units": [
+   {
+    "eta_to_calls_min": {},
+    "id": "PVT-1",
+    "type": "BLS"
+   },
+   {
+    "eta_to_calls_min": {},
+    "id": "PVT-2",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 13,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 4,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 3,
+    "free": {
+     "er_bed": 3,
+     "nurse_slot": 7,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "loaded_units": [
+   {
+    "eta_to_hospitals_min": {
+     "A": 5.6,
+     "B": 16.0,
+     "C": 8.7,
+     "D": 12.0
+    },
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "MCI-1-P0",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ]
+   },
+   {
+    "eta_to_hospitals_min": {
+     "A": 5.6,
+     "B": 16.0,
+     "C": 8.7,
+     "D": 12.0
+    },
+    "id": "AMB-2",
+    "patients": [
+     {
+      "id": "MCI-1-P1",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": 60,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ]
+   }
+  ],
+  "minute": 29,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-1",
+    "patient_ids": [
+     "MCI-1-P0"
+    ],
+    "rationale": "Assigned to the critical trauma patient who needs immediate care.",
+    "unit_id": "PVT-1"
+   },
+   {
+    "incident_id": "MCI-1",
+    "patient_ids": [
+     "MCI-1-P1"
+    ],
+    "rationale": "Assigned to the second critical trauma patient to ensure timely treatment.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "All critical patients are assigned to available units, and mutual aid is not needed.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C has a trauma center and the necessary capabilities to treat the critical patient.",
+    "unit_id": "AMB-1"
+   },
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C is also capable of handling the second critical patient.",
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "prompt_version": "6",
+ "tokens": 2082
+}

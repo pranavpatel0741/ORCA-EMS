@@ -1,0 +1,31 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "MCI-1",
+   "narrative": "Shots fired! I think 2 people are hit, the shooter ran off.",
+   "reported_victims": 2,
+   "trapped_victims": false,
+   "type": "SHOOTING",
+   "violent": true
+  },
+  "scene_report": null
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 1,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 1
+  },
+  "incident_id": "MCI-1",
+  "mode": "MCI",
+  "needs_fire": false,
+  "needs_police": true,
+  "rationale": "The call indicates a shooting with reports of 2 people hit, which suggests a high urgency scenario. The need for police is critical due to the potential for ongoing danger.",
+  "urgency": 0.9
+ },
+ "prompt_version": "2",
+ "tokens": 737
+}

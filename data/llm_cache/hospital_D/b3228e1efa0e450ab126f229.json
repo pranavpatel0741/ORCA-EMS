@@ -1,0 +1,66 @@
+{
+ "agent": "hospital:D",
+ "input": {
+  "already_incoming": [],
+  "hospital": "D",
+  "minute": 25,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": {
+    "accepts_critical_trauma": false,
+    "eligible_severities": [
+     "SERIOUS"
+    ],
+    "max_surge_patients": 4
+   },
+   "er_occupancy": 0.25,
+   "free": {
+    "er_bed": 3,
+    "nurse_slot": 7,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 0,
+    "ward_bed": 4
+   },
+   "min_nurse_coverage": 1,
+   "nurses_on_duty": 2,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 6.9,
+    "patients": [
+     {
+      "id": "I-CARDIAC-P0",
+      "needs": {
+       "capability": "CARDIAC_CATH",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "",
+  "decision": "REJECT",
+  "hospital_id": "D",
+  "rationale": "We cannot accept the patient as the capabilities required (CARDIAC_CATH) exceed our general capabilities.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "1",
+ "tokens": 840
+}

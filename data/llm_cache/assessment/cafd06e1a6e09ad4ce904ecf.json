@@ -1,0 +1,34 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-CARDIAC",
+   "narrative": "Someone's having chest pain, they can barely breathe.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_CARDIAC",
+   "violent": false
+  },
+  "retry": 1,
+  "scene_report": {
+   "critical": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 1,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 0
+  },
+  "incident_id": "I-CARDIAC",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The caller reports chest pain and difficulty breathing, which are red flags indicating a cardiac emergency. The scene report confirms one critical patient.",
+  "urgency": 1.0
+ },
+ "prompt_version": "1",
+ "tokens": 700
+}

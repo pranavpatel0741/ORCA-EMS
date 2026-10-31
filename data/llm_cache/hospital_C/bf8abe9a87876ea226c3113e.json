@@ -1,0 +1,75 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "I-002-P0",
+    "needs": {
+     "capability": "CARDIAC_CATH",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "CRITICAL"
+   }
+  ],
+  "hospital": "C",
+  "minute": 63,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 0.667,
+   "free": {
+    "er_bed": 2,
+    "nurse_slot": 12,
+    "or": 1,
+    "surgeon": 1,
+    "trauma_bay": 1,
+    "ward_bed": 5
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 15.8,
+    "patients": [
+     {
+      "id": "MCI-2-P00",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": 60,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P00"
+  ],
+  "counter_offer": "We can accept one patient right now, but we have a critical incoming patient (I-002-P0) that we must prioritize. We anticipate the trauma bay will be available in the next 10 minutes after stabilization procedures are completed.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "We have the capacity to accept one trauma patient, but we need to reserve resources for the critical incoming case.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1016
+}

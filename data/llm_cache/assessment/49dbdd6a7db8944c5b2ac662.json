@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-001",
+   "narrative": "There's been a crash at the intersection, one person people hurt.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  "scene_report": {
+   "serious": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 1
+  },
+  "incident_id": "I-001",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call is for a vehicle crash with one reported serious injury, indicating a moderate level of urgency.",
+  "urgency": 0.6
+ },
+ "prompt_version": "2",
+ "tokens": 725
+}

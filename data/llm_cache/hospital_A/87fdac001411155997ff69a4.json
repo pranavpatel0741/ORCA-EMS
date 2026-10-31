@@ -1,0 +1,65 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 258,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.333,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 8,
+    "or": 1,
+    "surgeon": 0,
+    "trauma_bay": 2,
+    "ward_bed": 15
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 8.9,
+    "patients": [
+     {
+      "id": "I-004-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-004-P0"
+  ],
+  "counter_offer": "We can accept patient I-004-P0, but it will require waiting for an ER bed to become available in approximately 15 minutes due to current occupancy.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We have sufficient nurse coverage and can accommodate the patient, but they will need to wait for a bed.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 945
+}

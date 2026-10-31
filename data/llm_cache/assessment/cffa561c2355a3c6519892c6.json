@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-005",
+   "narrative": "There's been a crash at the intersection, one person people hurt.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "VEHICLE_CRASH",
+   "violent": false
+  },
+  "scene_report": {
+   "minor": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 0
+  },
+  "incident_id": "I-005",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call reports only one minor injury from a vehicle crash, leading to a low urgency rating.",
+  "urgency": 0.3
+ },
+ "prompt_version": "2",
+ "tokens": 723
+}

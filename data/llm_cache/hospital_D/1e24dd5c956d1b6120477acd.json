@@ -1,0 +1,99 @@
+{
+ "agent": "hospital:D",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P07",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P08",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "D",
+  "minute": 160,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": {
+    "accepts_critical_trauma": false,
+    "eligible_severities": [
+     "SERIOUS"
+    ],
+    "max_surge_patients": 4
+   },
+   "er_occupancy": 1.5,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 4,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 0,
+    "ward_bed": 3
+   },
+   "min_nurse_coverage": 1,
+   "nurses_on_duty": 2,
+   "queue_scenario": 1,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.7,
+    "patients": [
+     {
+      "id": "MCI-2-P05",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P06",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-4"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P05"
+  ],
+  "counter_offer": "I can only accept MCI-2-P05 for now, as I have 0 ER beds available after accounting for incoming patients. I recommend sending MCI-2-P06 to another facility.",
+  "decision": "COUNTER",
+  "hospital_id": "D",
+  "rationale": "Due to current occupancy and incoming patients, I can only accept one more patient.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "null"
+ },
+ "prompt_version": "3",
+ "tokens": 1115
+}

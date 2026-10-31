@@ -1,0 +1,73 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [],
+  "hospital": "B",
+  "minute": 116,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.333,
+   "free": {
+    "er_bed": 4,
+    "nurse_slot": 14,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 9
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 9.3,
+    "patients": [
+     {
+      "id": "I-002-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-002-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-002-P1",
+   "I-002-P0"
+  ],
+  "counter_offer": "",
+  "decision": "ACCEPT",
+  "hospital_id": "B",
+  "rationale": "We have sufficient beds and nurses to treat both patients being sent.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 948
+}

@@ -1,0 +1,123 @@
+{
+ "run_id": "s07_Cardiac arrest_complete_agents",
+ "policy": "agents",
+ "info": "complete",
+ "seed": 7,
+ "model": "gpt-4o-mini",
+ "minutes": 120,
+ "headline": {
+  "deaths": 0,
+  "outcome_score": 0.897,
+  "critical_on_time": 1.0,
+  "critical_care_mean": 40,
+  "response_mean": 7,
+  "overload_min": 25,
+  "er_wait_over_base": 0.0,
+  "unserved_calls": 0,
+  "not_in_care_end": 0,
+  "rejections": 0,
+  "escalations": 0,
+  "fallback_rate": 0.0,
+  "llm_calls": 5,
+  "llm_tokens": 6651
+ },
+ "decisions": {
+  "ai": 2,
+  "rule_backup": 0,
+  "baseline_rules": 0
+ },
+ "metrics": {
+  "calls": 1,
+  "patients": 1,
+  "response_time": {
+   "n": 1,
+   "mean": 7,
+   "median": 7,
+   "p90": 7
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "n": 1,
+    "mean": 7,
+    "median": 7,
+    "p90": 7
+   },
+   "SERIOUS": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "MINOR": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "n": 1,
+    "mean": 40,
+    "median": 40,
+    "p90": 40
+   },
+   "SERIOUS": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "MINOR": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "critical_on_time_rate": 1.0,
+  "critical_patients": 1,
+  "stabilization_only_admissions": 0,
+  "hospital_overload_minutes": 25,
+  "ambulance_minutes_at_er_over_base": 0.0,
+  "unserved_calls_30min": 0,
+  "patients_not_in_care_at_end": 0,
+  "deaths": 0,
+  "outcome_score": 0.897,
+  "negotiation": {
+   "PROPOSE": 1,
+   "ACCEPT": 1
+  },
+  "mean_rounds_per_resolution": 0,
+  "rejections_by_rule": {},
+  "escalations": 0,
+  "approvals": 0,
+  "overrides": 0,
+  "fallbacks": 0,
+  "fallback_rate": 0.0,
+  "confidence_calibration": [
+   {
+    "bin": "0.90-1.00",
+    "decisions": 1,
+    "matched_hindsight_best": 0.0
+   }
+  ],
+  "llm_calls": 5,
+  "llm_tokens": 6651,
+  "llm_latency_ms": 1932.7,
+  "llm_cache_hit_rate": 0.8,
+  "incidents": 1
+ }
+}

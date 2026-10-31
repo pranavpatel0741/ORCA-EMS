@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-004",
+   "narrative": "My coworker is really sick and dizzy, I don't know what's wrong.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": {
+   "minor": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 0
+  },
+  "incident_id": "I-004",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call describes a single patient with general illness symptoms (sick and dizzy), which indicates a low urgency unless red flags are present. Since only minor issues were reported in the scene report, the urgency is assessed as moderate.",
+  "urgency": 0.4
+ },
+ "prompt_version": "2",
+ "tokens": 749
+}

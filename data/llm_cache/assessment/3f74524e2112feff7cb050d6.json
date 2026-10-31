@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "I-001",
+   "narrative": "Someone fainted, they're awake now but confused.",
+   "reported_victims": 1,
+   "trapped_victims": false,
+   "type": "MEDICAL_GENERAL",
+   "violent": false
+  },
+  "scene_report": {
+   "minor": 1
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 0,
+   "expectant": 0,
+   "minor": 1,
+   "serious": 0
+  },
+  "incident_id": "I-001",
+  "mode": "SINGLE",
+  "needs_fire": false,
+  "needs_police": false,
+  "rationale": "The call describes a single patient who fainted but is now awake, which typically indicates a lower urgency, especially with no signs of critical conditions.",
+  "urgency": 0.5
+ },
+ "prompt_version": "2",
+ "tokens": 728
+}

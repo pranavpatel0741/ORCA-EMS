@@ -1,0 +1,33 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "MCI-1",
+   "narrative": "I heard gunshots, people are down, I'm hiding.",
+   "reported_victims": 2,
+   "trapped_victims": false,
+   "type": "SHOOTING",
+   "violent": true
+  },
+  "scene_report": {
+   "critical": 2
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 2,
+   "expectant": 0,
+   "minor": 0,
+   "serious": 1
+  },
+  "incident_id": "MCI-1",
+  "mode": "MCI",
+  "needs_fire": false,
+  "needs_police": true,
+  "rationale": "The caller reported gunshots with victims down, indicating a high urgency scenario. With 2 critical victims estimated, police are needed for safety and response.",
+  "urgency": 1.0
+ },
+ "prompt_version": "2",
+ "tokens": 733
+}
