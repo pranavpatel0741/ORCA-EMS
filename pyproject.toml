@@ -12,6 +12,9 @@ extend-exclude = [".venv", "data", "logs", "results"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+"dashboard_v2/panels.py" = ["E501"]  # inline CSS and HTML
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

@@ -1,0 +1,38 @@
+/* Opt-in projection sizing: keep labels and explanations readable from a distance. */
+[data-testid="stMain"] .metric-eyebrow {font-size:.82rem}
+[data-testid="stMain"] .metric-detail {font-size:.75rem}
+[data-testid="stMain"] .metric-number {font-size:2.3rem}
+[data-testid="stMain"] .section-heading h3 {font-size:1rem}
+[data-testid="stMain"] .section-heading p {font-size:.78rem}
+[data-testid="stMain"] .section-heading>span {font-size:.7rem}
+[data-testid="stMain"] .command-status {font-size:.8rem}
+[data-testid="stMain"] .command-status .clock {font-size:1.1rem}
+[data-testid="stMain"] .source-context {font-size:.8rem}
+[data-testid="stMain"] .map-key {font-size:.75rem}
+[data-testid="stMain"] .network-card h4 {font-size:1rem}
+[data-testid="stMain"] .network-card>p {font-size:.75rem}
+[data-testid="stMain"] .capacity-label {font-size:.76rem}
+[data-testid="stMain"] .capacity-label small {font-size:.7rem}
+[data-testid="stMain"] .capacity-label b {font-size:.9rem}
+[data-testid="stMain"] .network-footer {font-size:.74rem}
+[data-testid="stMain"] .status-tag {font-size:.72rem}
+[data-testid="stMain"] .activity-time {font-size:.78rem}
+[data-testid="stMain"] .activity-title {font-size:.86rem}
+[data-testid="stMain"] .activity-title em {font-size:.69rem}
+[data-testid="stMain"] .activity-main p {font-size:.85rem}
+[data-testid="stMain"] .care-journey .journey-step {font-size:.8rem}
+[data-testid="stMain"] .care-journey .journey-step b {font-size:.75rem}
+[data-testid="stMain"] .triage-summary {flex-wrap:wrap;gap:.6rem}
+[data-testid="stMain"] .triage-summary span {font-size:.7rem}
+[data-testid="stMain"] .triage-summary b {font-size:.85rem}
+[data-testid="stMain"] .queue-top,[data-testid="stMain"] .queue-bottom {font-size:.76rem}
+[data-testid="stMain"] .queue-card h4 {font-size:1rem}
+[data-testid="stMain"] .report-table {font-size:.84rem}
+[data-testid="stMain"] .report-table th {font-size:.74rem}
+[data-testid="stMain"] .demo-eyebrow {font-size:.7rem}
+[data-testid="stMain"] .demo-title {font-size:1.15rem}
+[data-testid="stMain"] .agent-stage h4 {font-size:1rem}
+[data-testid="stMain"] .agent-stage p {font-size:.8rem}
+[data-testid="stMain"] .agent-stage b {font-size:.78rem}
+[data-testid="stMain"] [data-testid="stCaptionContainer"] p {font-size:.8rem}
+[data-testid="stSidebar"] [data-testid="stRadio"] p {font-size:.88rem}

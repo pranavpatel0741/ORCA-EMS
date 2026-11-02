@@ -58,7 +58,7 @@ run the agents with an offline stand-in, which is clearly labeled and is not an 
 ## One-command runs
 
 ```bash
-.venv/bin/streamlit run app/streamlit_app.py     # live dispatch dashboard
+.venv/bin/python dashboard_v2/run.py             # dispatch dashboard, http://localhost:8501
 .venv/bin/python run.py --policy rule_based --demand surge --info partial --seed 7
 .venv/bin/python run.py --policy agents --preset "School bus crash"   # needs .env
 .venv/bin/python eval/run_experiments.py --seeds 5                    # results/summary.md
@@ -67,19 +67,25 @@ run the agents with an offline stand-in, which is clearly labeled and is not an 
 ```
 
 **Dashboard.** Pick an incident (cardiac arrest, two-car crash, shooting, school bus crash,
-bus crash plus shooting, normal day) and who decides. Then press Start and watch:
+bus crash plus shooting, normal day) and who decides, then press **Start simulation**. The
+sidebar has six workspaces:
 
-- the incident table with triage counts
-- the town map
-- the conversation between caller, dispatch, ambulances, hospitals and safety rules
-- the hospital status board, the ambulance board, the mass-casualty board, and handling times
+| Workspace | What it shows |
+| --- | --- |
+| Response overview | Map, incident picker, response milestones, hospital summary, recent actions |
+| Hospital network | Beds, capabilities, incoming patients, patient distribution |
+| Ambulance fleet | Every unit, assignment, destination, time in status, private standby units |
+| Decision room | Proposals and replies between agents, with who produced each one |
+| Run report | Timings, outcomes, saved scorecards, event-log download |
+| Help | Definitions and the [presenter guide](dashboard_v2/DEMO_GUIDE.md) |
 
-Every message carries a label saying who produced it: the real AI agent, the rule backup, the
-offline stand-in, or the simulation. The **AI activity** tab lists each model call with exactly
-what the agent was given and what it answered.
+Every message carries a label saying who produced it: a real AI agent, the rule backup, the
+offline stand-in, or the simulation. **Try guided demo** walks through the school bus crash in
+five paused steps with presenter notes; it uses the offline stand-in, not GPT. For the real
+agents, choose **AI agents + negotiation · OpenAI**.
 
 To replay a run, write a log with `run.py` (add `--save` for a transcript and scorecard in
-`results/runs_saved/`) and open it via **Advanced → Replay a saved run**.
+`results/runs_saved/`) and open it from the dashboard's replay option.
 
 **No API key?** The saved agent answers in `data/llm_cache/` are committed. With
 `LLM_MODE=cache_only` and `OPENAI_MODEL=gpt-4o-mini` in `.env`, the dashboard replays the
