@@ -27,7 +27,7 @@ CONFIDENCE_WEIGHTS: dict[str, float] = {
 }
 CONFIDENCE_EXECUTE = 0.90
 CONFIDENCE_INFO_ROUND = 0.75
-CONSISTENCY_SAMPLES = 3
+CONSISTENCY_SAMPLES = 1  # Reserved; repeated allocator sampling is not implemented.
 FRESHNESS_ZERO_MIN = 30
 
 # Negotiation and approval

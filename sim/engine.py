@@ -437,7 +437,7 @@ class Engine:
         patients = action_patients(action, self)
         best = None
         for hid in sorted(self.hospitals):
-            if not fully_capable(self, hid, patients) and hid != action.hospital_id:
+            if not fully_capable(self, hid, patients):
                 continue
             probe = RouteToHospital(unit_id=action.unit_id, hospital_id=hid)
             eta = self.expected_arrival(probe, hid)

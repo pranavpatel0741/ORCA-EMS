@@ -41,10 +41,19 @@ def call_handling(events: Iterable[Event]) -> list[dict[str, Any]]:
         p = e.payload
         if e.type == EventType.CALL_RECEIVED:
             rows[p["incident_id"]] = {
-                "incident_id": p["incident_id"], "type": p["type"], "call_tick": e.tick,
-                "victims": len(by_incident[p["incident_id"]]), "reported": p["reported_victims"],
-                "decision_min": None, "scene_min": None, "hospital_min": None,
-                "care": {}, "deceased": 0, "rejections": 0, "rounds": 0, "messages": 0,
+                "incident_id": p["incident_id"],
+                "type": p["type"],
+                "call_tick": e.tick,
+                "victims": len(by_incident[p["incident_id"]]),
+                "reported": p["reported_victims"],
+                "decision_min": None,
+                "scene_min": None,
+                "hospital_min": None,
+                "care": {},
+                "deceased": 0,
+                "rejections": 0,
+                "rounds": 0,
+                "messages": 0,
             }
             continue
         if e.type == EventType.COMMITTED and p["action"].get("kind") == "dispatch":
@@ -58,8 +67,11 @@ def call_handling(events: Iterable[Event]) -> list[dict[str, Any]]:
             inc = action.get("incident_id") or unit_incident.get(action.get("unit_id", ""))
             if inc in rows:
                 rows[inc]["rejections"] += 1
-        elif e.type == EventType.UNIT_STATE_CHANGED and p.get("kind") == "AMBULANCE" \
-                and p.get("to") == "ON_SCENE":
+        elif (
+            e.type == EventType.UNIT_STATE_CHANGED
+            and p.get("kind") == "AMBULANCE"
+            and p.get("to") == "ON_SCENE"
+        ):
             row = rows.get(p.get("incident_id"))
             if row and row["scene_min"] is None:
                 row["scene_min"] = e.tick - row["call_tick"]
@@ -70,7 +82,7 @@ def call_handling(events: Iterable[Event]) -> list[dict[str, Any]]:
                 continue
             if p["to"] == "WAITING_AT_ER" and row["hospital_min"] is None:
                 row["hospital_min"] = e.tick - row["call_tick"]
-            elif p["to"] == "IN_TREATMENT":
+            elif p["to"] == "IN_TREATMENT" and not p.get("stabilization_only"):
                 row["care"][p["patient_id"]] = e.tick - row["call_tick"]
             elif p["to"] == "DECEASED":
                 row["deceased"] += 1
@@ -99,7 +111,7 @@ def patient_handling(events: Iterable[Event]) -> list[dict[str, Any]]:
     called = {e.payload["incident_id"] for e in events if e.type == EventType.CALL_RECEIVED}
     for e in events:
         if e.type == EventType.PATIENT_STATE_CHANGED:
-            if e.payload["to"] == "IN_TREATMENT":
+            if e.payload["to"] == "IN_TREATMENT" and not e.payload.get("stabilization_only"):
                 care.setdefault(e.payload["patient_id"], e.tick)
             elif e.payload["to"] == "DECEASED":
                 deceased.add(e.payload["patient_id"])
@@ -107,9 +119,15 @@ def patient_handling(events: Iterable[Event]) -> list[dict[str, Any]]:
     for pid, p in sorted(patients.items()):
         if p["incident_id"] not in called:
             continue
-        rows.append({"patient_id": pid, "incident_id": p["incident_id"], "severity": p["severity"],
-                     "care_min": care[pid] - p["call_tick"] if pid in care else None,
-                     "deceased": pid in deceased})
+        rows.append(
+            {
+                "patient_id": pid,
+                "incident_id": p["incident_id"],
+                "severity": p["severity"],
+                "care_min": care[pid] - p["call_tick"] if pid in care else None,
+                "deceased": pid in deceased,
+            }
+        )
     return rows
 
 
@@ -120,10 +138,16 @@ def by_severity(patient_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if not rows:
             continue
         times = [r["care_min"] for r in rows if r["care_min"] is not None]
-        out.append({"severity": sev, "patients": len(rows), "in_care": len(times),
-                    "care_mean_min": round(mean(times), 1) if times else None,
-                    "care_max_min": max(times) if times else None,
-                    "deceased": sum(r["deceased"] for r in rows)})
+        out.append(
+            {
+                "severity": sev,
+                "patients": len(rows),
+                "in_care": len(times),
+                "care_mean_min": round(mean(times), 1) if times else None,
+                "care_max_min": max(times) if times else None,
+                "deceased": sum(r["deceased"] for r in rows),
+            }
+        )
     return out
 
 

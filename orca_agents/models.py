@@ -8,10 +8,10 @@ from pydantic import BaseModel, Field
 
 
 class SeverityCounts(BaseModel):
-    critical: int = 0
-    serious: int = 0
-    minor: int = 0
-    expectant: int = 0
+    critical: int = Field(default=0, ge=0)
+    serious: int = Field(default=0, ge=0)
+    minor: int = Field(default=0, ge=0)
+    expectant: int = Field(default=0, ge=0)
 
 
 class PriorityReport(BaseModel):
@@ -41,7 +41,7 @@ class RouteChoice(BaseModel):
 
 class MutualAid(BaseModel):
     firm_id: str
-    units: int
+    units: int = Field(ge=1)
 
 
 class DispatchPlan(BaseModel):
@@ -61,7 +61,7 @@ class AdmissionDecision(BaseModel):
     accepted_patient_ids: list[str] = Field(default_factory=list)
     counter_offer: str = ""  # e.g. "can take 1 of 2", "suggest Hospital C", "bay free in 20 min"
     suggested_hospital: str | None = None
-    staff_request_nurses: int = 0  # nurses this hospital would need to accept more
+    staff_request_nurses: int = Field(default=0, ge=0)
     rationale: str
 
 

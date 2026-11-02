@@ -1,11 +1,11 @@
 """Save one run as a folder a person can read: event log, transcript, and scorecard.
 
-    results/runs_saved/<stamp>_<incident>_<policy>/
-        events.jsonl    full event log (replays exactly on the dashboard)
-        transcript.md   the conversation, each line labeled with who produced it, plus the
-                        negotiation threads
-        scorecard.json  every metric (eval/metrics.py) plus AI vs rule-backup decision counts
-    results/runs_saved/index.csv   one row per saved run, to compare runs side by side
+results/runs_saved/<stamp>_<incident>_<policy>/
+    events.jsonl    full event log (replays exactly on the dashboard)
+    transcript.md   the conversation, each line labeled with who produced it, plus the
+                    negotiation threads
+    scorecard.json  every metric (eval/metrics.py) plus AI vs rule-backup decision counts
+results/runs_saved/index.csv   one row per saved run, to compare runs side by side
 """
 
 from __future__ import annotations
@@ -24,8 +24,13 @@ from eval.metrics import compute_metrics, headline
 from sim.events import Event, EventType
 
 SAVE_DIR = RESULTS_DIR / "runs_saved"
-SOURCE_LABEL = {"ai": "AI", "standin": "stand-in (not AI)", "backup": "rule backup",
-                "rules": "rules", "sim": "sim"}
+SOURCE_LABEL = {
+    "ai": "AI",
+    "standin": "stand-in (not AI)",
+    "backup": "rule backup",
+    "rules": "rules",
+    "sim": "sim",
+}
 
 # Plain-language scorecard lines: (label, headline key, unit or formatter)
 SCORECARD = [
@@ -40,8 +45,8 @@ SCORECARD = [
     ("Proposals blocked by safety rules", "rejections", ""),
     ("Decisions sent for human review", "escalations", ""),
     ("Synthetic outcome score (higher is better)", "outcome_score", ""),
-    ("AI calls", "llm_calls", ""),
-    ("AI tokens", "llm_tokens", ""),
+    ("Agent calls (including scripted stand-ins)", "llm_calls", ""),
+    ("Agent tokens (recorded usage)", "llm_tokens", ""),
 ]
 
 
@@ -58,36 +63,56 @@ def _fmt(value: Any, unit: str) -> str:
 def decision_sources(events: list[Event]) -> dict[str, int]:
     """Committed decisions by who made them: AI agents, the rule backup, or a baseline."""
     out: Counter = Counter()
+    models = {e.payload.get("model") for e in events if e.type == EventType.LLM_CALL}
+    agent_source = "scripted_agents" if models == {"scripted"} else "ai"
     for e in events:
         if e.type == EventType.COMMITTED:
             by = e.payload["action"].get("decided_by", "")
-            out[{"ai": "ai", "rules": "rule_backup"}.get(by, "baseline_rules")] += 1
-    return {k: out.get(k, 0) for k in ("ai", "rule_backup", "baseline_rules")}
+            out[{"ai": agent_source, "rules": "rule_backup"}.get(by, "baseline_rules")] += 1
+    return {k: out.get(k, 0) for k in ("ai", "scripted_agents", "rule_backup", "baseline_rules")}
 
 
 def scorecard(events: list[Event]) -> dict[str, Any]:
     m = compute_metrics(events)
     started = next(e.payload for e in events if e.type == EventType.RUN_STARTED)
     calls = [e.payload for e in events if e.type == EventType.LLM_CALL]
-    return {"run_id": events[0].run_id, "policy": started.get("policy"),
-            "info": started.get("info"), "seed": started.get("seed"),
-            "model": calls[0]["model"] if calls else None,
-            "minutes": events[-1].tick, "headline": headline(m),
-            "decisions": decision_sources(events), "metrics": m}
+    return {
+        "run_id": events[0].run_id,
+        "policy": started.get("policy"),
+        "info": started.get("info"),
+        "seed": started.get("seed"),
+        "model": calls[0]["model"] if calls else None,
+        "minutes": events[-1].tick,
+        "headline": headline(m),
+        "decisions": decision_sources(events),
+        "metrics": m,
+    }
 
 
 def transcript(events: list[Event], title: str, card: dict[str, Any]) -> str:
     state = build_state(events)
     h, d = card["headline"], card["decisions"]
-    lines = [f"# {title}", "",
-             f"Policy: {card['policy']} · model: {card['model'] or 'none'} · "
-             f"information: {card['info']} · seed {card['seed']} · "
-             f"{card['minutes']} simulated minutes", "", "## How well it went", "",
-             "| Measure | Value |", "|---|---|"]
+    lines = [
+        f"# {title}",
+        "",
+        f"Policy: {card['policy']} · model: {card['model'] or 'none'} · "
+        f"information: {card['info']} · seed {card['seed']} · "
+        f"{card['minutes']} simulated minutes",
+        "",
+        "## How well it went",
+        "",
+        "| Measure | Value |",
+        "|---|---|",
+    ]
     lines += [f"| {label} | {_fmt(h.get(key), unit)} |" for label, key, unit in SCORECARD]
-    lines += [f"| Decisions by AI agents | {d['ai']} |",
-              f"| Decisions by the rule backup | {d['rule_backup']} |", "",
-              "## Negotiations", ""]
+    lines += [
+        f"| Decisions by AI agents | {d['ai']} |",
+        f"| Decisions by scripted stand-ins (not AI) | {d['scripted_agents']} |",
+        f"| Decisions by the rule backup | {d['rule_backup']} |",
+        "",
+        "## Negotiations",
+        "",
+    ]
     threads = negotiation_threads(events)
     if not threads:
         lines.append("No negotiations (baselines do not negotiate).")
@@ -95,11 +120,17 @@ def transcript(events: list[Event], title: str, card: dict[str, Any]) -> str:
         out = t["outcome"]
         end = f"→ Hospital {out['hospital']} (decided by {out['by']})" if out else "→ open"
         lines += ["", f"**{t['unit']}** · {t['patients']} patient(s) · {t['incident']} {end}"]
-        lines += [f"- {x['tick']:>3} min · {x['sender']} → {x['recipient']} · {x['type']} "
-                  f"[{SOURCE_LABEL[x['source']]}]: {x['text']}" for x in t["turns"]]
+        lines += [
+            f"- {x['tick']:>3} min · {x['sender']} → {x['recipient']} · {x['type']} "
+            f"[{SOURCE_LABEL[x['source']]}]: {x['text']}"
+            for x in t["turns"]
+        ]
     lines += ["", "## Full conversation", ""]
-    lines += [f"- {r.tick:>3} min · {r.sender} → {r.recipient} · {r.kind} "
-              f"[{SOURCE_LABEL.get(r.source, r.source)}]: {r.text}" for r in state.feed]
+    lines += [
+        f"- {r.tick:>3} min · {r.sender} → {r.recipient} · {r.kind} "
+        f"[{SOURCE_LABEL.get(r.source, r.source)}]: {r.text}"
+        for r in state.feed
+    ]
     return "\n".join(lines) + "\n"
 
 
@@ -115,12 +146,21 @@ def save_run(events: list[Event], incident: str, out_dir: Path = SAVE_DIR) -> Pa
             f.write(json.dumps(e.model_dump(mode="json"), sort_keys=True) + "\n")
     (folder / "scorecard.json").write_text(json.dumps(card, indent=1, default=str))
     (folder / "transcript.md").write_text(
-        transcript(events, f"{incident} · {card['policy']}", card))
-    row = {"saved": stamp, "incident": incident, "policy": card["policy"],
-           "model": card["model"] or "", "info": card["info"], "seed": card["seed"],
-           "minutes": card["minutes"], **card["headline"],
-           "ai_decisions": card["decisions"]["ai"],
-           "rule_backup_decisions": card["decisions"]["rule_backup"], "folder": folder.name}
+        transcript(events, f"{incident} · {card['policy']}", card)
+    )
+    row = {
+        "saved": stamp,
+        "incident": incident,
+        "policy": card["policy"],
+        "model": card["model"] or "",
+        "info": card["info"],
+        "seed": card["seed"],
+        "minutes": card["minutes"],
+        **card["headline"],
+        "ai_decisions": card["decisions"]["ai"],
+        "rule_backup_decisions": card["decisions"]["rule_backup"],
+        "folder": folder.name,
+    }
     index = out_dir / "index.csv"
     new = not index.exists()
     with index.open("a", newline="") as f:

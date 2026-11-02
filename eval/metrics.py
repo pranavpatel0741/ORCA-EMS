@@ -17,8 +17,17 @@ from sim.events import Event, EventType
 ON_TIME_MIN = 60  # modeled critical threshold
 UNSERVED_MIN = 30
 BASE_HANDOVER_MIN = 10
-NEGOTIATION_TYPES = ("PROPOSE", "ACCEPT", "REJECT", "COUNTER", "ESCALATE", "RESOLVE",
-                     "STAFF_REQUEST", "STAFF_RESPONSE", "MUTUAL_AID_REQUEST")
+NEGOTIATION_TYPES = (
+    "PROPOSE",
+    "ACCEPT",
+    "REJECT",
+    "COUNTER",
+    "ESCALATE",
+    "RESOLVE",
+    "STAFF_REQUEST",
+    "STAFF_RESPONSE",
+    "MUTUAL_AID_REQUEST",
+)
 
 
 def _stats(values: list[float]) -> dict[str, float | int | None]:
@@ -26,8 +35,12 @@ def _stats(values: list[float]) -> dict[str, float | int | None]:
         return {"n": 0, "mean": None, "median": None, "p90": None}
     s = sorted(values)
     p90 = s[min(len(s) - 1, int(round(0.9 * (len(s) - 1))))]
-    return {"n": len(s), "mean": round(mean(s), 1), "median": round(median(s), 1),
-            "p90": round(p90, 1)}
+    return {
+        "n": len(s),
+        "mean": round(mean(s), 1),
+        "median": round(median(s), 1),
+        "p90": round(p90, 1),
+    }
 
 
 def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
@@ -70,9 +83,10 @@ def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
         elif e.type == EventType.PATIENT_STATE_CHANGED:
             status[p["patient_id"]] = p["to"]
             if p["to"] == "IN_TREATMENT":
-                care_tick.setdefault(p["patient_id"], e.tick)
                 if p.get("stabilization_only"):
                     stabilization.add(p["patient_id"])
+                else:
+                    care_tick.setdefault(p["patient_id"], e.tick)
         elif e.type == EventType.HOSPITAL_STATUS:
             overloaded = p["er_occupancy"] >= 1.0 or p.get("queue_scenario", 0) > 0
             hospital_status[p["hospital_id"]].append((e.tick, overloaded))
@@ -84,9 +98,14 @@ def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
                 rounds.append(p.get("negotiation_round", 0))
         elif e.type == EventType.LLM_CALL:
             llm.append(p)
-        elif e.type in (EventType.ESCALATED, EventType.APPROVED, EventType.OVERRIDDEN,
-                        EventType.FALLBACK_USED, EventType.COMMITTED,
-                        EventType.PROPOSAL_VALIDATED):
+        elif e.type in (
+            EventType.ESCALATED,
+            EventType.APPROVED,
+            EventType.OVERRIDDEN,
+            EventType.FALLBACK_USED,
+            EventType.COMMITTED,
+            EventType.PROPOSAL_VALIDATED,
+        ):
             counts[e.type.value] += 1
             if p.get("confidence") is not None:
                 confidence.append(p)
@@ -99,18 +118,23 @@ def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
         cur = by_inc_sev.get(pt["incident_id"])
         if cur is None or SEVERITY_ORDER.index(pt["severity"]) < SEVERITY_ORDER.index(cur):
             by_inc_sev[pt["incident_id"]] = pt["severity"]
-    response = {iid: first_on_scene[iid] - t for iid, t in call_tick.items()
-                if iid in first_on_scene}
-    response_by_sev = {s: _stats([v for iid, v in response.items() if by_inc_sev.get(iid) == s])
-                       for s in SEVERITY_ORDER}
+    response = {
+        iid: first_on_scene[iid] - t for iid, t in call_tick.items() if iid in first_on_scene
+    }
+    response_by_sev = {
+        s: _stats([v for iid, v in response.items() if by_inc_sev.get(iid) == s])
+        for s in SEVERITY_ORDER
+    }
 
     called = {pid: pt for pid, pt in patients.items() if pt["incident_id"] in call_tick}
-    care = {pid: care_tick[pid] - pt["call_tick"] for pid, pt in called.items()
-            if pid in care_tick}
-    care_by_sev = {s: _stats([v for pid, v in care.items() if called[pid]["severity"] == s])
-                   for s in SEVERITY_ORDER}
-    critical = [pid for pid, pt in called.items() if pt["severity"] == "CRITICAL"
-                and pid not in stabilization]
+    care = {pid: care_tick[pid] - pt["call_tick"] for pid, pt in called.items() if pid in care_tick}
+    care_by_sev = {
+        s: _stats([v for pid, v in care.items() if called[pid]["severity"] == s])
+        for s in SEVERITY_ORDER
+    }
+    # Stabilization is not definitive care. Keep those patients in the denominator so
+    # sending a critical patient to stabilization cannot improve the success rate.
+    critical = [pid for pid, pt in called.items() if pt["severity"] == "CRITICAL"]
     on_time = sum(1 for pid in critical if pid in care and care[pid] <= ON_TIME_MIN)
 
     overload = 0
@@ -118,17 +142,24 @@ def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
         for (t0, over), (t1, _) in zip(series, series[1:] + [(end_tick, False)], strict=True):
             overload += (t1 - t0) if over else 0
 
-    unserved_calls = sum(1 for iid, t in call_tick.items()
-                         if first_on_scene.get(iid, end_tick + 1) - t > UNSERVED_MIN)
-    not_in_care = sum(1 for pid in called
-                      if status.get(pid, "WAITING_ON_SCENE") in ("WAITING_ON_SCENE",
-                                                                 "IN_TRANSPORT",
-                                                                 "WAITING_AT_ER"))
+    unserved_calls = sum(
+        1
+        for iid, t in call_tick.items()
+        if first_on_scene.get(iid, end_tick + 1) - t > UNSERVED_MIN
+    )
+    not_in_care = sum(
+        1
+        for pid in called
+        if status.get(pid, "WAITING_ON_SCENE")
+        in ("WAITING_ON_SCENE", "IN_TRANSPORT", "WAITING_AT_ER")
+        or (pid in stabilization and pid not in care_tick and status.get(pid) != "DECEASED")
+    )
     summary = next((e.payload for e in events if e.type == EventType.RUN_SUMMARY), None)
     outcome = None
     if summary:
-        outcome = round(sum(p["survival_prob"] or 0.0 for p in summary["patients"]
-                            if p["id"] in called), 3)
+        outcome = round(
+            sum(p["survival_prob"] or 0.0 for p in summary["patients"] if p["id"] in called), 3
+        )
 
     decisions = counts["PROPOSAL_VALIDATED"] + sum(rejections.values())
     return {
@@ -159,7 +190,8 @@ def compute_metrics(events: Iterable[Event]) -> dict[str, Any]:
         "llm_tokens": sum(c.get("tokens", 0) for c in llm),
         "llm_latency_ms": round(sum(c.get("latency_ms", 0) for c in llm), 1),
         "llm_cache_hit_rate": round(sum(1 for c in llm if c.get("cache_hit")) / len(llm), 3)
-        if llm else None,
+        if llm
+        else None,
         "incidents": len(incidents),
     }
 
@@ -171,9 +203,15 @@ def confidence_calibration(records: list[dict[str, Any]]) -> list[dict[str, Any]
     for lo, hi in bins:
         rows = [r for r in records if lo <= r["confidence"] < hi and "hindsight_best" in r]
         if rows:
-            out.append({"bin": f"{lo:.2f}-{min(hi, 1.0):.2f}", "decisions": len(rows),
-                        "matched_hindsight_best": round(
-                            sum(1 for r in rows if r["hindsight_best"]) / len(rows), 3)})
+            out.append(
+                {
+                    "bin": f"{lo:.2f}-{min(hi, 1.0):.2f}",
+                    "decisions": len(rows),
+                    "matched_hindsight_best": round(
+                        sum(1 for r in rows if r["hindsight_best"]) / len(rows), 3
+                    ),
+                }
+            )
     return out
 
 

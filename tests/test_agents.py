@@ -47,39 +47,59 @@ def obs_with(observations, predicate):
 
 
 def client(tmp_path, backend=None, mode="live"):
-    return LLMClient(backend if backend is not None else ScriptedBackend(), mode=mode,
-                     cache_dir=tmp_path)
+    return LLMClient(
+        backend if backend is not None else ScriptedBackend(), mode=mode, cache_dir=tmp_path
+    )
 
 
-def agent_run(name, tmp_path, negotiate=True, info="partial", backend=None, hook=True,
-              scenario=None):
+def agent_run(
+    name, tmp_path, negotiate=True, info="partial", backend=None, hook=True, scenario=None
+):
     policy = AgentPolicy(negotiate=negotiate, client=client(tmp_path, backend))
-    engine = Engine(scenario or generate(7, "surge"), policy, info=info,
-                    tick_hook=check_invariants if hook else None)
+    engine = Engine(
+        scenario or generate(7, "surge"),
+        policy,
+        info=info,
+        tick_hook=check_invariants if hook else None,
+    )
     engine.run()
     return engine
 
 
 # --- each agent returns its typed output on a sample input --------------------------------------
 
+
 def test_each_agent_returns_typed_output(surge_obs, tmp_path):
     c = client(tmp_path)
-    obs = obs_with(surge_obs, lambda o: "MCI-2" in o.incidents and o.incidents["MCI-2"]
-                   .scene_reported and o.units_needing_destination())
+    obs = obs_with(
+        surge_obs,
+        lambda o: (
+            "MCI-2" in o.incidents
+            and o.incidents["MCI-2"].scene_reported
+            and o.units_needing_destination()
+        ),
+    )
     report, _ = c.call(assessment.SPEC, assessment.payload(obs.incidents["MCI-2"]))
     assert isinstance(report, PriorityReport) and report.mode == "MCI"
     plan, _ = c.call(dispatch.SPEC, dispatch.payload(obs, {"MCI-2": report}, []))
     assert isinstance(plan, DispatchPlan)
     unit = obs.units_needing_destination()[0]
     props = [{"unit_id": unit.id, "eta_min": 5, "patients": []}]
-    dec, _ = c.call(hospital_agent.spec(obs, "A"),
-                    hospital_agent.admission_payload(obs, "A", props))
+    dec, _ = c.call(
+        hospital_agent.spec(obs, "A"), hospital_agent.admission_payload(obs, "A", props)
+    )
     assert isinstance(dec, AdmissionDecision)
-    staff, _ = c.call(hospital_agent.spec(obs, "C", staff=True),
-                      hospital_agent.staff_payload(obs, "C", "A", 1, "test"))
+    staff, _ = c.call(
+        hospital_agent.spec(obs, "C", staff=True),
+        hospital_agent.staff_payload(obs, "C", "A", 1, "test"),
+    )
     assert isinstance(staff, StaffDecision)
-    res, _ = c.call(allocator.SPEC, allocator.payload(
-        obs, [{"type": "route_unresolved", "unit_id": unit.id, "last_hospital": "A"}], []))
+    res, _ = c.call(
+        allocator.SPEC,
+        allocator.payload(
+            obs, [{"type": "route_unresolved", "unit_id": unit.id, "last_hospital": "A"}], []
+        ),
+    )
     assert isinstance(res, Resolution)
 
 
@@ -91,12 +111,19 @@ def test_openai_backend_builds_sdk_agent_with_tools(monkeypatch, surge_obs):
 
     async def fake_run(agent, prompt, **kw):
         seen["agent"], seen["prompt"], seen["kw"] = agent, prompt, kw
-        out = PriorityReport(incident_id="X", mode="SINGLE",
-                             estimated={"critical": 1}, needs_police=False, needs_fire=False,
-                             urgency=0.9, rationale="test")
+        out = PriorityReport(
+            incident_id="X",
+            mode="SINGLE",
+            estimated={"critical": 1},
+            needs_police=False,
+            needs_fire=False,
+            urgency=0.9,
+            rationale="test",
+        )
         usage = SimpleNamespace(total_tokens=123)
-        return SimpleNamespace(final_output_as=lambda t: out,
-                               context_wrapper=SimpleNamespace(usage=usage))
+        return SimpleNamespace(
+            final_output_as=lambda t: out, context_wrapper=SimpleNamespace(usage=usage)
+        )
 
     monkeypatch.setattr(agents.Runner, "run", fake_run)
     backend = OpenAIAgentsBackend(model="test-model")
@@ -109,6 +136,7 @@ def test_openai_backend_builds_sdk_agent_with_tools(monkeypatch, surge_obs):
 
 
 # --- cache ---------------------------------------------------------------------------------------
+
 
 class CountingBackend(ScriptedBackend):
     def __init__(self):
@@ -147,14 +175,16 @@ def test_cache_only_replays_identical_run(tmp_path):
         return rows
 
     recorded = agent_run("agents", tmp_path, backend=ScriptedBackend(), hook=False)
-    policy = AgentPolicy(client=LLMClient(None, mode="cache_only", cache_dir=tmp_path,
-                                          model_name="scripted"))
+    policy = AgentPolicy(
+        client=LLMClient(None, mode="cache_only", cache_dir=tmp_path, model_name="scripted")
+    )
     replay = Engine(generate(7, "surge"), policy, info="partial")
     replay.run()
     assert comparable(replay) == comparable(recorded)
 
 
 # --- orchestration -------------------------------------------------------------------------------
+
 
 class BrokenDispatch(ScriptedBackend):
     def run(self, spec, payload, context):
@@ -174,8 +204,7 @@ def test_no_negotiation_never_calls_allocator(tmp_path):
     engine = agent_run("agents_no_negotiation", tmp_path, negotiate=False)
     agents_called = {e.payload["agent"] for e in engine.log.of_type(EventType.LLM_CALL)}
     assert "allocator" not in agents_called and "dispatch" in agents_called
-    assert not [e for e in engine.log.of_type(EventType.MESSAGE)
-                if e.payload["type"] == "RESOLVE"]
+    assert not [e for e in engine.log.of_type(EventType.MESSAGE) if e.payload["type"] == "RESOLVE"]
 
 
 def test_llm_calls_are_bounded(tmp_path):
@@ -185,12 +214,21 @@ def test_llm_calls_are_bounded(tmp_path):
 
 # --- confidence and approval ---------------------------------------------------------------------
 
+
 def test_confidence_components(surge_obs):
-    obs = obs_with(surge_obs, lambda o: any(
-        o.patient(pid) and o.patient(pid).severity == "CRITICAL"
-        for u in o.units_needing_destination() for pid in u.patient_ids))
-    unit = next(u for u in obs.units_needing_destination()
-                if any(obs.patient(p).severity == "CRITICAL" for p in u.patient_ids))
+    obs = obs_with(
+        surge_obs,
+        lambda o: any(
+            o.patient(pid) and o.patient(pid).severity == "CRITICAL"
+            for u in o.units_needing_destination()
+            for pid in u.patient_ids
+        ),
+    )
+    unit = next(
+        u
+        for u in obs.units_needing_destination()
+        if any(obs.patient(p).severity == "CRITICAL" for p in u.patient_ids)
+    )
     pats = [obs.patient(p) for p in unit.patient_ids]
     c = score(obs, unit.id, "A", pats)
     assert 0 <= c.score <= 1 and 0 <= c.freshness <= 1
@@ -225,17 +263,25 @@ def test_interactive_approval_takes_human_choice():
 
 def test_needs_review_flag_escalates_any_action():
     from sim.actions import Dispatch
+
     engine = Engine(generate(7, "surge"), None)
     engine.run(until=36)
-    pid = next(p for p in engine.incidents["MCI-2"].true_victim_ids
-               if engine.patients[p].true_severity == "SERIOUS")
-    unit = next(a.id for a in engine.ambulances.values() if a.state == "IDLE"
-                and engine.unit_available(a.id))
+    pid = next(
+        p
+        for p in engine.incidents["MCI-2"].true_victim_ids
+        if engine.patients[p].true_severity == "SERIOUS"
+    )
+    unit = next(
+        a.id
+        for a in engine.ambulances.values()
+        if a.state == "IDLE" and engine.unit_available(a.id)
+    )
     assert engine.commit(Dispatch(unit_id=unit, incident_id="MCI-2", patient_ids=[pid]))
     while not engine.units_needing_destination():
         engine.step()
-    assert engine.commit(RouteToHospital(unit_id=unit, hospital_id="A", needs_review=True,
-                                         confidence=0.5))
+    assert engine.commit(
+        RouteToHospital(unit_id=unit, hospital_id="A", needs_review=True, confidence=0.5)
+    )
     assert engine.pending_approvals and engine.pending_approvals[0].action.unit_id == unit
     engine.step()
     engine.step()
@@ -271,10 +317,17 @@ def test_assigning_a_crew_to_the_call_it_already_serves_is_a_no_op(tmp_path):
         engine.step()
     obs = engine.observe()
     unit = next(u for u in obs.units.values() if u.state == "EN_ROUTE")
-    plan = DispatchPlan(assignments=[Assignment(unit_id=unit.id,
-                                                incident_id=unit.assigned_incident,
-                                                patient_ids=[], rationale="same call")],
-                        rationale="")
+    plan = DispatchPlan(
+        assignments=[
+            Assignment(
+                unit_id=unit.id,
+                incident_id=unit.assigned_incident,
+                patient_ids=[],
+                rationale="same call",
+            )
+        ],
+        rationale="",
+    )
     actions, conflicts = AgentPolicy(client=client(tmp_path))._assignments(obs, plan)
     assert not actions and not conflicts
 
@@ -288,3 +341,149 @@ def test_hospital_options_skip_incapable_and_declined(surge_obs):
     assert ids and all(can_treat(obs.hospitals[h], patients, obs.surge_active) for h in ids)
     assert [o["eta_min"] for o in opts] == sorted(o["eta_min"] for o in opts)
     assert ids[0] not in [o["id"] for o in dispatch.hospital_options(obs, unit.id, {ids[0]})]
+
+
+# --- grounding adversarial checks ---------------------------------------------------------------
+
+
+def test_assessment_cannot_name_another_incident(surge_obs):
+    from orca_agents.grounding import validate_output
+
+    obs = obs_with(surge_obs, lambda o: bool(o.incidents))
+    inc = next(iter(obs.incidents.values()))
+    pl = assessment.payload(inc)
+    report = ScriptedBackend().assessment(pl).model_copy(update={"incident_id": "INVENTED"})
+    with pytest.raises(ValueError, match="another call"):
+        validate_output(report, pl, obs)
+
+
+def test_assessment_cannot_override_observed_scene_counts(surge_obs):
+    from orca_agents.grounding import validate_output
+
+    obs = obs_with(surge_obs, lambda o: any(i.scene_reported for i in o.incidents.values()))
+    inc = next(i for i in obs.incidents.values() if i.scene_reported)
+    pl = assessment.payload(inc)
+    report = ScriptedBackend().assessment(pl)
+    report.estimated.critical += 1
+    with pytest.raises(ValueError, match="scene counts"):
+        validate_output(report, pl, obs)
+
+
+@pytest.mark.parametrize("change", ["identity", "patient", "suggestion"])
+def test_hospital_answers_must_match_proposal(surge_obs, change):
+    from orca_agents.grounding import validate_output
+
+    obs = obs_with(surge_obs, lambda o: bool(o.units_needing_destination()))
+    unit = obs.units_needing_destination()[0]
+    hid = next(iter(obs.hospitals))
+    pl = hospital_agent.admission_payload(
+        obs,
+        hid,
+        [
+            {
+                "unit_id": unit.id,
+                "eta_min": 5,
+                "patients": [{"id": pid} for pid in unit.patient_ids],
+            }
+        ],
+    )
+    answer = AdmissionDecision(hospital_id=hid, decision="ACCEPT", rationale="test")
+    if change == "identity":
+        answer.hospital_id = "INVENTED"
+    elif change == "patient":
+        answer.accepted_patient_ids = ["INVENTED"]
+    else:
+        answer.suggested_hospital = "INVENTED"
+    with pytest.raises(ValueError, match="ungrounded"):
+        validate_output(answer, pl, obs)
+
+
+def test_dispatch_duplicate_patients_are_rejected(surge_obs):
+    from orca_agents.grounding import validate_output
+    from orca_agents.models import Assignment
+
+    obs = obs_with(surge_obs, lambda o: any(i.patients for i in o.incidents.values()))
+    inc = next(i for i in obs.incidents.values() if i.patients)
+    pid = inc.patients[0].id
+    out = DispatchPlan(
+        assignments=[
+            Assignment(
+                unit_id=next(iter(obs.units)),
+                incident_id=inc.id,
+                patient_ids=[pid, pid],
+                rationale="test",
+            )
+        ],
+        rationale="test",
+    )
+    with pytest.raises(ValueError, match="duplicate patient"):
+        validate_output(out, {}, obs)
+
+
+def test_agent_rationale_cannot_spoof_rule_provenance(surge_obs, tmp_path):
+    from sim.actions import Dispatch
+
+    class SpoofedRationale(AgentPolicy):
+        def _decide(self, obs):
+            return [
+                Dispatch(
+                    unit_id="AMB-1", incident_id="I-1", rationale="rule-based fabricated label"
+                )
+            ]
+
+    policy = SpoofedRationale(client=client(tmp_path))
+    assert policy.decide(surge_obs[0])[0].decided_by == "ai"
+
+
+def test_negative_model_counts_are_invalid():
+    from pydantic import ValidationError
+
+    from orca_agents.models import MutualAid, SeverityCounts
+
+    with pytest.raises(ValidationError):
+        SeverityCounts(critical=-1)
+    with pytest.raises(ValidationError):
+        MutualAid(firm_id="F", units=0)
+
+
+def test_staff_lender_selection_does_not_read_hidden_live_status(surge_obs, tmp_path):
+    borrower = "A"
+    base = obs_with(surge_obs, lambda o: borrower in o.own_status)
+    targets = []
+    for boost in ("B", "C"):
+        obs = base.model_copy(deep=True)
+        obs.outbox = []
+        obs.own_status[boost]["nurses_on_duty"] = 10000
+        policy = AgentPolicy(client=client(tmp_path / boost))
+        policy._staff(obs, borrower, 1, [])
+        targets.append(next(m["recipient"] for m in obs.outbox if m["type"] == "STAFF_REQUEST"))
+    assert targets[0] == targets[1]
+
+
+def test_hindsight_does_not_reward_a_stabilization_only_destination(monkeypatch):
+    from sim.actions import Dispatch
+    from sim.validator import fully_capable
+
+    engine = Engine(generate(7, "surge"), None)
+    engine.run(until=36)
+    pid = next(
+        pid
+        for pid in engine.incidents["MCI-2"].true_victim_ids
+        if engine.patients[pid].true_severity == "CRITICAL"
+    )
+    uid = next(
+        a.id
+        for a in engine.ambulances.values()
+        if a.state == "IDLE" and engine.unit_available(a.id)
+    )
+    assert engine.commit(Dispatch(unit_id=uid, incident_id="MCI-2", patient_ids=[pid]))
+    while not engine.units_needing_destination():
+        engine.step()
+    assert not fully_capable(engine, "B", [engine.patients[pid]])
+    monkeypatch.setattr(engine, "expected_arrival", lambda action, hid: 1 if hid == "B" else 1000)
+    monkeypatch.setattr(
+        type(engine.hospitals["B"]),
+        "earliest_fit",
+        lambda self, *args: 1 if self.id == "B" else 1000,
+    )
+    assert not engine.hindsight_best(RouteToHospital(unit_id=uid, hospital_id="B"))
