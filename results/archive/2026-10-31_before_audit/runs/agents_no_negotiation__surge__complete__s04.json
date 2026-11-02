@@ -1,0 +1,116 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "complete",
+ "key": "agents_no_negotiation__surge__complete__s04",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 479.0,
+  "approvals": 7,
+  "calls": 7,
+  "confidence_calibration": [
+   {
+    "bin": "0.00-0.75",
+    "decisions": 3,
+    "matched_hindsight_best": 0.0
+   },
+   {
+    "bin": "0.90-1.00",
+    "decisions": 2,
+    "matched_hindsight_best": 1.0
+   }
+  ],
+  "critical_on_time_rate": 0.273,
+  "critical_patients": 11,
+  "deaths": 9,
+  "escalations": 9,
+  "fallback_rate": 0.197,
+  "fallbacks": 13,
+  "hospital_overload_minutes": 629,
+  "incidents": 7,
+  "llm_cache_hit_rate": 0.184,
+  "llm_calls": 98,
+  "llm_latency_ms": 143489.5,
+  "llm_tokens": 228166,
+  "mean_rounds_per_resolution": 0,
+  "negotiation": {
+   "ACCEPT": 13,
+   "COUNTER": 6,
+   "ESCALATE": 5,
+   "MUTUAL_AID_REQUEST": 2,
+   "PROPOSE": 20,
+   "REJECT": 1
+  },
+  "outcome_score": 27.504,
+  "overrides": 2,
+  "patients": 39,
+  "patients_not_in_care_at_end": 6,
+  "rejections_by_rule": {
+   "R2": 4,
+   "R4": 1,
+   "R7": 2
+  },
+  "response_time": {
+   "mean": 68.7,
+   "median": 30,
+   "n": 7,
+   "p90": 140
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 16.7,
+    "median": 13,
+    "n": 3,
+    "p90": 30
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 80.3,
+    "median": 96,
+    "n": 3,
+    "p90": 140
+   },
+   "SERIOUS": {
+    "mean": 190,
+    "median": 190,
+    "n": 1,
+    "p90": 190
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 59.2,
+    "median": 48.5,
+    "n": 4,
+    "p90": 104
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 108.4,
+    "median": 83.0,
+    "n": 12,
+    "p90": 226
+   },
+   "SERIOUS": {
+    "mean": 196.9,
+    "median": 189.5,
+    "n": 8,
+    "p90": 205
+   }
+  },
+  "unserved_calls_30min": 3
+ },
+ "policy": "agents_no_negotiation",
+ "seed": 4,
+ "wall_seconds": 144.16
+}

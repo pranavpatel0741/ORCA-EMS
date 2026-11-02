@@ -1,0 +1,120 @@
+{
+ "backend": "openai",
+ "demand": "surge",
+ "info": "partial",
+ "key": "agents__surge__partial__s01",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 444.0,
+  "approvals": 5,
+  "calls": 5,
+  "confidence_calibration": [
+   {
+    "bin": "0.00-0.75",
+    "decisions": 2,
+    "matched_hindsight_best": 1.0
+   },
+   {
+    "bin": "0.90-1.00",
+    "decisions": 1,
+    "matched_hindsight_best": 0.0
+   }
+  ],
+  "critical_on_time_rate": 0.333,
+  "critical_patients": 6,
+  "deaths": 3,
+  "escalations": 6,
+  "fallback_rate": 0.132,
+  "fallbacks": 7,
+  "hospital_overload_minutes": 606,
+  "incidents": 5,
+  "llm_cache_hit_rate": 0.191,
+  "llm_calls": 110,
+  "llm_latency_ms": 170581.7,
+  "llm_tokens": 238982,
+  "mean_rounds_per_resolution": 3.1,
+  "negotiation": {
+   "ACCEPT": 5,
+   "COUNTER": 10,
+   "ESCALATE": 31,
+   "MUTUAL_AID_REQUEST": 1,
+   "PROPOSE": 24,
+   "REJECT": 9,
+   "RESOLVE": 16,
+   "STAFF_REQUEST": 1,
+   "STAFF_RESPONSE": 1
+  },
+  "outcome_score": 31.903,
+  "overrides": 1,
+  "patients": 39,
+  "patients_not_in_care_at_end": 9,
+  "rejections_by_rule": {
+   "R2": 5,
+   "R3": 1,
+   "R4": 1,
+   "R7": 1
+  },
+  "response_time": {
+   "mean": 59.2,
+   "median": 29.0,
+   "n": 4,
+   "p90": 163
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": 69.3,
+    "median": 29,
+    "n": 3,
+    "p90": 163
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 29,
+    "median": 29,
+    "n": 1,
+    "p90": 29
+   },
+   "SERIOUS": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   }
+  },
+  "stabilization_only_admissions": 1,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": 76.8,
+    "median": 71.0,
+    "n": 6,
+    "p90": 101
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 79,
+    "median": 65,
+    "n": 9,
+    "p90": 127
+   },
+   "SERIOUS": {
+    "mean": 164.2,
+    "median": 159.5,
+    "n": 12,
+    "p90": 192
+   }
+  },
+  "unserved_calls_30min": 2
+ },
+ "policy": "agents",
+ "seed": 1,
+ "wall_seconds": 171.24
+}

@@ -1,0 +1,96 @@
+{
+ "backend": "none",
+ "demand": "normal",
+ "info": "partial",
+ "key": "nearest__normal__partial__s03",
+ "metrics": {
+  "ambulance_minutes_at_er_over_base": 116.0,
+  "approvals": 0,
+  "calls": 4,
+  "confidence_calibration": [],
+  "critical_on_time_rate": null,
+  "critical_patients": 0,
+  "deaths": 0,
+  "escalations": 0,
+  "fallback_rate": 0.0,
+  "fallbacks": 0,
+  "hospital_overload_minutes": 443,
+  "incidents": 4,
+  "llm_cache_hit_rate": null,
+  "llm_calls": 0,
+  "llm_latency_ms": 0,
+  "llm_tokens": 0,
+  "mean_rounds_per_resolution": null,
+  "negotiation": {},
+  "outcome_score": 3.968,
+  "overrides": 0,
+  "patients": 4,
+  "patients_not_in_care_at_end": 0,
+  "rejections_by_rule": {
+   "R2": 2
+  },
+  "response_time": {
+   "mean": 9,
+   "median": 7.5,
+   "n": 4,
+   "p90": 20
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 2.5,
+    "median": 2.5,
+    "n": 2,
+    "p90": 4
+   },
+   "SERIOUS": {
+    "mean": 15.5,
+    "median": 15.5,
+    "n": 2,
+    "p90": 20
+   }
+  },
+  "stabilization_only_admissions": 0,
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "mean": null,
+    "median": null,
+    "n": 0,
+    "p90": null
+   },
+   "MINOR": {
+    "mean": 107,
+    "median": 107.0,
+    "n": 2,
+    "p90": 111
+   },
+   "SERIOUS": {
+    "mean": 65,
+    "median": 65.0,
+    "n": 2,
+    "p90": 80
+   }
+  },
+  "unserved_calls_30min": 0
+ },
+ "policy": "nearest",
+ "seed": 3,
+ "wall_seconds": 0.13
+}
