@@ -1,0 +1,102 @@
+{
+  "summary": {
+    "result_files": 80,
+    "logs_checked": 80,
+    "logged_model_calls": 2125,
+    "unique_answer_files_checked": 1638,
+    "results_with_metric_changes": 6,
+    "paired_scenario_groups": 10,
+    "paired_scenario_mismatches": 0,
+    "empty_agent_scenarios_without_calls": 4,
+    "missing_logs": 0,
+    "metadata_mismatches": 0,
+    "scripted_calls_in_openai_results": 0,
+    "commits_without_logged_validation": 0
+  },
+  "historical_cache_grounding_issues": {
+    "assessment_contradicts_scene_counts": 4
+  },
+  "changed_metric_fields": {
+    "critical_on_time_rate": 2,
+    "patients_not_in_care_at_end": 2,
+    "critical_patients": 2,
+    "time_to_care_by_severity.CRITICAL.n": 2,
+    "time_to_care_by_severity.CRITICAL.median": 2,
+    "time_to_care_by_severity.CRITICAL.p90": 1,
+    "time_to_care_by_severity.CRITICAL.mean": 1,
+    "llm_tokens": 4,
+    "llm_cache_hit_rate": 4,
+    "llm_latency_ms": 4,
+    "time_to_care_by_severity.SERIOUS.p90": 1,
+    "time_to_care_by_severity.SERIOUS.mean": 1,
+    "time_to_care_by_severity.SERIOUS.median": 1
+  },
+  "affected_records": [
+    {
+      "key": "agents__surge__complete__s04",
+      "changed_metric_fields": [
+        "critical_on_time_rate",
+        "patients_not_in_care_at_end",
+        "critical_patients",
+        "time_to_care_by_severity.CRITICAL.n",
+        "time_to_care_by_severity.CRITICAL.median"
+      ]
+    },
+    {
+      "key": "agents__surge__partial__s01",
+      "changed_metric_fields": [
+        "critical_on_time_rate",
+        "patients_not_in_care_at_end",
+        "critical_patients",
+        "time_to_care_by_severity.CRITICAL.p90",
+        "time_to_care_by_severity.CRITICAL.mean",
+        "time_to_care_by_severity.CRITICAL.n",
+        "time_to_care_by_severity.CRITICAL.median"
+      ]
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s01",
+      "changed_metric_fields": [
+        "llm_tokens",
+        "llm_cache_hit_rate",
+        "llm_latency_ms"
+      ]
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s03",
+      "changed_metric_fields": [
+        "llm_tokens",
+        "llm_cache_hit_rate",
+        "llm_latency_ms"
+      ]
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s05",
+      "changed_metric_fields": [
+        "llm_tokens",
+        "llm_cache_hit_rate",
+        "llm_latency_ms",
+        "time_to_care_by_severity.SERIOUS.p90",
+        "time_to_care_by_severity.SERIOUS.mean",
+        "time_to_care_by_severity.SERIOUS.median"
+      ]
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s01",
+      "changed_metric_fields": [
+        "llm_tokens",
+        "llm_cache_hit_rate",
+        "llm_latency_ms"
+      ]
+    }
+  ],
+  "limits": [
+    "Structured provenance checks only; free-text rationale truth is not established.",
+    "Archived logs were checked without new API calls.",
+    "Archived outcomes predate the grounding and staffing fixes and require reruns for current-code claims."
+  ],
+  "current_code_replay_summary": {
+    "missing_current_answer": 28,
+    "completed": 52
+  }
+}

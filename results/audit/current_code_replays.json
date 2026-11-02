@@ -1,0 +1,1349 @@
+{
+  "mode": "cache_only; no API calls",
+  "summary": {
+    "missing_current_answer": 28,
+    "completed": 52
+  },
+  "runs": [
+    {
+      "key": "agents__normal__complete__s01",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 109,
+      "reason": "dispatch: no cached response for key 3c7f0011c528f636b2f5e2ed"
+    },
+    {
+      "key": "agents__normal__complete__s02",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__complete__s03",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.97,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 13.5,
+        "overload_min": 424,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.214,
+        "llm_calls": 17,
+        "llm_tokens": 23808
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__complete__s04",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 34,
+      "reason": "dispatch: no cached response for key 50ff126e230fef4989f2eeb0"
+    },
+    {
+      "key": "agents__normal__complete__s05",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.988,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 5,
+        "llm_tokens": 6618
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__partial__s01",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.797,
+        "critical_on_time": 1.0,
+        "critical_care_mean": 57,
+        "response_mean": 12.3,
+        "overload_min": 253,
+        "er_wait_over_base": 22.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 1,
+        "fallback_rate": 0.0,
+        "llm_calls": 21,
+        "llm_tokens": 31397
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__partial__s02",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__partial__s03",
+      "policy": "agents",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.976,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 3.8,
+        "overload_min": 432,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 26,
+        "llm_tokens": 37542
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents__normal__partial__s04",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 56,
+      "reason": "dispatch: no cached response for key 42c5b3698184eb9592da0c65"
+    },
+    {
+      "key": "agents__normal__partial__s05",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 120,
+      "reason": "dispatch: no cached response for key 92ca4ed45c99363cddee41be"
+    },
+    {
+      "key": "agents__surge__complete__s01",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 46,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents__surge__complete__s02",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key 19648e75b02c1f2b6041b91e"
+    },
+    {
+      "key": "agents__surge__complete__s03",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 60,
+      "reason": "allocator: no cached response for key c7eee4498a9b7287768b4423"
+    },
+    {
+      "key": "agents__surge__complete__s04",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 48,
+      "reason": "dispatch: no cached response for key 127817337dcd5f312066f2b0"
+    },
+    {
+      "key": "agents__surge__complete__s05",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key b53a676c8435f878ba79aa8f"
+    },
+    {
+      "key": "agents__surge__partial__s01",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 46,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents__surge__partial__s02",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key 19648e75b02c1f2b6041b91e"
+    },
+    {
+      "key": "agents__surge__partial__s03",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 63,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents__surge__partial__s04",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 70,
+      "reason": "allocator: no cached response for key 0f0789894ebdddc997fe6de1"
+    },
+    {
+      "key": "agents__surge__partial__s05",
+      "policy": "agents",
+      "status": "requires_new_answer",
+      "at_tick": 43,
+      "reason": "assessment: no cached response for key b53a676c8435f878ba79aa8f"
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s01",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 109,
+      "reason": "dispatch: no cached response for key 3c7f0011c528f636b2f5e2ed"
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s02",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s03",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.97,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 13.5,
+        "overload_min": 424,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.214,
+        "llm_calls": 17,
+        "llm_tokens": 23808
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s04",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 34,
+      "reason": "dispatch: no cached response for key 50ff126e230fef4989f2eeb0"
+    },
+    {
+      "key": "agents_no_negotiation__normal__complete__s05",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.988,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 5,
+        "llm_tokens": 6618
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s01",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.797,
+        "critical_on_time": 1.0,
+        "critical_care_mean": 57,
+        "response_mean": 12.3,
+        "overload_min": 253,
+        "er_wait_over_base": 22.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.077,
+        "llm_calls": 19,
+        "llm_tokens": 27588
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s02",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s03",
+      "policy": "agents_no_negotiation",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.976,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 3.8,
+        "overload_min": 432,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 26,
+        "llm_tokens": 37542
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s04",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 56,
+      "reason": "dispatch: no cached response for key 42c5b3698184eb9592da0c65"
+    },
+    {
+      "key": "agents_no_negotiation__normal__partial__s05",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 120,
+      "reason": "dispatch: no cached response for key 92ca4ed45c99363cddee41be"
+    },
+    {
+      "key": "agents_no_negotiation__surge__complete__s01",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 46,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__complete__s02",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key 19648e75b02c1f2b6041b91e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__complete__s03",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 63,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__complete__s04",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 108,
+      "reason": "hospital:C: no cached response for key 494068aedc8980723ba07915"
+    },
+    {
+      "key": "agents_no_negotiation__surge__complete__s05",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key b53a676c8435f878ba79aa8f"
+    },
+    {
+      "key": "agents_no_negotiation__surge__partial__s01",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 46,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__partial__s02",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 42,
+      "reason": "assessment: no cached response for key 19648e75b02c1f2b6041b91e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__partial__s03",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 63,
+      "reason": "assessment: no cached response for key 65f90fb3275b20afe5f5125e"
+    },
+    {
+      "key": "agents_no_negotiation__surge__partial__s04",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 189,
+      "reason": "hospital:B: no cached response for key f463eae247a45d5ee63fb4f1"
+    },
+    {
+      "key": "agents_no_negotiation__surge__partial__s05",
+      "policy": "agents_no_negotiation",
+      "status": "requires_new_answer",
+      "at_tick": 43,
+      "reason": "assessment: no cached response for key b53a676c8435f878ba79aa8f"
+    },
+    {
+      "key": "nearest__normal__complete__s01",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.784,
+        "critical_on_time": 1.0,
+        "critical_care_mean": 59,
+        "response_mean": 12.7,
+        "overload_min": 251,
+        "er_wait_over_base": 22.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__complete__s02",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__complete__s03",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.976,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 3.8,
+        "overload_min": 439,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 3,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__complete__s04",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 5.826,
+        "critical_on_time": 1.0,
+        "critical_care_mean": 56,
+        "response_mean": 8.4,
+        "overload_min": 338,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 2,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__complete__s05",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.988,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__partial__s01",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.338,
+        "critical_on_time": 0.0,
+        "critical_care_mean": 100,
+        "response_mean": 12.7,
+        "overload_min": 237,
+        "er_wait_over_base": 69.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__partial__s02",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__partial__s03",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.968,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 443,
+        "er_wait_over_base": 116.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 2,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__partial__s04",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 5.743,
+        "critical_on_time": 0.0,
+        "critical_care_mean": 67,
+        "response_mean": 7.8,
+        "overload_min": 319,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 2,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__normal__partial__s05",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.987,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__complete__s01",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 4,
+        "outcome_score": 30.121,
+        "critical_on_time": 0.286,
+        "critical_care_mean": 69,
+        "response_mean": 8.5,
+        "overload_min": 517,
+        "er_wait_over_base": 322.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 12,
+        "rejections": 13,
+        "escalations": 4,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__complete__s02",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 27.329,
+        "critical_on_time": 0.4,
+        "critical_care_mean": 40,
+        "response_mean": 18.5,
+        "overload_min": 609,
+        "er_wait_over_base": 376.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 6,
+        "rejections": 13,
+        "escalations": 3,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__complete__s03",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 1,
+        "outcome_score": 29.019,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 84.2,
+        "response_mean": 53,
+        "overload_min": 714,
+        "er_wait_over_base": 266.0,
+        "unserved_calls": 4,
+        "not_in_care_end": 6,
+        "rejections": 13,
+        "escalations": 2,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__complete__s04",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 10,
+        "outcome_score": 26.779,
+        "critical_on_time": 0.273,
+        "critical_care_mean": 47,
+        "response_mean": 63.8,
+        "overload_min": 613,
+        "er_wait_over_base": 318.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 9,
+        "rejections": 9,
+        "escalations": 4,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__complete__s05",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 32.265,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 71,
+        "response_mean": 15,
+        "overload_min": 769,
+        "er_wait_over_base": 214.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 7,
+        "rejections": 10,
+        "escalations": 1,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__partial__s01",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 4,
+        "outcome_score": 29.605,
+        "critical_on_time": 0.286,
+        "critical_care_mean": 69.6,
+        "response_mean": 8.5,
+        "overload_min": 506,
+        "er_wait_over_base": 340.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 12,
+        "rejections": 13,
+        "escalations": 3,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__partial__s02",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 27.278,
+        "critical_on_time": 0.4,
+        "critical_care_mean": 38,
+        "response_mean": 19,
+        "overload_min": 559,
+        "er_wait_over_base": 390.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 6,
+        "rejections": 9,
+        "escalations": 3,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__partial__s03",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 2,
+        "outcome_score": 27.189,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 82,
+        "response_mean": 17.3,
+        "overload_min": 637,
+        "er_wait_over_base": 274.0,
+        "unserved_calls": 4,
+        "not_in_care_end": 9,
+        "rejections": 18,
+        "escalations": 4,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__partial__s04",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 9,
+        "outcome_score": 26.941,
+        "critical_on_time": 0.182,
+        "critical_care_mean": 68,
+        "response_mean": 64.8,
+        "overload_min": 583,
+        "er_wait_over_base": 256.0,
+        "unserved_calls": 4,
+        "not_in_care_end": 9,
+        "rejections": 9,
+        "escalations": 5,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "nearest__surge__partial__s05",
+      "policy": "nearest",
+      "status": "completed",
+      "headline": {
+        "deaths": 1,
+        "outcome_score": 32.427,
+        "critical_on_time": 0.667,
+        "critical_care_mean": 56.5,
+        "response_mean": 15.5,
+        "overload_min": 813,
+        "er_wait_over_base": 179.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 6,
+        "rejections": 9,
+        "escalations": 1,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__complete__s01",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.729,
+        "critical_on_time": 0.0,
+        "critical_care_mean": 66,
+        "response_mean": 9.7,
+        "overload_min": 281,
+        "er_wait_over_base": 1.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 1,
+        "escalations": 2,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__complete__s02",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__complete__s03",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.976,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 3.8,
+        "overload_min": 432,
+        "er_wait_over_base": 30.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__complete__s04",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 5.826,
+        "critical_on_time": 1.0,
+        "critical_care_mean": 56,
+        "response_mean": 8.4,
+        "overload_min": 337,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 1,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__complete__s05",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.988,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__partial__s01",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.709,
+        "critical_on_time": 0.0,
+        "critical_care_mean": 68,
+        "response_mean": 12.7,
+        "overload_min": 232,
+        "er_wait_over_base": 1.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__partial__s02",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": null,
+        "overload_min": 207,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__partial__s03",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 3.968,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 419,
+        "er_wait_over_base": 48.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__partial__s04",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 5.743,
+        "critical_on_time": 0.0,
+        "critical_care_mean": 67,
+        "response_mean": 7.8,
+        "overload_min": 319,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 1,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__normal__partial__s05",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 0.987,
+        "critical_on_time": null,
+        "critical_care_mean": null,
+        "response_mean": 9,
+        "overload_min": 376,
+        "er_wait_over_base": 0.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 0,
+        "rejections": 0,
+        "escalations": 0,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__complete__s01",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 32.611,
+        "critical_on_time": 0.286,
+        "critical_care_mean": 73.7,
+        "response_mean": 42.8,
+        "overload_min": 594,
+        "er_wait_over_base": 617.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 9,
+        "rejections": 0,
+        "escalations": 5,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__complete__s02",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 29.293,
+        "critical_on_time": 0.4,
+        "critical_care_mean": 41,
+        "response_mean": 18.5,
+        "overload_min": 696,
+        "er_wait_over_base": 748.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 5,
+        "rejections": 9,
+        "escalations": 3,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__complete__s03",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 2,
+        "outcome_score": 30.121,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 73.8,
+        "response_mean": 67.2,
+        "overload_min": 807,
+        "er_wait_over_base": 571.0,
+        "unserved_calls": 4,
+        "not_in_care_end": 2,
+        "rejections": 11,
+        "escalations": 5,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__complete__s04",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 7,
+        "outcome_score": 28.332,
+        "critical_on_time": 0.273,
+        "critical_care_mean": 77.7,
+        "response_mean": 63.4,
+        "overload_min": 646,
+        "er_wait_over_base": 502.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 6,
+        "rejections": 4,
+        "escalations": 8,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__complete__s05",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 0,
+        "outcome_score": 33.048,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 70.7,
+        "response_mean": 37.3,
+        "overload_min": 800,
+        "er_wait_over_base": 301.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 6,
+        "rejections": 0,
+        "escalations": 1,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__partial__s01",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 32.204,
+        "critical_on_time": 0.286,
+        "critical_care_mean": 80.8,
+        "response_mean": 68.2,
+        "overload_min": 641,
+        "er_wait_over_base": 587.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 8,
+        "rejections": 3,
+        "escalations": 6,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__partial__s02",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 3,
+        "outcome_score": 29.689,
+        "critical_on_time": 0.4,
+        "critical_care_mean": 38.5,
+        "response_mean": 19,
+        "overload_min": 649,
+        "er_wait_over_base": 740.0,
+        "unserved_calls": 0,
+        "not_in_care_end": 7,
+        "rejections": 4,
+        "escalations": 3,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__partial__s03",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 2,
+        "outcome_score": 30.081,
+        "critical_on_time": 0.333,
+        "critical_care_mean": 73,
+        "response_mean": 61.7,
+        "overload_min": 758,
+        "er_wait_over_base": 423.0,
+        "unserved_calls": 4,
+        "not_in_care_end": 3,
+        "rejections": 8,
+        "escalations": 5,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__partial__s04",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 9,
+        "outcome_score": 27.401,
+        "critical_on_time": 0.182,
+        "critical_care_mean": 62.5,
+        "response_mean": 61.3,
+        "overload_min": 600,
+        "er_wait_over_base": 493.0,
+        "unserved_calls": 3,
+        "not_in_care_end": 9,
+        "rejections": 2,
+        "escalations": 7,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    },
+    {
+      "key": "rule_based__surge__partial__s05",
+      "policy": "rule_based",
+      "status": "completed",
+      "headline": {
+        "deaths": 1,
+        "outcome_score": 33.059,
+        "critical_on_time": 0.667,
+        "critical_care_mean": 58,
+        "response_mean": 31.7,
+        "overload_min": 887,
+        "er_wait_over_base": 435.0,
+        "unserved_calls": 1,
+        "not_in_care_end": 4,
+        "rejections": 1,
+        "escalations": 1,
+        "fallback_rate": 0.0,
+        "llm_calls": 0,
+        "llm_tokens": 0
+      },
+      "changed_headline_fields": []
+    }
+  ]
+}
