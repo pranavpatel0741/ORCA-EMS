@@ -620,8 +620,9 @@ def render(events, tick: int, timings) -> None:
         ui.agent_pipeline(state)
         st.caption(
             f"{k['total_llm_calls']} agent calls · {k['total_negotiations']} proposals · "
-            f"{k['fallbacks']} rule fallbacks · {k['escalations']} reviews raised. "
-            "Scripted agents are an offline stand-in, not a language model."
+            f"{k['fallbacks']} rule fallbacks · {k['escalations']} reviews raised."
+            + (" Scripted agents are an offline stand-in, not a language model."
+               if ss.v2_policy.startswith("Scripted") else "")
         )
         ui.heading("Decision trail", "Actual proposals, replies, and committed actions")
         incident_picker(state)
