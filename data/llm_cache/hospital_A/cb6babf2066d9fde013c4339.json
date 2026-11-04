@@ -1,0 +1,112 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P06",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P07",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "A",
+  "minute": 90,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 0.5,
+   "free": {
+    "er_bed": 3,
+    "nurse_slot": 11,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 13
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 15.9,
+    "patients": [
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "PVT-1"
+   },
+   {
+    "eta_min": 15.9,
+    "patients": [
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "PVT-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P12"
+  ],
+  "counter_offer": "We can accept MCI-2-P12 but only one of MCI-2-P10 or MCI-2-P11 due to limited general capabilities. Please hold MCI-2-P10 or MCI-2-P11 until that bed opens in approximately 15 minutes.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We are at capacity for our current incoming patients and can only accept one more without exceeding our nurse coverage.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1200
+}

@@ -1,0 +1,193 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "A",
+    "type": "route_unresolved",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 12
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 4,
+    "free": {
+     "er_bed": 4,
+     "nurse_slot": 14,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 6,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 7,
+  "offers": [
+   {
+    "counter": "We can accept MCI-2-P00 once a nurse becomes available at minute 15, currently we have 4 nurses on duty and need to reserve at least 2 for minimum coverage. We can admit the patient after that time.",
+    "decision": "COUNTER",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "unit_id": "AMB-1"
+   },
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "AMB-1"
+   }
+  ],
+  "retry": 1,
+  "units": [
+   {
+    "already_declined_by": [
+     "A",
+     "C"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 15.9,
+     "B": 21.9,
+     "C": 15.3,
+     "D": 9.0
+    },
+    "hospitals_that_can_treat": [],
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "MCI-2-P00",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2-P00",
+    "patient_ids": [
+     "MCI-2-P00"
+    ],
+    "rationale": "Patient MCI-2-P00 is assigned to AMB-1 for transport to Hospital C due to their ability to treat the critical condition.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Ambulance AMB-1 is assigned to Hospital C, which can accept the critical patient with a slight delay for resource availability.",
+  "routes": [
+   {
+    "hospital_id": "C",
+    "rationale": "Hospital C can treat the critical patient and has the necessary resources available after the nurse becomes available at minute 15.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "4",
+ "tokens": 1840
+}
