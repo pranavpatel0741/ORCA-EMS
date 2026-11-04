@@ -87,20 +87,18 @@ agents, choose **AI agents + negotiation · OpenAI**.
 To replay a run, write a log with `run.py` (add `--save` for a transcript and scorecard in
 `results/runs_saved/`) and open it from the dashboard's replay option.
 
-**No API key?** Recorded answers in `data/llm_cache/` can replay matching requests with
-`LLM_MODE=cache_only` and `OPENAI_MODEL=gpt-4o-mini` in `.env`. Requests changed by the audit
-fixes need new answers; the old cache no longer reproduces the entire grid with current code.
-The guided demo remains fully offline using explicitly labeled scripted stand-ins.
+**No API key?** The model answers from the 2026-11-04 grid are saved in `data/llm_cache/`.
+With `LLM_MODE=cache_only` and `OPENAI_MODEL=gpt-4o-mini` in `.env`, matching requests replay
+without network calls. Saved runs in `results/runs_saved/` replay on the dashboard, and the
+guided demo runs fully offline with labeled scripted stand-ins.
 
-> **Audit notice:** the results below and existing summary tables are historical. Grounding,
-> information-boundary, and care-metric fixes require a fresh grid before making current-code
-> claims. See [the audit](docs/AGENT_EVAL_AUDIT.md). Existing experiment files now require
-> explicit `--rerun` before replacement; live reruns need a working API key.
-
-**Historical results (5 seeds, gpt-4o-mini).** Recorded runs suggested faster critical care
-on normal days with partial information. Surge outcomes were mixed, with slower response
-and worse deaths in some settings. These findings need regeneration after the audit fixes.
-Details are in [docs/REPORT.md](docs/REPORT.md) §5.
+**Results (5 seeds, gpt-4o-mini, current code).** With incomplete hospital information on a
+normal day, the agents got every critical patient into care within 60 minutes (both baselines:
+none). In a mass-casualty surge, negotiation cut ambulance waiting at ER doors compared with the
+same agents without it, but the agents sent the first ambulance later than the baselines and
+deaths were about the same. Details, including where agents did not help, are in
+[docs/REPORT.md](docs/REPORT.md) §5; an earlier self-audit is in
+[docs/AGENT_EVAL_AUDIT.md](docs/AGENT_EVAL_AUDIT.md).
 
 **Experiments.** Four policies (`nearest`, `rule_based`, `agents_no_negotiation`, `agents`)
 × 2 information settings × 2 demand levels × N seeds, on identical scenarios. LLM runs need

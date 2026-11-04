@@ -196,3 +196,6 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
   clone replays the grid with `LLM_MODE=cache_only` and no key.
 - **Demo:** Cardiac arrest, Shooting, School bus crash are cached for the dashboard's
   "AI agents, negotiating (OpenAI)" setting and replay free.
+- **Re-run after audit (2026-11-04):** full 5-seed grid regenerated live with the fixed code
+  (80 runs, about $1). REPORT §5, README and SUBMISSION updated; normal-day partial-info gain
+  holds, surge results mixed, rule backup about 25% of agent decisions.
