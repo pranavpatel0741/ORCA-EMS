@@ -11,7 +11,8 @@ review, and a rule-based backup takes over when an agent's answer is unusable. E
 is labeled with who produced it, and every model answer is saved so runs replay exactly.
 
 **Results** (5 seeds × 2 demand levels × 2 information settings, gpt-4o-mini, about $0.80 in
-total):
+total). These come from the grid recorded before a self-audit fixed answer grounding and two
+metrics (`docs/AGENT_EVAL_AUDIT.md`); they are labeled historical until the grid is re-run:
 - With incomplete hospital information on a normal day, the agents got every critical patient
   into care within 60 minutes; neither baseline did, and critical care came 12–28 minutes sooner.
 - In a mass-casualty surge with incomplete information, negotiation brought critical patients
