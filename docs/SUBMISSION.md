@@ -29,3 +29,11 @@ model are synthetic and not clinically validated. See `docs/REPORT.md` and `resu
 
 **Run it:** follow `README.md`. Without an API key, saved runs replay on the dashboard, the
 guided demo runs offline, and `LLM_MODE=cache_only` reuses the saved model answers.
+
+**Where each requirement is:**
+- Agents (Assessment, Dispatch, Hospital A–D, Allocator), OpenAI Agents SDK: `orca_agents/`
+- Structured messages and negotiation (propose / accept / counter / reject, up to 3 rounds): `orca_agents/orchestrator.py`, `sim/engine.py`
+- Simulated environment (incidents, hospitals, ambulances, nurses, trauma teams, police and fire): `sim/`; assumptions in `ASSUMPTIONS.md`; reproducible with a seed
+- Dashboard (map, resource status, agent activity, negotiation history, performance): `dashboard_v2/`, run with `python dashboard_v2/run.py`
+- Evaluation against baselines: `eval/`, `results/summary.md`, `docs/REPORT.md` §5
+- Presentation slides: `docs/slides/index.html`
