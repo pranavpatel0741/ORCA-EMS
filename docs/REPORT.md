@@ -161,6 +161,9 @@ test.
   validated.
 - The resource ratios are national averages. The steps to on-duty staff are assumptions
   (ASSUMPTIONS.md).
+- Medical staff is modeled as nurses (coverage limits, lending between hospitals) and trauma
+  surgical teams. General ER physicians are not modeled separately; ER beds stand in for their
+  capacity.
 - Travel uses straight-line distance × 1.3 at a fixed speed. There are no street networks and
   no live tracking.
 - One town layout, 5 seeds, one small model: the evidence is descriptive.
