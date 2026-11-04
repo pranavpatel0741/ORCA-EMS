@@ -1,6 +1,7 @@
 {
  "backend": "openai",
  "demand": "normal",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "complete",
  "key": "agents_no_negotiation__normal__complete__s03",
  "metrics": {
@@ -94,5 +95,5 @@
  },
  "policy": "agents_no_negotiation",
  "seed": 3,
- "wall_seconds": 27.08
+ "wall_seconds": 0.11
 }

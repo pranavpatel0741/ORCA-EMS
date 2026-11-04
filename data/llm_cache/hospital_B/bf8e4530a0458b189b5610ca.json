@@ -1,0 +1,60 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [],
+  "hospital": "B",
+  "minute": 100,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.667,
+   "free": {
+    "er_bed": 2,
+    "nurse_slot": 12,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 7
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 7.6,
+    "patients": [
+     {
+      "id": "MCI-2-P01",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "PVT-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "",
+  "decision": "REJECT",
+  "hospital_id": "B",
+  "rationale": "We cannot accept this patient as we lack the necessary trauma capabilities and do not have an available surgeon.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": "null"
+ },
+ "prompt_version": "3",
+ "tokens": 898
+}

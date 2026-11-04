@@ -1,0 +1,44 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "hospital": "C",
+  "minute": 129,
+  "my_status": {
+   "ambulances_at_door": 2,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 2.333,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 12,
+    "or": 1,
+    "surgeon": 0,
+    "trauma_bay": 0,
+    "ward_bed": 7
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 5,
+   "queue_scenario": 8,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "request": {
+   "from": "Hospital B",
+   "nurses": 1,
+   "why": "Hospital B needs 1 nurse(s) to accept incoming patients"
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "hospital_id": "C",
+  "lend_nurses": 1,
+  "rationale": "I can lend 1 nurse while still maintaining my minimum nurse coverage of 2, given I currently have 5 nurses on duty."
+ },
+ "prompt_version": "3",
+ "tokens": 754
+}

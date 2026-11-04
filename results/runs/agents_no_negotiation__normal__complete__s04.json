@@ -1,6 +1,7 @@
 {
  "backend": "openai",
  "demand": "normal",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "complete",
  "key": "agents_no_negotiation__normal__complete__s04",
  "metrics": {
@@ -12,20 +13,19 @@
   "critical_patients": 1,
   "deaths": 0,
   "escalations": 0,
-  "fallback_rate": 0.062,
-  "fallbacks": 1,
+  "fallback_rate": 0.125,
+  "fallbacks": 2,
   "hospital_overload_minutes": 268,
   "incidents": 5,
-  "llm_cache_hit_rate": 0.0,
-  "llm_calls": 28,
-  "llm_latency_ms": 46199.6,
-  "llm_tokens": 38641,
+  "llm_cache_hit_rate": 0.897,
+  "llm_calls": 29,
+  "llm_latency_ms": 5975.9,
+  "llm_tokens": 43202,
   "mean_rounds_per_resolution": 0,
   "negotiation": {
-   "ACCEPT": 5,
+   "ACCEPT": 4,
    "MUTUAL_AID_REQUEST": 1,
-   "PROPOSE": 6,
-   "REJECT": 1
+   "PROPOSE": 4
   },
   "outcome_score": 5.852,
   "overrides": 0,
@@ -95,5 +95,5 @@
  },
  "policy": "agents_no_negotiation",
  "seed": 4,
- "wall_seconds": 47.44
+ "wall_seconds": 6.12
 }

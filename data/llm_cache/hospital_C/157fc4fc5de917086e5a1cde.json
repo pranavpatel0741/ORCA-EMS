@@ -1,0 +1,112 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P02",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   },
+   {
+    "id": "MCI-2-P00",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   },
+   {
+    "id": "MCI-1-P0",
+    "needs": {
+     "capability": "TRAUMA_L2",
+     "or_within_min": null,
+     "surgeon": true,
+     "trauma_bay": true
+    },
+    "severity": "CRITICAL"
+   }
+  ],
+  "hospital": "C",
+  "minute": 74,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 1.5,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 1,
+    "surgeon": 1,
+    "trauma_bay": 1,
+    "ward_bed": 6
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 3,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 1.2,
+    "patients": [
+     {
+      "id": "MCI-2-P01",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "PVT-1"
+   },
+   {
+    "eta_min": 1.2,
+    "patients": [
+     {
+      "id": "MCI-2-P03",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "PVT-2"
+   }
+  ],
+  "retry": 1
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P03"
+  ],
+  "counter_offer": "We can only accept MCI-2-P03 due to our current trauma bay and bed limitations. MCI-2-P01 cannot be accepted as we are currently receiving three critical patients, and we have no capacity for more than one at this time.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "We are currently accepting patients, but due to the critical cases already incoming, we are unable to accept any additional patients at this time.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1216
+}

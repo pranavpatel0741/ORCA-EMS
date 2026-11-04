@@ -1,6 +1,7 @@
 {
  "backend": "none",
  "demand": "normal",
+ "fingerprint": "389106652b7ab689a24df91174970153d1c9d2771b6c8ed86e4ac4abc20f4572",
  "info": "complete",
  "key": "rule_based__normal__complete__s01",
  "metrics": {
@@ -92,5 +93,5 @@
  },
  "policy": "rule_based",
  "seed": 1,
- "wall_seconds": 0.1
+ "wall_seconds": 0.12
 }

@@ -1,0 +1,214 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "B",
+    "type": "route_unresolved",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 2,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": -1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 9,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 2,
+     "ward_bed": 10
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 5
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 4,
+    "board_age_min": 12,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": -4,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 6
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 2,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 207,
+  "offers": [
+   {
+    "counter": "",
+    "decision": "REJECT",
+    "hospital_id": "B",
+    "suggested_hospital": null,
+    "unit_id": "AMB-2"
+   }
+  ],
+  "retry": 1,
+  "units": [
+   {
+    "already_declined_by": [
+     "B"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 8.5,
+     "B": 7.6,
+     "C": 19.7,
+     "D": 6.5
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": -1,
+      "eta_min": 8.5,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 19.7,
+      "id": "C"
+     }
+    ],
+    "id": "AMB-2",
+    "patients": [
+     {
+      "id": "MCI-2-P14",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P15",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2-P14",
+    "patient_ids": [
+     "MCI-2-P14"
+    ],
+    "rationale": "Patient MCI-2-P14 is assigned to AMB-2 due to needing general care.",
+    "unit_id": "AMB-2"
+   },
+   {
+    "incident_id": "MCI-2-P15",
+    "patient_ids": [
+     "MCI-2-P15"
+    ],
+    "rationale": "Patient MCI-2-P15 is assigned to AMB-2 due to needing general care.",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Patient assignments were made to AMB-2 to hospital A, which is the only hospital that can treat the patients despite being at capacity.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "A is the only available hospital that can accept AMB-2, despite being at capacity, it is the only option for treatment.",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "4",
+ "tokens": 1912
+}

@@ -1,0 +1,75 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 133,
+  "my_status": {
+   "ambulances_at_door": 2,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.167,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 4,
+    "or": 1,
+    "surgeon": 0,
+    "trauma_bay": 2,
+    "ward_bed": 13
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 3,
+   "queue_scenario": 2,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.0,
+    "patients": [
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "PVT-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P09"
+  ],
+  "counter_offer": "I can only accept one patient now; a bed will be available shortly after the arrival of ambulances at 9 minutes.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We have limited capacity, but can accept one serious case at this time.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 986
+}

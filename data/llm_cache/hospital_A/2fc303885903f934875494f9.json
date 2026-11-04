@@ -1,0 +1,64 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 112,
+  "my_status": {
+   "ambulances_at_door": 3,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 8,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 10
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 2,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 8.5,
+    "patients": [
+     {
+      "id": "MCI-2-P03",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": null,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ],
+  "retry": 1
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "",
+  "decision": "REJECT",
+  "hospital_id": "A",
+  "rationale": "I cannot accept this patient as they require a Trauma Level 2 capability, which we do not provide.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 917
+}

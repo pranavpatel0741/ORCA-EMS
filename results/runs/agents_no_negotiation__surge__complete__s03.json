@@ -1,6 +1,7 @@
 {
  "backend": "openai",
  "demand": "surge",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "complete",
  "key": "agents_no_negotiation__surge__complete__s03",
  "metrics": {
@@ -18,21 +19,21 @@
   "critical_patients": 6,
   "deaths": 1,
   "escalations": 4,
-  "fallback_rate": 0.411,
-  "fallbacks": 23,
+  "fallback_rate": 0.464,
+  "fallbacks": 26,
   "hospital_overload_minutes": 713,
   "incidents": 6,
-  "llm_cache_hit_rate": 0.111,
-  "llm_calls": 90,
-  "llm_latency_ms": 139043.6,
-  "llm_tokens": 205692,
+  "llm_cache_hit_rate": 0.926,
+  "llm_calls": 95,
+  "llm_latency_ms": 11986.1,
+  "llm_tokens": 210273,
   "mean_rounds_per_resolution": 0,
   "negotiation": {
    "ACCEPT": 7,
-   "COUNTER": 7,
+   "COUNTER": 6,
    "MUTUAL_AID_REQUEST": 1,
    "PROPOSE": 18,
-   "REJECT": 4
+   "REJECT": 3
   },
   "outcome_score": 29.074,
   "overrides": 0,
@@ -105,5 +106,5 @@
  },
  "policy": "agents_no_negotiation",
  "seed": 3,
- "wall_seconds": 139.68
+ "wall_seconds": 12.36
 }

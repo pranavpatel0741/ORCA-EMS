@@ -1,0 +1,60 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [],
+  "hospital": "B",
+  "minute": 191,
+  "my_status": {
+   "ambulances_at_door": 1,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 1.167,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 6,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 8
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 3,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 19.3,
+    "patients": [
+     {
+      "id": "MCI-2-P30",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "",
+  "decision": "REJECT",
+  "hospital_id": "B",
+  "rationale": "We cannot accept the patient as we currently have no available beds in the ER and must prioritize our existing incoming patients.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 895
+}

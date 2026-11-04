@@ -1,0 +1,218 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "last_hospital": "A",
+    "type": "route_unresolved",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 2,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 6,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 2,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": -1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 9,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 133,
+  "offers": [
+   {
+    "counter": "I can only accept 1 patient at this time, but I can take MCI-2-P10 when a bed frees up in about 20 minutes due to stabilized patients.",
+    "decision": "COUNTER",
+    "hospital_id": "B",
+    "suggested_hospital": null,
+    "unit_id": "PVT-2"
+   },
+   {
+    "counter": "I can accept one patient now (MCI-2-P09) but I can only take MCI-2-P10 if a bed frees up shortly.",
+    "decision": "COUNTER",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "unit_id": "PVT-2"
+   },
+   {
+    "counter": "I can only accept one patient now; a bed will be available shortly after the arrival of ambulances at 9 minutes.",
+    "decision": "COUNTER",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "unit_id": "PVT-2"
+   }
+  ],
+  "units": [
+   {
+    "already_declined_by": [
+     "A",
+     "B",
+     "C"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 9.0,
+     "B": 19.3,
+     "C": 6.0,
+     "D": 13.5
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": -1,
+      "eta_min": 13.5,
+      "id": "D"
+     }
+    ],
+    "id": "PVT-2",
+    "patients": [
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "state": "ON_SCENE"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2-P09",
+    "patient_ids": [
+     "MCI-2-P09"
+    ],
+    "rationale": "Assigned to hospital B, which can accept this stable SERIOUS non-trauma patient.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Hospital B can accept one patient immediately, allowing for the best utilization of resources while meeting immediate care needs.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B can take one patient immediately and has one ER bed available.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "unassigned_patient_ids": [
+   "MCI-2-P10"
+  ]
+ },
+ "prompt_version": "4",
+ "tokens": 1983
+}

@@ -1,10 +1,11 @@
 {
  "backend": "openai",
  "demand": "surge",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "complete",
  "key": "agents__surge__complete__s02",
  "metrics": {
-  "ambulance_minutes_at_er_over_base": 726.0,
+  "ambulance_minutes_at_er_over_base": 732.0,
   "approvals": 4,
   "calls": 2,
   "confidence_calibration": [
@@ -15,7 +16,7 @@
    },
    {
     "bin": "0.90-1.00",
-    "decisions": 3,
+    "decisions": 2,
     "matched_hindsight_best": 1.0
    }
   ],
@@ -23,32 +24,34 @@
   "critical_patients": 5,
   "deaths": 3,
   "escalations": 4,
-  "fallback_rate": 0.186,
-  "fallbacks": 8,
-  "hospital_overload_minutes": 777,
+  "fallback_rate": 0.52,
+  "fallbacks": 26,
+  "hospital_overload_minutes": 732,
   "incidents": 2,
-  "llm_cache_hit_rate": 0.386,
-  "llm_calls": 83,
-  "llm_latency_ms": 91186.0,
-  "llm_tokens": 191117,
-  "mean_rounds_per_resolution": 3.56,
+  "llm_cache_hit_rate": 0.448,
+  "llm_calls": 96,
+  "llm_latency_ms": 106557.1,
+  "llm_tokens": 219401,
+  "mean_rounds_per_resolution": 3.08,
   "negotiation": {
-   "ACCEPT": 2,
-   "COUNTER": 8,
-   "ESCALATE": 27,
+   "ACCEPT": 3,
+   "COUNTER": 9,
+   "ESCALATE": 26,
    "MUTUAL_AID_REQUEST": 2,
-   "PROPOSE": 16,
-   "REJECT": 6,
-   "RESOLVE": 16,
+   "PROPOSE": 17,
+   "REJECT": 5,
+   "RESOLVE": 9,
    "STAFF_REQUEST": 2,
    "STAFF_RESPONSE": 2
   },
-  "outcome_score": 29.739,
+  "outcome_score": 29.645,
   "overrides": 0,
   "patients": 34,
   "patients_not_in_care_at_end": 5,
   "rejections_by_rule": {
-   "R2": 5
+   "R2": 10,
+   "R4": 1,
+   "R7": 1
   },
   "response_time": {
    "mean": 18.5,
@@ -97,21 +100,21 @@
     "p90": null
    },
    "MINOR": {
-    "mean": 139.4,
-    "median": 141.0,
+    "mean": 152.1,
+    "median": 144.5,
     "n": 12,
-    "p90": 232
+    "p90": 249
    },
    "SERIOUS": {
-    "mean": 140.6,
-    "median": 147.5,
+    "mean": 141.8,
+    "median": 149.5,
     "n": 12,
-    "p90": 194
+    "p90": 198
    }
   },
   "unserved_calls_30min": 0
  },
  "policy": "agents",
  "seed": 2,
- "wall_seconds": 91.67
+ "wall_seconds": 107.07
 }

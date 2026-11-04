@@ -1,0 +1,65 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 294,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 10,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 9
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 14.2,
+    "patients": [
+     {
+      "id": "I-001-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-001-P0"
+  ],
+  "counter_offer": "We can accept the patient I-001-P0, but currently have no ER beds available. The patient will need to wait for a bed to open up.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We have the necessary capabilities to treat the incoming patient, but we are at full ER capacity. We can only accept this one minor case while waiting for a bed to become available.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 960
+}

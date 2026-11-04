@@ -1,6 +1,7 @@
 {
  "backend": "none",
  "demand": "normal",
+ "fingerprint": "389106652b7ab689a24df91174970153d1c9d2771b6c8ed86e4ac4abc20f4572",
  "info": "partial",
  "key": "rule_based__normal__partial__s02",
  "metrics": {

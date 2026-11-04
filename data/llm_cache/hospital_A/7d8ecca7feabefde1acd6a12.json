@@ -1,0 +1,84 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P03",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P04",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "A",
+  "minute": 63,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 0.833,
+   "free": {
+    "er_bed": 1,
+    "nurse_slot": 7,
+    "or": 2,
+    "surgeon": 1,
+    "trauma_bay": 2,
+    "ward_bed": 14
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 3,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.0,
+    "patients": [
+     {
+      "id": "MCI-2-P00",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": 60,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [],
+  "counter_offer": "",
+  "decision": "REJECT",
+  "hospital_id": "A",
+  "rationale": "We are currently able to accommodate only one critical patient due to limited capacity, and the incoming patients already utilize our available beds and staff.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1020
+}

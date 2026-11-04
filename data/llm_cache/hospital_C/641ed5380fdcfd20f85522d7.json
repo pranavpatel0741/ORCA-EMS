@@ -1,0 +1,95 @@
+{
+ "agent": "hospital:C",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P12",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P13",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   }
+  ],
+  "hospital": "C",
+  "minute": 244,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "TRAUMA_L2"
+   ],
+   "contract": null,
+   "er_occupancy": 0.5,
+   "free": {
+    "er_bed": 3,
+    "nurse_slot": 3,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 5
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 2,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 19.7,
+    "patients": [
+     {
+      "id": "MCI-2-P15",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P17",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P15"
+  ],
+  "counter_offer": "I can accept one patient now, but I will be able to take the second patient after a soon-to-be freed bed in the ER. I currently have 3 beds, and with the two incoming patients, I will reach capacity.",
+  "decision": "COUNTER",
+  "hospital_id": "C",
+  "rationale": "I am able to accept one patient right now, but must hold off on the second until we have more capacity. My current nurse coverage is at minimum.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1120
+}

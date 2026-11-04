@@ -1,61 +1,63 @@
 {
  "backend": "openai",
  "demand": "surge",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "complete",
  "key": "agents__surge__complete__s03",
  "metrics": {
-  "ambulance_minutes_at_er_over_base": 535.0,
-  "approvals": 4,
+  "ambulance_minutes_at_er_over_base": 461.0,
+  "approvals": 3,
   "calls": 6,
   "confidence_calibration": [
    {
     "bin": "0.00-0.75",
-    "decisions": 2,
+    "decisions": 1,
     "matched_hindsight_best": 0.0
    },
    {
     "bin": "0.90-1.00",
-    "decisions": 2,
+    "decisions": 4,
     "matched_hindsight_best": 1.0
    }
   ],
   "critical_on_time_rate": 0.333,
   "critical_patients": 6,
   "deaths": 2,
-  "escalations": 4,
-  "fallback_rate": 0.228,
-  "fallbacks": 13,
-  "hospital_overload_minutes": 802,
+  "escalations": 3,
+  "fallback_rate": 0.441,
+  "fallbacks": 26,
+  "hospital_overload_minutes": 798,
   "incidents": 6,
-  "llm_cache_hit_rate": 0.223,
-  "llm_calls": 130,
-  "llm_latency_ms": 169871.6,
-  "llm_tokens": 291692,
-  "mean_rounds_per_resolution": 3.08,
+  "llm_cache_hit_rate": 0.275,
+  "llm_calls": 142,
+  "llm_latency_ms": 241292.1,
+  "llm_tokens": 306066,
+  "mean_rounds_per_resolution": 2.27,
   "negotiation": {
-   "ACCEPT": 7,
-   "COUNTER": 11,
-   "ESCALATE": 27,
+   "ACCEPT": 10,
+   "COUNTER": 7,
+   "ESCALATE": 31,
    "MUTUAL_AID_REQUEST": 1,
-   "PROPOSE": 25,
+   "PROPOSE": 24,
    "REJECT": 7,
-   "RESOLVE": 19,
-   "STAFF_REQUEST": 2,
-   "STAFF_RESPONSE": 2
+   "RESOLVE": 12,
+   "STAFF_REQUEST": 3,
+   "STAFF_RESPONSE": 3
   },
-  "outcome_score": 29.693,
+  "outcome_score": 28.935,
   "overrides": 0,
   "patients": 35,
-  "patients_not_in_care_at_end": 5,
+  "patients_not_in_care_at_end": 0,
   "rejections_by_rule": {
-   "R2": 9,
-   "R3": 1
+   "R2": 10,
+   "R4": 1,
+   "R7": 2
   },
   "response_time": {
-   "mean": 88.2,
-   "median": 52.5,
+   "mean": 52.7,
+   "median": 38.0,
    "n": 6,
-   "p90": 155
+   "p90": 46
   },
   "response_time_by_severity": {
    "CRITICAL": {
@@ -71,25 +73,25 @@
     "p90": null
    },
    "MINOR": {
-    "mean": 87.5,
-    "median": 87.5,
+    "mean": 84.5,
+    "median": 84.5,
     "n": 2,
-    "p90": 155
+    "p90": 149
    },
    "SERIOUS": {
-    "mean": 148,
-    "median": 148.0,
+    "mean": 44.5,
+    "median": 44.5,
     "n": 2,
-    "p90": 224
+    "p90": 46
    }
   },
   "stabilization_only_admissions": 0,
   "time_to_care_by_severity": {
    "CRITICAL": {
-    "mean": 77.2,
-    "median": 74.0,
+    "mean": 88.2,
+    "median": 83.5,
     "n": 4,
-    "p90": 113
+    "p90": 138
    },
    "EXPECTANT": {
     "mean": null,
@@ -98,21 +100,21 @@
     "p90": null
    },
    "MINOR": {
-    "mean": 144.4,
-    "median": 136,
-    "n": 13,
-    "p90": 229
+    "mean": 163.5,
+    "median": 173,
+    "n": 17,
+    "p90": 241
    },
    "SERIOUS": {
-    "mean": 159.9,
-    "median": 160,
-    "n": 11,
-    "p90": 194
+    "mean": 167.2,
+    "median": 184.0,
+    "n": 12,
+    "p90": 233
    }
   },
   "unserved_calls_30min": 4
  },
  "policy": "agents",
  "seed": 3,
- "wall_seconds": 170.6
+ "wall_seconds": 242.37
 }

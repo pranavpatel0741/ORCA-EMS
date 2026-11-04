@@ -1,0 +1,78 @@
+{
+ "agent": "hospital:D",
+ "input": {
+  "already_incoming": [],
+  "hospital": "D",
+  "minute": 128,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": {
+    "accepts_critical_trauma": false,
+    "eligible_severities": [
+     "SERIOUS"
+    ],
+    "max_surge_patients": 4
+   },
+   "er_occupancy": 2.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 4,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 0,
+    "ward_bed": 3
+   },
+   "min_nurse_coverage": 1,
+   "nurses_on_duty": 2,
+   "queue_scenario": 4,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.7,
+    "patients": [
+     {
+      "id": "MCI-2-P11",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P12",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-3"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P11"
+  ],
+  "counter_offer": "We can accept one patient now, but can only take MCI-2-P11 due to current bed occupancy. MCI-2-P12 will have to be redirected to another facility as we cannot accommodate it immediately.",
+  "decision": "COUNTER",
+  "hospital_id": "D",
+  "rationale": "We have limited ER capacity and need to prioritize our resources while still providing care to incoming patients.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1020
+}

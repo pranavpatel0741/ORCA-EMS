@@ -1,0 +1,223 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P20",
+     "MCI-2-P22"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P27",
+     "MCI-2-P29"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P30"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 5,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 2,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 6,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 7
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 6,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 184,
+  "offers": [],
+  "units": [
+   {
+    "already_declined_by": [],
+    "eta_to_hospitals_min": {
+     "A": 1.0,
+     "B": 11.1,
+     "C": 13.5,
+     "D": 12.5
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 1,
+      "eta_min": 1.0,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 11.1,
+      "id": "B"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 12.5,
+      "id": "D"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 13.5,
+      "id": "C"
+     }
+    ],
+    "id": "AMB-3",
+    "patients": [],
+    "state": "RETURNING"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P20",
+     "MCI-2-P22"
+    ],
+    "rationale": "Patients MCI-2-P20 and MCI-2-P22 are assigned to AMB-3 for transport to Hospital A.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P27",
+     "MCI-2-P29"
+    ],
+    "rationale": "Patients MCI-2-P27 and MCI-2-P29 are assigned to AMB-3 for transport to Hospital A.",
+    "unit_id": "AMB-3"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P30"
+    ],
+    "rationale": "Patient MCI-2-P30 is assigned to AMB-3 for transport to Hospital A.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "escalate": false,
+  "rationale": "All patients can be transported to Hospital A, which is the only hospital with available ER beds.",
+  "routes": [
+   {
+    "hospital_id": "A",
+    "rationale": "Hospital A has 1 free ER bed and can treat the patients, making it the only viable option for AMB-3.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "4",
+ "tokens": 1994
+}

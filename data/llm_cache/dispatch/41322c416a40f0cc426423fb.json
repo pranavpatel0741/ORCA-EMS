@@ -1,0 +1,205 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [
+   {
+    "already_declined_by": [
+     "B"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 9.9,
+     "B": 9.1,
+     "C": 20.1,
+     "D": 4.8
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 9.9,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 20.1,
+      "id": "C"
+     }
+    ],
+    "id": "AMB-1",
+    "patients": [
+     {
+      "id": "I-003-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "I-003-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "calls": [],
+  "en_route_units": [
+   {
+    "going_to": "I-004",
+    "id": "AMB-3"
+   },
+   {
+    "going_to": "I-005",
+    "id": "PVT-2"
+   }
+  ],
+  "feedback": [
+   {
+    "counter": "We can accept patient I-003-P0, but due to current staffing and bed availability, we are unable to take patient I-003-P1 at this time.",
+    "hospital_id": "B",
+    "suggested_hospital": null,
+    "type": "COUNTER",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "free_unit_count": 0,
+  "free_units": [],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 16
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 4,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 3,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 3
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 4
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 4,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 12,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 5
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "no: only during a mass-casualty surge",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 289,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "route_these_unit_ids": [
+   "AMB-1"
+  ],
+  "surge_active": false
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [],
+  "mutual_aid": null,
+  "rationale": "There are no free units available, and the waiting patients cannot be assigned to AMB-1 due to the hospital's rejection of the serious patient. Since there are critical patients waiting, mutual aid has not been requested as there are no free units.",
+  "routes": []
+ },
+ "prompt_version": "8",
+ "tokens": 2222
+}

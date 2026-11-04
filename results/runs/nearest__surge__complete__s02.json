@@ -1,6 +1,7 @@
 {
  "backend": "none",
  "demand": "surge",
+ "fingerprint": "389106652b7ab689a24df91174970153d1c9d2771b6c8ed86e4ac4abc20f4572",
  "info": "complete",
  "key": "nearest__surge__complete__s02",
  "metrics": {
@@ -92,5 +93,5 @@
  },
  "policy": "nearest",
  "seed": 2,
- "wall_seconds": 0.18
+ "wall_seconds": 0.15
 }

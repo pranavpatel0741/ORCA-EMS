@@ -1,0 +1,65 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 276,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 1.0,
+   "free": {
+    "er_bed": 0,
+    "nurse_slot": 12,
+    "or": 1,
+    "surgeon": 0,
+    "trauma_bay": 2,
+    "ward_bed": 8
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 5,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": false
+  },
+  "proposals": [
+   {
+    "eta_min": 9.8,
+    "patients": [
+     {
+      "id": "I-003-P0",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-003-P0"
+  ],
+  "counter_offer": "We can accept the patient now, but we anticipate needing the trauma bays for critical cases very soon. Currently, we have no free ER beds, but we can stabilize the patient until one becomes available.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We have the necessary capacity to treat the patient currently, but no available ER beds right now.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 951
+}

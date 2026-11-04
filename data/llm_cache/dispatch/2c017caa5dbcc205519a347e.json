@@ -1,0 +1,267 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [
+   {
+    "already_declined_by": [
+     "A",
+     "C"
+    ],
+    "eta_to_hospitals_min": {
+     "A": 20.8,
+     "B": 31.8,
+     "C": 7.5,
+     "D": 26.5
+    },
+    "hospitals_that_can_treat": [],
+    "id": "AMB-2",
+    "patients": [
+     {
+      "id": "MCI-1-P1",
+      "needs": {
+       "capability": "TRAUMA_L2",
+       "or_within_min": 60,
+       "surgeon": true,
+       "trauma_bay": true
+      },
+      "severity": "CRITICAL"
+     }
+    ]
+   }
+  ],
+  "calls": [
+   {
+    "called_min": 33,
+    "crews_already_assigned": [],
+    "id": "I-001",
+    "mode": "SINGLE",
+    "type": "MEDICAL_GENERAL",
+    "unsafe_scene": false,
+    "urgency": 0.5,
+    "victims_not_yet_seen": 1,
+    "waiting_patients": []
+   },
+   {
+    "called_min": 35,
+    "crews_already_assigned": [
+     {
+      "id": "AMB-4",
+      "state": "EN_ROUTE"
+     },
+     {
+      "id": "PVT-1",
+      "state": "EN_ROUTE"
+     },
+     {
+      "id": "PVT-2",
+      "state": "EN_ROUTE"
+     }
+    ],
+    "id": "MCI-2",
+    "mode": "MCI",
+    "type": "BUS_CRASH",
+    "unsafe_scene": false,
+    "urgency": 0.9,
+    "victims_not_yet_seen": 21,
+    "waiting_patients": []
+   },
+   {
+    "called_min": 61,
+    "crews_already_assigned": [],
+    "id": "I-002",
+    "mode": "SINGLE",
+    "type": "MEDICAL_GENERAL",
+    "unsafe_scene": false,
+    "urgency": 0.4,
+    "victims_not_yet_seen": 1,
+    "waiting_patients": []
+   }
+  ],
+  "en_route_units": [
+   {
+    "going_to": "MCI-2",
+    "id": "AMB-4"
+   },
+   {
+    "going_to": "MCI-2",
+    "id": "PVT-1"
+   },
+   {
+    "going_to": "MCI-2",
+    "id": "PVT-2"
+   }
+  ],
+  "feedback": [
+   {
+    "counter": "safety rule R2 (NO_CAPACITY_AT_ETA)",
+    "hospital_id": "C",
+    "suggested_hospital": null,
+    "type": "RULE",
+    "unit_id": "AMB-2"
+   },
+   {
+    "counter": "",
+    "hospital_id": "A",
+    "suggested_hospital": null,
+    "type": "REJECT",
+    "unit_id": "AMB-2"
+   }
+  ],
+  "free_unit_count": 1,
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "I-001": 24.2,
+     "I-002": 27.5,
+     "MCI-2": 27.2
+    },
+    "id": "AMB-3",
+    "type": "BLS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 2,
+     "surgeon": 1,
+     "trauma_bay": 2,
+     "ward_bed": 10
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 2,
+    "free": {
+     "er_bed": 2,
+     "nurse_slot": 12,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 1,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": -1,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 1,
+     "surgeon": 1,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 6
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "information": "partial",
+  "minute": 74,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "retry": 1,
+  "route_these_unit_ids": [
+   "AMB-2"
+  ],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [],
+    "rationale": "Assigned the free ambulance to MCI-2 as there are multiple critical patients needing transport.",
+    "unit_id": "AMB-3"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "There is one free unit available, which has been assigned to MCI-2, as it requires immediate attention for the waiting patients.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "Despite being declined by other hospitals, hospital B can treat patients with general needs and has the nearest ETA of 31.8 minutes.",
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "prompt_version": "8",
+ "tokens": 2535
+}

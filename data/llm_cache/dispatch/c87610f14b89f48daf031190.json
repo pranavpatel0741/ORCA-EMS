@@ -1,0 +1,225 @@
+{
+ "agent": "dispatch",
+ "input": {
+  "ambulances_needing_a_hospital": [],
+  "calls": [
+   {
+    "called_min": 35,
+    "crews_already_assigned": [],
+    "id": "MCI-2",
+    "mode": "MCI",
+    "type": "BUS_CRASH",
+    "unsafe_scene": false,
+    "urgency": 0.9,
+    "victims_not_yet_seen": 0,
+    "waiting_patients": [
+     {
+      "id": "MCI-2-P21",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P22",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P23",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     },
+     {
+      "id": "MCI-2-P26",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "MINOR"
+     }
+    ]
+   }
+  ],
+  "en_route_units": [],
+  "feedback": [],
+  "free_unit_count": 1,
+  "free_units": [
+   {
+    "eta_to_calls_min": {
+     "MCI-2": 9.7
+    },
+    "id": "AMB-1",
+    "type": "ALS"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 2,
+     "ward_bed": 15
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 10,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 9
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 8,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 3,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 0,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 3
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 1,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "information": "complete",
+  "minute": 233,
+  "private_firms": [
+   {
+    "id": "MedRide",
+    "units_left": 0
+   }
+  ],
+  "route_these_unit_ids": [],
+  "surge_active": true
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P21",
+     "MCI-2-P22"
+    ],
+    "rationale": "Assigned the first two minor patients to maximize usage of the free ALS unit.",
+    "unit_id": "AMB-1"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P23",
+     "MCI-2-P26"
+    ],
+    "rationale": "Assigned the next two minor patients to this unit before it departs for the hospital.",
+    "unit_id": "AMB-1"
+   }
+  ],
+  "mutual_aid": null,
+  "rationale": "All waiting patients are minor and can be treated at Hospital B, which is the only hospital available given the lack of beds.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B is the nearest capable location that can treat minor patients, despite having no ER beds",
+    "unit_id": "AMB-1"
+   }
+  ]
+ },
+ "prompt_version": "8",
+ "tokens": 2304
+}

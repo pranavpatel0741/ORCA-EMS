@@ -1,6 +1,7 @@
 {
  "backend": "openai",
  "demand": "normal",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "partial",
  "key": "agents__normal__partial__s01",
  "metrics": {
@@ -16,9 +17,9 @@
   "fallbacks": 0,
   "hospital_overload_minutes": 253,
   "incidents": 3,
-  "llm_cache_hit_rate": 0.905,
+  "llm_cache_hit_rate": 1.0,
   "llm_calls": 21,
-  "llm_latency_ms": 3419.0,
+  "llm_latency_ms": 0.0,
   "llm_tokens": 31397,
   "mean_rounds_per_resolution": 1.33,
   "negotiation": {
@@ -97,5 +98,5 @@
  },
  "policy": "agents",
  "seed": 1,
- "wall_seconds": 3.53
+ "wall_seconds": 0.11
 }

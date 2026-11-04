@@ -1,0 +1,36 @@
+{
+ "agent": "assessment",
+ "input": {
+  "call": {
+   "id": "MCI-2",
+   "narrative": "A bus flipped over! There are so many people, maybe 25 or so, people screaming.",
+   "reported_victims": 29,
+   "trapped_victims": true,
+   "type": "BUS_CRASH",
+   "violent": false
+  },
+  "retry": 1,
+  "scene_report": {
+   "critical": 1,
+   "minor": 18,
+   "serious": 13
+  }
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "estimated": {
+   "critical": 1,
+   "expectant": 0,
+   "minor": 18,
+   "serious": 13
+  },
+  "incident_id": "MCI-2",
+  "mode": "MCI",
+  "needs_fire": true,
+  "needs_police": false,
+  "rationale": "This is a mass-casualty incident with confirmed trapped victims, requiring fire services for extraction and rescue. The urgency is high due to the significant number of injuries reported and the need for immediate triage.",
+  "urgency": 0.9
+ },
+ "prompt_version": "2",
+ "tokens": 772
+}

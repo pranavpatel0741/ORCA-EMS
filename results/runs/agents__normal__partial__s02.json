@@ -1,6 +1,7 @@
 {
  "backend": "openai",
  "demand": "normal",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "partial",
  "key": "agents__normal__partial__s02",
  "metrics": {
@@ -90,5 +91,5 @@
  },
  "policy": "agents",
  "seed": 2,
- "wall_seconds": 0.07
+ "wall_seconds": 0.08
 }

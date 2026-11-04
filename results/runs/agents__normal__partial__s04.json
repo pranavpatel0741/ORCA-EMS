@@ -1,41 +1,41 @@
 {
  "backend": "openai",
  "demand": "normal",
+ "fingerprint": "8b495b65228eac07d1ae9dc146dd4e8b5d6f1c86c62d29bf631df7d71724fea7",
  "info": "partial",
  "key": "agents__normal__partial__s04",
  "metrics": {
-  "ambulance_minutes_at_er_over_base": 0.0,
-  "approvals": 1,
+  "ambulance_minutes_at_er_over_base": 6.0,
+  "approvals": 0,
   "calls": 5,
   "confidence_calibration": [
    {
-    "bin": "0.00-0.75",
+    "bin": "0.90-1.00",
     "decisions": 1,
-    "matched_hindsight_best": 1.0
+    "matched_hindsight_best": 0.0
    }
   ],
   "critical_on_time_rate": 1.0,
   "critical_patients": 1,
   "deaths": 0,
-  "escalations": 1,
-  "fallback_rate": 0.125,
-  "fallbacks": 2,
-  "hospital_overload_minutes": 351,
+  "escalations": 0,
+  "fallback_rate": 0.438,
+  "fallbacks": 7,
+  "hospital_overload_minutes": 318,
   "incidents": 5,
-  "llm_cache_hit_rate": 0.697,
-  "llm_calls": 33,
-  "llm_latency_ms": 14347.7,
-  "llm_tokens": 50097,
-  "mean_rounds_per_resolution": 1,
+  "llm_cache_hit_rate": 0.829,
+  "llm_calls": 35,
+  "llm_latency_ms": 12949.1,
+  "llm_tokens": 55108,
+  "mean_rounds_per_resolution": 0,
   "negotiation": {
-   "ACCEPT": 3,
-   "COUNTER": 1,
+   "ACCEPT": 1,
+   "COUNTER": 2,
    "ESCALATE": 2,
    "MUTUAL_AID_REQUEST": 1,
-   "PROPOSE": 4,
-   "RESOLVE": 1
+   "PROPOSE": 3
   },
-  "outcome_score": 5.826,
+  "outcome_score": 5.86,
   "overrides": 0,
   "patients": 6,
   "patients_not_in_care_at_end": 0,
@@ -43,10 +43,10 @@
    "R2": 1
   },
   "response_time": {
-   "mean": 20.4,
-   "median": 16,
+   "mean": 17,
+   "median": 9,
    "n": 5,
-   "p90": 53
+   "p90": 48
   },
   "response_time_by_severity": {
    "CRITICAL": {
@@ -62,10 +62,10 @@
     "p90": null
    },
    "MINOR": {
-    "mean": 24.7,
-    "median": 16,
+    "mean": 19,
+    "median": 5,
     "n": 3,
-    "p90": 53
+    "p90": 48
    },
    "SERIOUS": {
     "mean": 9,
@@ -77,10 +77,10 @@
   "stabilization_only_admissions": 0,
   "time_to_care_by_severity": {
    "CRITICAL": {
-    "mean": 56,
-    "median": 56,
+    "mean": 49,
+    "median": 49,
     "n": 1,
-    "p90": 56
+    "p90": 49
    },
    "EXPECTANT": {
     "mean": null,
@@ -89,21 +89,21 @@
     "p90": null
    },
    "MINOR": {
-    "mean": 46.2,
-    "median": 42.5,
+    "mean": 42.8,
+    "median": 37.5,
     "n": 4,
-    "p90": 70
+    "p90": 66
    },
    "SERIOUS": {
-    "mean": 37,
-    "median": 37,
+    "mean": 43,
+    "median": 43,
     "n": 1,
-    "p90": 37
+    "p90": 43
    }
   },
   "unserved_calls_30min": 1
  },
  "policy": "agents",
  "seed": 4,
- "wall_seconds": 15.03
+ "wall_seconds": 13.1
 }

@@ -1,0 +1,83 @@
+{
+ "agent": "hospital:B",
+ "input": {
+  "already_incoming": [
+   {
+    "id": "MCI-2-P14",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "SERIOUS"
+   },
+   {
+    "id": "MCI-2-P15",
+    "needs": {
+     "capability": "GENERAL",
+     "or_within_min": null,
+     "surgeon": false,
+     "trauma_bay": false
+    },
+    "severity": "MINOR"
+   }
+  ],
+  "hospital": "B",
+  "minute": 231,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "GENERAL"
+   ],
+   "contract": null,
+   "er_occupancy": 0.5,
+   "free": {
+    "er_bed": 3,
+    "nurse_slot": 13,
+    "or": 0,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 4
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": true,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 9.1,
+    "patients": [
+     {
+      "id": "I-003-P1",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "PVT-1"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "I-003-P1"
+  ],
+  "counter_offer": "We can accept I-003-P1 but currently have two patients on the way as well. Additional capacity may become available in about 15 minutes as we anticipate some patients being discharged.",
+  "decision": "COUNTER",
+  "hospital_id": "B",
+  "rationale": "We are able to accept one serious patient, but our current nurse staffing levels are close to minimum with incoming patients.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1040
+}

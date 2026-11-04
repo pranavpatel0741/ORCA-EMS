@@ -1,6 +1,7 @@
 {
  "backend": "none",
  "demand": "surge",
+ "fingerprint": "389106652b7ab689a24df91174970153d1c9d2771b6c8ed86e4ac4abc20f4572",
  "info": "complete",
  "key": "rule_based__surge__complete__s03",
  "metrics": {
@@ -94,5 +95,5 @@
  },
  "policy": "rule_based",
  "seed": 3,
- "wall_seconds": 0.17
+ "wall_seconds": 0.15
 }

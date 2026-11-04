@@ -1,0 +1,75 @@
+{
+ "agent": "hospital:A",
+ "input": {
+  "already_incoming": [],
+  "hospital": "A",
+  "minute": 126,
+  "my_status": {
+   "ambulances_at_door": 0,
+   "boarding": 0,
+   "capabilities": [
+    "CARDIAC_CATH",
+    "GENERAL",
+    "STROKE",
+    "TRAUMA_L1"
+   ],
+   "contract": null,
+   "er_occupancy": 0.667,
+   "free": {
+    "er_bed": 2,
+    "nurse_slot": 10,
+    "or": 2,
+    "surgeon": 0,
+    "trauma_bay": 1,
+    "ward_bed": 18
+   },
+   "min_nurse_coverage": 2,
+   "nurses_on_duty": 4,
+   "queue_scenario": 0,
+   "stabilization_only": false,
+   "surge_active": true
+  },
+  "proposals": [
+   {
+    "eta_min": 20.9,
+    "patients": [
+     {
+      "id": "MCI-2-P09",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     },
+     {
+      "id": "MCI-2-P10",
+      "needs": {
+       "capability": "GENERAL",
+       "or_within_min": null,
+       "surgeon": false,
+       "trauma_bay": false
+      },
+      "severity": "SERIOUS"
+     }
+    ],
+    "unit_id": "AMB-2"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "accepted_patient_ids": [
+   "MCI-2-P09"
+  ],
+  "counter_offer": "We can take 1 patient, MCI-2-P09, immediately. However, we currently do not have a surgeon available for MCI-2-P10 and thus cannot accept that patient at this time.",
+  "decision": "COUNTER",
+  "hospital_id": "A",
+  "rationale": "We have the capacity to treat one patient now but cannot accommodate the second due to the lack of available surgical staff.",
+  "staff_request_nurses": 0,
+  "suggested_hospital": null
+ },
+ "prompt_version": "3",
+ "tokens": 1011
+}

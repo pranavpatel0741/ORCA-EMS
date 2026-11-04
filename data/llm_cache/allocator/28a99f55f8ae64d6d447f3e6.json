@@ -1,0 +1,230 @@
+{
+ "agent": "allocator",
+ "input": {
+  "conflicts": [
+   {
+    "patient_ids": [
+     "MCI-2-P07",
+     "MCI-2-P08"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "PVT-2"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P09",
+     "MCI-2-P10"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "PVT-2"
+   },
+   {
+    "patient_ids": [
+     "MCI-2-P11",
+     "MCI-2-P12"
+    ],
+    "to_call": "MCI-2",
+    "type": "duplicate",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "hospitals": [
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "STROKE",
+     "TRAUMA_L1"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 4,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 13
+    },
+    "id": "A",
+    "owner": "PUBLIC",
+    "queue": 2,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 11,
+     "or": 0,
+     "surgeon": 0,
+     "trauma_bay": 1,
+     "ward_bed": 6
+    },
+    "id": "B",
+    "owner": "PUBLIC",
+    "queue": 0,
+    "stabilization_only": true,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": false
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "CARDIAC_CATH",
+     "GENERAL",
+     "TRAUMA_L2"
+    ],
+    "contract": null,
+    "er_beds_left_after_ambulances_on_the_way": 0,
+    "free": {
+     "er_bed": 0,
+     "nurse_slot": 12,
+     "or": 1,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 7
+    },
+    "id": "C",
+    "owner": "PUBLIC",
+    "queue": 10,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "yes",
+    "trauma_center": true
+   },
+   {
+    "already_sent": 0,
+    "board_age_min": 14,
+    "boarding": 0,
+    "capabilities": [
+     "GENERAL"
+    ],
+    "contract": {
+     "accepts_critical_trauma": false,
+     "eligible_severities": [
+      "SERIOUS"
+     ],
+     "max_surge_patients": 4
+    },
+    "er_beds_left_after_ambulances_on_the_way": 1,
+    "free": {
+     "er_bed": 1,
+     "nurse_slot": 5,
+     "or": 2,
+     "surgeon": 0,
+     "trauma_bay": 0,
+     "ward_bed": 4
+    },
+    "id": "D",
+    "owner": "PRIVATE",
+    "queue": 0,
+    "stabilization_only": false,
+    "takes_ambulance_patients": "now: stable SERIOUS non-trauma patients only",
+    "trauma_center": false
+   }
+  ],
+  "minute": 119,
+  "offers": [],
+  "units": [
+   {
+    "already_declined_by": [],
+    "eta_to_hospitals_min": {
+     "A": 1.0,
+     "B": 11.1,
+     "C": 13.5,
+     "D": 12.5
+    },
+    "hospitals_that_can_treat": [
+     {
+      "er_beds_left_after_ambulances_on_the_way": 1,
+      "eta_min": 11.1,
+      "id": "B"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 1,
+      "eta_min": 12.5,
+      "id": "D"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 1.0,
+      "id": "A"
+     },
+     {
+      "er_beds_left_after_ambulances_on_the_way": 0,
+      "eta_min": 13.5,
+      "id": "C"
+     }
+    ],
+    "id": "PVT-2",
+    "patients": [],
+    "state": "RETURNING"
+   }
+  ]
+ },
+ "model": "gpt-4o-mini",
+ "output": {
+  "assignments": [
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P07",
+     "MCI-2-P08"
+    ],
+    "rationale": "Assigned to hospital B due to available capacity for patients.",
+    "unit_id": "PVT-2"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P09",
+     "MCI-2-P10"
+    ],
+    "rationale": "Assigned to hospital D as they can only take stable SERIOUS non-trauma patients.",
+    "unit_id": "PVT-2"
+   },
+   {
+    "incident_id": "MCI-2",
+    "patient_ids": [
+     "MCI-2-P11",
+     "MCI-2-P12"
+    ],
+    "rationale": "Assigned to hospital B due to available capacity for patients.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "escalate": false,
+  "rationale": "Patients were assigned to hospitals B and D based on available resources and capabilities, ensuring no overload on a single hospital.",
+  "routes": [
+   {
+    "hospital_id": "B",
+    "rationale": "Hospital B has available ER beds and can take patients without violating safety rules.",
+    "unit_id": "PVT-2"
+   },
+   {
+    "hospital_id": "D",
+    "rationale": "Hospital D can take stable SERIOUS non-trauma patients due to available ER bed.",
+    "unit_id": "PVT-2"
+   }
+  ],
+  "unassigned_patient_ids": []
+ },
+ "prompt_version": "4",
+ "tokens": 2009
+}
