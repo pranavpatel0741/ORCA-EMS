@@ -36,4 +36,4 @@ guided demo runs offline, and `LLM_MODE=cache_only` reuses the saved model answe
 - Simulated environment (incidents, hospitals, ambulances, nurses, trauma teams, police and fire): `sim/`; assumptions in `ASSUMPTIONS.md`; reproducible with a seed
 - Dashboard (map, resource status, agent activity, negotiation history, performance): `dashboard_v2/`, run with `python dashboard_v2/run.py`
 - Evaluation against baselines: `eval/`, `results/summary.md`, `docs/REPORT.md` §5
-- Presentation slides: `docs/slides/index.html`
+- Presentation slides: `docs/ORCA-EMS_presentation.pptx`
