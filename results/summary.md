@@ -1,5 +1,9 @@
 # ORCA-EMS results
 
+> **Historical snapshot (audited 2026-10-31).** These tables predate the grounding and
+> definitive-care metric fixes and have not been regenerated. See
+> [the audit](../docs/AGENT_EVAL_AUDIT.md) before citing these numbers.
+
 80 runs · seeds [1, 2, 3, 4, 5] · policies ['nearest', 'rule_based', 'agents_no_negotiation', 'agents']
 
 Synthetic simulation; the outcome score is a modeled survival sum, not a clinical measure. Mean ± standard deviation over seeds.

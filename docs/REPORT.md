@@ -1,7 +1,7 @@
 # ORCA-EMS: When does agent negotiation help emergency coordination?
 
-*Course mid-term report (draft). Results tables are generated in `results/summary.md`; the
-agent rows are filled in once the LLM runs are recorded.*
+*Course report. Results tables are generated in `results/summary.md` from the recorded
+5-seed grid (gpt-4o-mini).*
 
 ## 1. Problem
 
@@ -84,6 +84,11 @@ coordination, and when are deterministic rules sufficient?
 
 ## 5. Results
 
+> **Historical results — audit correction (2026-10-31).** The tables below predate fixes to
+> model-output grounding, staff-information access, and definitive-care metrics. Four stored
+> records also differ from their associated logs. Do not present these tables as current-code
+> results until the experiment grid is regenerated. See [the agent/evaluation audit](AGENT_EVAL_AUDIT.md).
+
 **Baselines, 5 seeds.** Mean values for the surge scenario:
 
 | | Deaths | Outcome score | Capacity failures | Response (min) | ER minutes over base |
@@ -99,9 +104,11 @@ minutes waiting at ER doors, because it serves mass-casualty patients first and 
 patients to hospitals that were farther away. On a normal day the two baselines perform almost
 the same. This is the bar the agents must clear.
 
-**Agents (gpt-4o-mini, 5 seeds, 40 LLM runs).** Mean values; full tables with spreads are in
-`results/summary.md`. Every LLM answer is saved in `data/llm_cache/`, so the runs replay exactly
-with `LLM_MODE=cache_only` and no API key.
+**Historical agents (gpt-4o-mini, 5 seeds, 40 agent-policy runs; 36 with model calls and 4 empty
+scenarios).** Mean values; full tables with spreads are in
+`results/summary.md`. Historical model answers are saved in `data/llm_cache/`. With the current
+grounding and information-boundary fixes, 28 of the 40 agent-policy cells need new answers;
+the old cache does not reproduce the entire grid with current code.
 
 | | Critical on time | Critical: call to care (min) | Response (min) | ER minutes over base | Deaths |
 |---|---|---|---|---|---|

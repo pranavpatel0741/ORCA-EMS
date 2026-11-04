@@ -94,9 +94,9 @@ ORCA-EMS: Orchestrated Response and Capacity Allocation (formerly EMERGE-AI).
 - [x] M6 Agent models, tools, single agents (offline-tested; live LLM check needs a key)
 - [x] M7 Orchestrator, negotiation, confidence, approval, fallbacks
 - [x] M8 Integration check (automated, scripted backend)
-- [~] M9 Experiments (grid + tables done; baselines run; LLM runs pending a key)
+- [x] M9 Experiments (5-seed grid, baselines and gpt-4o-mini agents)
 - [x] M10 Dashboard (live, replay, agents, interactive approval)
-- [~] M11 Documentation (README, report draft, attribution, assumptions done; final results pending)
+- [x] M11 Documentation (README, report with results, attribution, assumptions, submission text)
 
 ## Log
 
