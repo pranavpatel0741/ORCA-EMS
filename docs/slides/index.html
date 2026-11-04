@@ -1,0 +1,440 @@
+<title>ORCA-EMS Presentation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one 16:9 slide fitted to the window, sized in container units so it scales as a unit; stacked on phones.
+   Single committed look for projection (dispatch-console navy + signal orange, matching the dashboard). */
+:root{
+  --navy:#13213a; --navy-2:#1d2b40; --paper:#f5f6f8; --card:#ffffff;
+  --ink:#1d2b40; --muted:#5b6b82; --line:#dde2ea; --orange:#ed713d; --orange-soft:#fde9df;
+  --good:#2f8a66; --good-soft:#e2f2ea; --bad:#c3473b; --bad-soft:#f9e3e0; --amber:#b7791f;
+  --display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:#0b1426;color:var(--ink);font-family:var(--body);margin:0;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+.stage{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-block:12px;box-sizing:border-box}
+.deck{position:relative;width:min(100%, calc((100vh - 96px) * 16 / 9));aspect-ratio:16/9;max-width:100%}
+.slide{position:absolute;inset:0;container-type:inline-size;background:var(--paper);border-radius:6px;overflow:hidden;
+  display:none;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.slide.on{display:block}
+.in{position:absolute;inset:0;padding:4.6cqw 6cqw 4.6cqw;display:flex;flex-direction:column;gap:1.8cqw;box-sizing:border-box}
+.dark{background:var(--navy);color:#e8edf5}
+.dark .muted{color:#9fb0c8}
+.kicker{font-family:var(--mono);font-size:1.15cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.005em}
+h1{font-size:6.6cqw;line-height:1}
+h2{font-size:3.6cqw;line-height:1.05}
+p,li{font-size:1.65cqw;line-height:1.38;margin:0}
+.muted{color:var(--muted)}
+ul{margin:0;padding-left:1.6cqw;display:flex;flex-direction:column;gap:.9cqw}
+li::marker{color:var(--orange)}
+b{font-weight:700}
+.foot{position:absolute;left:6cqw;right:6cqw;bottom:2.2cqw;display:flex;justify-content:space-between;font-family:var(--mono);font-size:1cqw;color:var(--muted);letter-spacing:.06em}
+.dark .foot{color:#7f91ab}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3.2cqw;flex:1;min-height:0}
+.cols>*{min-width:0}
+.c3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6cqw}
+.c4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4cqw}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:.5cqw;padding:1.4cqw 1.5cqw;display:flex;flex-direction:column;gap:.4cqw}
+.tile .n{font-family:var(--display);font-weight:700;font-size:3.3cqw;line-height:1;color:var(--navy-2)}
+.tile .l{font-size:1.35cqw;color:var(--muted);line-height:1.3}
+.mono{font-family:var(--mono)}
+.chip{display:inline-block;font-family:var(--mono);font-size:1.05cqw;padding:.25cqw .7cqw;border-radius:2cqw;letter-spacing:.04em}
+.chip.g{background:var(--good-soft);color:var(--good)} .chip.r{background:var(--bad-soft);color:var(--bad)} .chip.o{background:var(--orange-soft);color:#b4511f}
+/* flow diagram */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2cqw;align-items:stretch}
+.agent{background:var(--card);border:1px solid var(--line);border-top:.35cqw solid var(--orange);border-radius:.4cqw;padding:1.3cqw;display:flex;flex-direction:column;gap:.5cqw}
+.agent h3{font-family:var(--display);font-size:2.1cqw;margin:0}
+.agent p{font-size:1.4cqw}
+.agent .out{font-family:var(--mono);font-size:1.05cqw;color:var(--muted);margin-top:auto}
+.msg{background:var(--navy);color:#dbe3ef;border-radius:.5cqw;padding:1.6cqw 1.8cqw;font-family:var(--mono);font-size:1.22cqw;line-height:1.55;white-space:pre;overflow:hidden}
+.msg .k{color:#8fa3bf} .msg .s{color:#ffb38f} .msg .h{color:var(--orange)}
+.shot{width:100%;height:100%;object-fit:cover;object-position:top left;border-radius:.5cqw;border:1px solid var(--line);display:block}
+table{border-collapse:collapse;width:100%;font-size:1.5cqw;font-variant-numeric:tabular-nums}
+th{font-family:var(--mono);font-weight:500;font-size:1.05cqw;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;padding:.6cqw .8cqw;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td{padding:.55cqw .8cqw;text-align:right;border-bottom:1px solid var(--line)}
+tr.sec td{font-family:var(--mono);font-size:1.05cqw;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);border-bottom:none;padding-top:1.2cqw}
+tr.us td{font-weight:700;background:#fff}
+.best{color:var(--good);font-weight:700}
+.worse{color:var(--bad)}
+.verdict{display:grid;grid-template-columns:auto 1fr auto;gap:.6cqw 1.6cqw;align-items:center}
+.verdict .h{font-family:var(--display);font-weight:700;font-size:2.2cqw;color:var(--navy-2)}
+svg text{font-family:var(--body)}
+/* controls */
+.bar{display:flex;align-items:center;gap:10px;color:#9fb0c8;font:13px var(--mono)}
+.bar button{background:#1d2b40;color:#e8edf5;border:1px solid #33435c;border-radius:4px;padding:6px 12px;font:13px var(--mono);cursor:pointer}
+.bar button:hover{border-color:var(--orange)}
+.bar button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.notes{width:min(100%, calc((100vh - 96px) * 16 / 9));max-width:100%;background:#16233b;color:#cdd7e5;border-radius:6px;padding:12px 16px;font-size:15px;line-height:1.5;box-sizing:border-box;max-height:30vh;overflow:auto}
+.notes b{color:var(--orange);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+.note-src{display:none}
+body.with-notes .deck{width:min(100%, calc((70vh - 110px) * 16 / 9))}
+/* phones: stack every slide, notes inline */
+@media (max-width:700px){
+  body{overflow:auto}
+  .stage{height:auto;justify-content:flex-start}
+  .deck{width:100%;aspect-ratio:auto;display:flex;flex-direction:column;gap:14px}
+  .slide{position:relative;display:block;aspect-ratio:16/9}
+  .bar,.notes{display:none}
+}
+</style>
+
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide dark">
+  <div class="in" style="justify-content:center;gap:2.6cqw">
+    <div class="kicker">Mid-term project · Intelligent Agents &amp; Multi-Agent Systems</div>
+    <h1>ORCA-EMS</h1>
+    <p style="font-size:2.6cqw;line-height:1.25;max-width:62cqw;color:#e8edf5">Can AI agents that negotiate route ambulances and share hospital capacity better than fixed rules?</p>
+    <p class="muted" style="font-size:1.6cqw">Orchestrated Response and Capacity Allocation · OpenAI Agents SDK · gpt-4o-mini</p>
+    <p class="mono" style="font-size:1.35cqw;color:var(--orange)">github.com/pranavpatel0741/ORCA-EMS</p>
+  </div>
+  <div class="foot"><span>Pranav Patel · Northeastern University</span><span>November 2026</span></div>
+  <div class="note-src">Introduce the project in one sentence: a simulated town where AI agents coordinate ambulances and hospitals during emergencies. The question is not whether agents can talk, but whether their talking improves outcomes compared with fixed rules. Everything is on the public GitHub repo, including every model answer, so the results can be checked.</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">The problem</div>
+    <h2>The nearest ER is not always the right ER</h2>
+    <div class="cols">
+      <ul>
+        <li>Ambulances usually go to the <b>nearest</b> emergency department, even when it is full.</li>
+        <li>A full ER causes <b>offload delay</b>: the crew waits with the patient and the ambulance is out of service.</li>
+        <li>In a mass-casualty incident the nearest hospital floods while others still have beds.</li>
+        <li>Shared status boards are self-reported, refresh every 15 minutes or so, and cannot negotiate.</li>
+      </ul>
+      <div style="display:flex;flex-direction:column;gap:1.2cqw">
+        <div class="tile" style="border-left:.35cqw solid var(--orange)">
+          <div class="l mono" style="font-size:1.05cqw;letter-spacing:.1em;text-transform:uppercase">Research question</div>
+          <p style="font-size:1.9cqw"><b>When does negotiation between AI agents improve emergency coordination, and when are rules enough?</b></p>
+        </div>
+        <div class="tile"><p><b>H1</b> Negotiation reduces conflicts and capacity failures.</p></div>
+        <div class="tile"><p><b>H2</b> Negotiation gets critical patients to care faster under scarcity.</p></div>
+        <div class="tile"><p><b>H3</b> The benefit is larger in a surge and with incomplete information.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>02</span></div>
+  <div class="note-src">Explain offload delay: a crew cannot leave until the ER takes the patient, so a crowded ER also removes ambulances from service. In a mass-casualty event the nearest hospital gets overwhelmed while others have space. Real status boards show information but cannot negotiate. That gap is what the agents try to fill, and these three hypotheses are what I tested.</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Simulated environment</div>
+    <h2>A fictional town of 50,000, sized from U.S. per-capita ratios</h2>
+    <div class="c4">
+      <div class="tile"><div class="n">4</div><div class="l">hospitals: Level-1 and Level-2 trauma centers, a community hospital, a private hospital with a surge contract</div></div>
+      <div class="tile"><div class="n">22</div><div class="l">ER beds, 114 ward beds; admitted patients board in the ER when wards are full</div></div>
+      <div class="tile"><div class="n">4 + 2</div><div class="l">city ambulances plus 2 private units through mutual aid</div></div>
+      <div class="tile"><div class="n">2</div><div class="l">trauma surgical teams; nurses with coverage limits who can be lent between hospitals</div></div>
+    </div>
+    <div class="cols" style="grid-template-columns:1.1fr 1fr">
+      <ul>
+        <li><b>First responders:</b> police secure violent scenes before ambulances enter; fire crews extricate trapped victims.</li>
+        <li><b>Patients:</b> severity, needs, and a synthetic survival curve that decays with time to care.</li>
+        <li><b>Engine:</b> deterministic 1-minute ticks; the same seed gives the same calls, patients and hospital load.</li>
+      </ul>
+      <div style="display:flex;flex-direction:column;gap:1cqw">
+        <div class="tile"><p><span class="chip g">Complete info</span>&nbsp; live hospital capacity; victim counts known at the call.</p></div>
+        <div class="tile"><p><span class="chip o">Partial info</span>&nbsp; status board refreshed every 15 min; victim counts known only after the first unit reports.</p></div>
+        <p class="muted" style="font-size:1.35cqw">All data synthetic and seeded. Assumptions are listed in ASSUMPTIONS.md.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>03</span></div>
+  <div class="note-src">The town is small on purpose so it can be run many times. Resource counts come from national per-capita averages, scaled to 50,000 residents. The important design choice is the two information settings: with partial information, hospital capacity is only updated every 15 minutes, like a real status board. That is where coordination should matter most.</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Agents · OpenAI Agents SDK · typed outputs</div>
+    <h2>Four agent roles that talk in structured messages</h2>
+    <div class="flow">
+      <div class="agent"><h3>Assessment</h3><p>Reads each call and scene report; estimates urgency and victim counts.</p><div class="out">→ priority report</div></div>
+      <div class="agent"><h3>Dispatch</h3><p>Assigns ambulances and proposes a hospital for each patient.</p><div class="out">→ PROPOSE</div></div>
+      <div class="agent"><h3>Hospital A–D</h3><p>One agent per hospital. Checks its own beds and nurses; can borrow nurses.</p><div class="out">→ ACCEPT · COUNTER · REJECT</div></div>
+      <div class="agent"><h3>Allocator</h3><p>Settles conflicts when hospitals and dispatch disagree.</p><div class="out">→ final assignment</div></div>
+    </div>
+    <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:2.4cqw">
+      <div class="msg"><span class="h">// a real answer from Hospital A's agent (gpt-4o-mini)</span>
+<span class="k">sender</span>      <span class="s">"hospital_A"</span>   <span class="k">recipient</span> <span class="s">"dispatch"</span>
+<span class="k">type</span>        <span class="s">"COUNTER"</span>      <span class="k">incident</span>  <span class="s">"MCI-2"</span>
+<span class="k">accepted</span>    [<span class="s">"MCI-2-P08"</span>]
+<span class="k">counter</span>     <span class="s">"We can accept MCI-2-P09, but only if we</span>
+<span class="s">             receive additional nurse coverage..."</span>
+<span class="k">staff_request_nurses</span>  2</div>
+      <ul>
+        <li>Every message carries sender, recipient, type, incident ID and proposed action.</li>
+        <li>Each agent sees only what its role would know. Hospitals see their own staff, not the others'.</li>
+        <li>Answers are checked against what the agent was shown before they are used.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>04</span></div>
+  <div class="note-src">These are the four roles the brief asks for, built with the OpenAI Agents SDK and typed outputs, so every answer has a fixed structure. The example on the left is a real answer from the Hospital A agent during the bus crash: it accepts one patient and counters on the second unless it gets two more nurses. That nurse request then becomes a negotiation with the other hospitals.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Negotiation and safety</div>
+    <h2>Propose, accept or counter, resolve, with rules as a safety net</h2>
+    <svg viewBox="0 0 1100 170" style="width:100%;height:auto" role="img" aria-label="Negotiation loop">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5b6b82"/></marker></defs>
+      <g font-size="19" fill="#1d2b40">
+        <rect x="10" y="50" width="170" height="70" rx="6" fill="#fff" stroke="#dde2ea"/><text x="95" y="92" text-anchor="middle" font-weight="700">Dispatch proposes</text>
+        <rect x="250" y="50" width="190" height="70" rx="6" fill="#fff" stroke="#dde2ea"/><text x="345" y="82" text-anchor="middle" font-weight="700">Hospital replies</text><text x="345" y="106" text-anchor="middle" font-size="15" fill="#5b6b82">accept · counter · reject</text>
+        <rect x="510" y="50" width="170" height="70" rx="6" fill="#fff" stroke="#dde2ea"/><text x="595" y="82" text-anchor="middle" font-weight="700">Allocator</text><text x="595" y="106" text-anchor="middle" font-size="15" fill="#5b6b82">resolves conflicts</text>
+        <rect x="750" y="50" width="170" height="70" rx="6" fill="#fff" stroke="#ed713d"/><text x="835" y="82" text-anchor="middle" font-weight="700">Safety check</text><text x="835" y="106" text-anchor="middle" font-size="15" fill="#5b6b82">rules R1–R9</text>
+        <rect x="990" y="50" width="100" height="70" rx="6" fill="#13213a"/><text x="1040" y="92" text-anchor="middle" font-weight="700" fill="#fff">Execute</text>
+      </g>
+      <g stroke="#5b6b82" stroke-width="2" fill="none" marker-end="url(#ar)">
+        <path d="M180 85H246"/><path d="M440 85H506"/><path d="M680 85H746"/><path d="M920 85H986"/>
+        <path d="M345 50C345 10 95 10 95 46"/>
+      </g>
+      <text x="220" y="22" font-size="15" fill="#b4511f" font-family="IBM Plex Mono,monospace">counter → revised proposal, up to 3 rounds</text>
+      <text x="835" y="152" text-anchor="middle" font-size="15" fill="#5b6b82">risky → human review</text>
+    </svg>
+    <div class="c3">
+      <div class="tile"><p><b>Contract Net, adapted.</b> The classic announce / bid / award protocol becomes propose / counter / resolve between dispatch and hospitals.</p></div>
+      <div class="tile"><p><b>Safety rules on every decision.</b> A critical patient rides alone, critical trauma goes to a trauma center, no entry to unsecured scenes, minimum nurse coverage.</p></div>
+      <div class="tile"><p><b>Rule backup, labeled.</b> If an answer is unusable or names a patient or hospital it was not shown, the rule-based policy decides and the log says so.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>05</span></div>
+  <div class="note-src">Negotiation follows the Contract Net idea from multi-agent systems. A hospital can counter, and dispatch gets up to three rounds to revise. The allocator steps in when they still disagree. Every decision, from agents or baselines, passes the same safety rules, and risky ones go to human review. If the model gives an unusable answer, a rule-based backup decides, and the dashboard shows which one decided.</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Dynamic visualization · Streamlit + Plotly</div>
+    <h2>A live command dashboard</h2>
+    <div class="cols" style="grid-template-columns:1.55fr 1fr;gap:2.4cqw">
+      <img class="shot" src="img/1-response-overview.jpg" alt="Response overview workspace during the school bus crash: map, incident desk and counters">
+      <div style="display:flex;flex-direction:column;gap:1cqw">
+        <div class="tile"><p><b>Response overview</b> · incident map, severity, assigned units, live counters</p></div>
+        <div class="tile"><p><b>Hospital network · Ambulance fleet</b> · ER beds, nurses, trauma teams, unit status</p></div>
+        <div class="tile"><p><b>Decision room</b> · each agent's messages, proposals and decisions, labeled AI agent, rule backup or simulation</p></div>
+        <div class="tile"><p><b>Run report</b> · response time, patients served, unserved critical patients, utilization, conflicts</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>School bus crash, minute 75, replay of a real gpt-4o-mini run</span><span>06</span></div>
+  <div class="note-src">This is where I switch to the live demo. Each workspace maps to one of the views the brief asks for. The Decision room is the key one: every message shows who produced it, so you can tell a real model answer from the rule backup. Saved runs replay with no internet or API key.</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Experiment</div>
+    <h2>80 paired runs on identical scenarios</h2>
+    <div class="cols" style="grid-template-columns:1fr 1fr">
+      <div style="display:flex;flex-direction:column;gap:1.1cqw">
+        <div class="tile"><p class="mono" style="font-size:1.25cqw;color:var(--muted)">POLICIES</p>
+          <p><b>Nearest hospital</b> · how it is often done today</p>
+          <p><b>Rule-based</b> · severity queue, capacity-aware, mutual aid</p>
+          <p><b>Agents, no negotiation</b> · hospitals cannot counter</p>
+          <p><b>Agents, negotiating</b> · the full system</p></div>
+        <p class="mono" style="font-size:1.5cqw;color:var(--navy-2)">4 policies × 2 info × 2 demand × 5 seeds = <b style="color:var(--orange)">80 runs</b></p>
+      </div>
+      <ul>
+        <li><b>Paired:</b> each seed fixes the calls, patients and hospital load for every policy.</li>
+        <li><b>Surge day:</b> a normal day plus a shooting at minute 30 and a bus crash with 28–34 victims at minute 35.</li>
+        <li><b>Same inputs:</b> baselines use the same observations and travel-time model as the agents.</li>
+        <li><b>Metrics:</b> critical patients in care within 60 min, call-to-care time, response time, ambulance minutes waiting at the ER, deaths, rule-backup rate, cost.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>07</span></div>
+  <div class="note-src">To show a measurable improvement I compare four policies on exactly the same scenarios. The agents without negotiation isolate the effect of negotiation itself. The rule-based baseline is deliberately strong, so the agents have to beat good rules, not a strawman. This grid was re-run on the final code, after the audit I mention at the end.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Result 1 · normal day, incomplete hospital information</div>
+    <h2>Agents got every critical patient into care within 60 minutes. Neither baseline did.</h2>
+    <div class="cols" style="grid-template-columns:1.5fr 1fr;align-items:center">
+      <svg viewBox="0 0 720 330" style="width:100%;height:auto" role="img" aria-label="Critical patients, call to care in minutes: Nearest 84, Rule-based 68, Agents without negotiation 53, Agents negotiating 53">
+        <text x="0" y="18" font-size="16" fill="#5b6b82" font-family="IBM Plex Mono,monospace">CRITICAL PATIENTS · CALL TO CARE (MIN) · MEAN OF 5 SEEDS</text>
+        <g font-size="12" fill="#5b6b82" font-family="IBM Plex Mono,monospace" text-anchor="middle">
+          <text x="200" y="322">0</text><text x="315" y="322">20</text><text x="430" y="322">40</text><text x="545" y="322">60</text><text x="660" y="322">80</text>
+        </g>
+        <g stroke="#dde2ea"><path d="M200 40V305M315 40V305M430 40V305M660 40V305"/></g>
+        <!-- scale: 0..80 min -> 200..660 px (5.75 px/min) -->
+        <g font-size="17" fill="#1d2b40">
+          <text x="190" y="82" text-anchor="end">Nearest</text><rect x="200" y="60" width="483" height="34" fill="#c3473b"/><text x="691" y="83" font-weight="700">84</text>
+          <text x="190" y="146" text-anchor="end">Rule-based</text><rect x="200" y="124" width="391" height="34" fill="#c3473b" fill-opacity=".75"/><text x="599" y="147" font-weight="700">68</text>
+          <text x="190" y="210" text-anchor="end">Agents, no negotiation</text><rect x="200" y="188" width="305" height="34" fill="#2f8a66"/><text x="513" y="211" font-weight="700">53</text>
+          <text x="190" y="274" text-anchor="end">Agents, negotiating</text><rect x="200" y="252" width="305" height="34" fill="#2f8a66"/><text x="513" y="275" font-weight="700">53</text>
+        </g>
+        <path d="M545 40V305" stroke="#ed713d" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="551" y="52" font-size="13" fill="#b4511f" font-family="IBM Plex Mono,monospace">60-min target</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1.2cqw">
+        <div class="tile"><div class="l">Critical patients in care within 60 min</div>
+          <div style="display:flex;gap:2cqw;align-items:baseline"><div class="n" style="color:var(--good)">100%</div><div class="l">agents</div></div>
+          <div style="display:flex;gap:2cqw;align-items:baseline"><div class="n" style="color:var(--bad)">0%</div><div class="l">both baselines</div></div></div>
+        <p style="font-size:1.6cqw">The agents read scene reports and hospital facts and avoided hospitals that turned out to be full, <b>15–31 minutes sooner</b> on average.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>results/summary.md · normal demand · partial information</span><span>08</span></div>
+  <div class="note-src">This is the clearest result. On a normal day with a stale status board, both baselines send critical patients to hospitals that look free but are not, and none of them reach care within an hour. The agents use the scene reports and hospital facts and get every critical patient there within 60 minutes. Negotiation does not add anything here because hospitals rarely need to counter on a normal day.</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Result 2 · mass-casualty surge</div>
+    <h2>Negotiation cut ambulance waiting at ER doors, but the agents responded slower</h2>
+    <div class="cols" style="flex:0 0 auto;gap:3cqw">
+      <div>
+      <p class="kicker" style="margin-bottom:.6cqw">Partial information</p>
+      <table>
+        <thead><tr><th>Policy</th><th>Call to care</th><th>Response</th><th>ER wait</th><th>Deaths</th></tr></thead>
+        <tbody>
+        <tr><td>Nearest</td><td>63</td><td>25</td><td>288</td><td>3.8</td></tr>
+        <tr><td>Rule-based</td><td>63</td><td>48</td><td>536</td><td>3.6</td></tr>
+        <tr><td>Agents, no negotiation</td><td>65</td><td>62</td><td>558</td><td>3.6</td></tr>
+        <tr class="us"><td>Agents, negotiating</td><td>60</td><td>70</td><td>504</td><td>4.0</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div>
+      <p class="kicker" style="margin-bottom:.6cqw">Complete information</p>
+      <table>
+        <thead><tr><th>Policy</th><th>Call to care</th><th>Response</th><th>ER wait</th><th>Deaths</th></tr></thead>
+        <tbody>
+        <tr><td>Nearest</td><td>62</td><td>32</td><td>299</td><td>3.6</td></tr>
+        <tr><td>Rule-based</td><td>67</td><td>46</td><td>548</td><td>3.0</td></tr>
+        <tr><td>Agents, no negotiation</td><td>69</td><td>56</td><td>540</td><td>3.4</td></tr>
+        <tr class="us"><td>Agents, negotiating</td><td>66</td><td>48</td><td>517</td><td>3.4</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <ul>
+      <li>Against the same agents without negotiation: <b>54 fewer ambulance minutes</b> waiting at ER doors (partial info) and critical patients in care <b>3–5 min sooner</b>.</li>
+      <li>Against the baselines: the first ambulance arrives later and deaths are about the same. Critical patients in care within 60 min: 33–37% for every policy.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Mean of 5 seeds · minutes · ER wait = ambulance minutes at the ER beyond a 10-min base</span><span>09</span></div>
+  <div class="note-src">In the surge, negotiation helps compared with the same agents without it: hospitals push back before they overflow, so ambulances spend less time stuck at ER doors. But the agents commit ambulances to the mass-casualty patients first, so other calls wait longer for a first unit. Nearest-hospital looks good on ER waiting only because it piles patients into one hospital and leaves more of them not in care. Deaths are about the same across policies.</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">What held up and what did not</div>
+    <h2>An honest scorecard</h2>
+    <div class="cols" style="grid-template-columns:1.1fr 1fr">
+      <div class="verdict">
+        <span class="h">H1</span><p>Negotiation reduces capacity failures</p><span class="chip r">not supported</span>
+        <span class="h">H2</span><p>Faster critical care under scarcity</p><span class="chip o">mixed</span>
+        <span class="h">H3</span><p>Bigger gain in surge and partial info</p><span class="chip r">not supported</span>
+        <span></span><p class="muted" style="font-size:1.45cqw;grid-column:2 / 4">The clear gain is on a normal day with incomplete information, not in the surge.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.1cqw">
+        <div class="tile"><p><b>Self-audit before the final run.</b> Some agent answers named patients or hospitals they had not been shown, and two metrics were wrong. I fixed both and re-ran all 80 runs.</p></div>
+        <div class="c3" style="gap:1cqw">
+          <div class="tile"><div class="n">25%</div><div class="l">decisions made by the rule backup</div></div>
+          <div class="tile"><div class="n">69</div><div class="l">model calls per negotiated run</div></div>
+          <div class="tile"><div class="n">≈$1</div><div class="l">for the whole grid on gpt-4o-mini</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>docs/REPORT.md §5 · docs/AGENT_EVAL_AUDIT.md</span><span>10</span></div>
+  <div class="note-src">I want to be clear about what did not work. Two of three hypotheses were not supported, and the third is mixed. Before the final run I audited my own system and found the agents sometimes referred to patients or hospitals they had never been shown. I added checks, so those answers now go to the rule backup, which is why a quarter of decisions come from the backup. The old results are archived for comparison.</div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="in">
+    <div class="kicker">Limitations and next steps</div>
+    <h2>Descriptive evidence from a synthetic town</h2>
+    <div class="cols">
+      <ul>
+        <li>Synthetic patients and capacities; the outcome model is not clinically validated.</li>
+        <li>Straight-line travel at a fixed speed; no street network.</li>
+        <li>One town, 5 seeds, one small model: no significance test.</li>
+        <li>Doctors are modeled as trauma surgical teams; general ER physicians are folded into ER bed capacity.</li>
+      </ul>
+      <ul>
+        <li><b>Shadow mode</b> on real dispatch logs: compare agent suggestions with what dispatchers did.</li>
+        <li><b>Transfers</b> between hospitals and street-network travel times.</li>
+        <li><b>Stronger models</b> and more seeds to test whether the surge result changes.</li>
+        <li>Lower the rule-backup rate by giving agents better tools to check their own answers.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>ORCA-EMS</span><span>11</span></div>
+  <div class="note-src">The main limitation is that everything is synthetic, so the numbers describe this simulation, not real patients. With five seeds and one small model, the results are descriptive. The most useful next step would be shadow mode on real dispatch data, where the agents suggest but do not act.</div>
+</section>
+
+<!-- 12 -->
+<section class="slide dark">
+  <div class="in" style="justify-content:center;gap:2.4cqw">
+    <div class="kicker">Thank you · questions</div>
+    <h1 style="font-size:5.2cqw">Agents help most when information is stale, not when everything is on fire.</h1>
+    <div class="c3" style="max-width:80cqw">
+      <div><p class="muted" style="font-size:1.3cqw">Code, report, results</p><p class="mono" style="font-size:1.4cqw;color:var(--orange)">github.com/pranavpatel0741/ORCA-EMS</p></div>
+      <div><p class="muted" style="font-size:1.3cqw">Run the dashboard</p><p class="mono" style="font-size:1.4cqw">python dashboard_v2/run.py</p></div>
+      <div><p class="muted" style="font-size:1.3cqw">Write-up</p><p class="mono" style="font-size:1.4cqw">docs/REPORT.md</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Pranav Patel</span><span>12</span></div>
+  <div class="note-src">Summarize in one line: the agents add real value when hospital information is incomplete, and in a full mass-casualty surge they are about as good as good rules. Point to the repo for the code, report and every recorded model answer, then take questions.</div>
+</section>
+
+</div>
+<div class="notes" id="notes" hidden><b>Speaker notes</b><span id="noteText"></span></div>
+<div class="bar">
+  <button id="prev" type="button" aria-label="Previous slide">←</button>
+  <span id="count">1 / 12</span>
+  <button id="next" type="button" aria-label="Next slide">→</button>
+  <button id="noteBtn" type="button">Notes (N)</button>
+  <button id="fsBtn" type="button">Full screen (F)</button>
+</div>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const notes=document.getElementById('notes'), noteText=document.getElementById('noteText');
+let i=0;
+try{const h=parseInt((location.hash||'').replace('#s',''),10); if(h>=1&&h<=slides.length) i=h-1;}catch(e){}
+function show(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+  document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+  noteText.textContent=slides[i].querySelector('.note-src')?.textContent||'';
+}
+function toggleNotes(){notes.hidden=!notes.hidden;document.body.classList.toggle('with-notes',!notes.hidden);}
+function fs(){const d=document.documentElement; if(!document.fullscreenElement){d.requestFullscreen?.().catch(()=>{});} else {document.exitFullscreen?.().catch(()=>{});}}
+document.getElementById('prev').onclick=()=>show(i-1);
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('noteBtn').onclick=toggleNotes;
+document.getElementById('fsBtn').onclick=fs;
+document.getElementById('deck').addEventListener('click',e=>{ if(window.innerWidth>700) show(e.clientX>window.innerWidth/2?i+1:i-1); });
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(i-1);}
+  else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);
+  else if(e.key==='n'||e.key==='N')toggleNotes(); else if(e.key==='f'||e.key==='F')fs();
+});
+show(i);
+</script>
