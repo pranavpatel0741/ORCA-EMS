@@ -100,6 +100,9 @@ deaths were about the same. Details, including where agents did not help, are in
 [docs/REPORT.md](docs/REPORT.md) §5; an earlier self-audit is in
 [docs/AGENT_EVAL_AUDIT.md](docs/AGENT_EVAL_AUDIT.md).
 
+**Slides.** Open `docs/slides/index.html` in a browser (arrow keys to move, N for speaker
+notes, F for full screen).
+
 **Experiments.** Four policies (`nearest`, `rule_based`, `agents_no_negotiation`, `agents`)
 × 2 information settings × 2 demand levels × N seeds, on identical scenarios. LLM runs need
 `LLM_MODE=record` (or `live`) and a key. Afterwards, `LLM_MODE=cache_only` replays them for
