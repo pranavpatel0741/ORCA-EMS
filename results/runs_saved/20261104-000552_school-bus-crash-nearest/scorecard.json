@@ -1,0 +1,117 @@
+{
+ "run_id": "s07_School bus crash_partial_nearest",
+ "policy": "nearest",
+ "info": "partial",
+ "seed": 7,
+ "model": null,
+ "minutes": 270,
+ "headline": {
+  "deaths": 0,
+  "outcome_score": 28.125,
+  "critical_on_time": 0.5,
+  "critical_care_mean": 58.5,
+  "response_mean": 5,
+  "overload_min": 701,
+  "er_wait_over_base": 221.0,
+  "unserved_calls": 0,
+  "not_in_care_end": 0,
+  "rejections": 9,
+  "escalations": 0,
+  "fallback_rate": 0.0,
+  "llm_calls": 0,
+  "llm_tokens": 0
+ },
+ "decisions": {
+  "ai": 0,
+  "scripted_agents": 0,
+  "rule_backup": 0,
+  "baseline_rules": 22
+ },
+ "metrics": {
+  "calls": 1,
+  "patients": 29,
+  "response_time": {
+   "n": 1,
+   "mean": 5,
+   "median": 5,
+   "p90": 5
+  },
+  "response_time_by_severity": {
+   "CRITICAL": {
+    "n": 1,
+    "mean": 5,
+    "median": 5,
+    "p90": 5
+   },
+   "SERIOUS": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "MINOR": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "time_to_care_by_severity": {
+   "CRITICAL": {
+    "n": 2,
+    "mean": 58.5,
+    "median": 58.5,
+    "p90": 62
+   },
+   "SERIOUS": {
+    "n": 11,
+    "mean": 109.7,
+    "median": 113,
+    "p90": 160
+   },
+   "MINOR": {
+    "n": 16,
+    "mean": 144.4,
+    "median": 168.5,
+    "p90": 241
+   },
+   "EXPECTANT": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "p90": null
+   }
+  },
+  "critical_on_time_rate": 0.5,
+  "critical_patients": 2,
+  "stabilization_only_admissions": 0,
+  "hospital_overload_minutes": 701,
+  "ambulance_minutes_at_er_over_base": 221.0,
+  "unserved_calls_30min": 0,
+  "patients_not_in_care_at_end": 0,
+  "deaths": 0,
+  "outcome_score": 28.125,
+  "negotiation": {},
+  "mean_rounds_per_resolution": null,
+  "rejections_by_rule": {
+   "R2": 9
+  },
+  "escalations": 0,
+  "approvals": 0,
+  "overrides": 0,
+  "fallbacks": 0,
+  "fallback_rate": 0.0,
+  "confidence_calibration": [],
+  "llm_calls": 0,
+  "llm_tokens": 0,
+  "llm_latency_ms": 0,
+  "llm_cache_hit_rate": null,
+  "incidents": 1
+ }
+}
