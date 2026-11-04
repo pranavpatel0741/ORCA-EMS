@@ -5,6 +5,10 @@ confidence, engine validation, all evaluation modules, and the archived experime
 This audit used local code, event logs, recorded model answers, and offline tests. It did
 not make new model calls or establish the truth of arbitrary model-written explanations.
 
+> **Follow-up (2026-11-04):** the experiment grid was regenerated with the fixed code
+> (`results/summary.md`, `docs/REPORT.md` §5). The pre-audit tables are in
+> `results/archive/2026-10-31_before_audit/`.
+
 ## Conclusion
 
 The archive has real structural problems; a passing test suite was not enough to establish

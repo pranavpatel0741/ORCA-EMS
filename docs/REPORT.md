@@ -1,7 +1,7 @@
 # ORCA-EMS: When does agent negotiation help emergency coordination?
 
-*Course report. Results tables are generated in `results/summary.md` from the recorded
-5-seed grid (gpt-4o-mini).*
+*Course report. Results tables are generated in `results/summary.md` from the 5-seed grid
+(gpt-4o-mini), regenerated with the current code on 2026-11-04.*
 
 ## 1. Problem
 
@@ -84,10 +84,9 @@ coordination, and when are deterministic rules sufficient?
 
 ## 5. Results
 
-> **Historical results — audit correction (2026-10-31).** The tables below predate fixes to
-> model-output grounding, staff-information access, and definitive-care metrics. Four stored
-> records also differ from their associated logs. Do not present these tables as current-code
-> results until the experiment grid is regenerated. See [the agent/evaluation audit](AGENT_EVAL_AUDIT.md).
+Every run below uses the current code, after a self-audit fixed how agent answers are checked
+against their input and corrected two metrics ([audit](AGENT_EVAL_AUDIT.md)). The grid was
+regenerated on 2026-11-04; the pre-audit results are kept in `results/archive/2026-10-31_before_audit/`.
 
 **Baselines, 5 seeds.** Mean values for the surge scenario:
 
@@ -104,56 +103,55 @@ minutes waiting at ER doors, because it serves mass-casualty patients first and 
 patients to hospitals that were farther away. On a normal day the two baselines perform almost
 the same. This is the bar the agents must clear.
 
-**Historical agents (gpt-4o-mini, 5 seeds, 40 agent-policy runs; 36 with model calls and 4 empty
-scenarios).** Mean values; full tables with spreads are in
-`results/summary.md`. Historical model answers are saved in `data/llm_cache/`. With the current
-grounding and information-boundary fixes, 28 of the 40 agent-policy cells need new answers;
-the old cache does not reproduce the entire grid with current code.
+**Agents (gpt-4o-mini, 5 seeds, 40 agent-policy runs).** Mean values; full tables with spreads
+are in `results/summary.md`. Every model answer is saved in `data/llm_cache/`.
 
 | | Critical on time | Critical: call to care (min) | Response (min) | ER minutes over base | Deaths |
 |---|---|---|---|---|---|
 | *Normal day, partial info* | | | | | |
 | Nearest | 0% | 84 | 9.6 | 37 | 0 |
 | Rule-based | 0% | 68 | 9.6 | 9.8 | 0 |
-| Agents, no negotiation | 100% | 56 | 11 | 10 | 0 |
-| Agents, negotiating | 100% | 56 | 11 | 10 | 0 |
+| Agents, no negotiation | 100% | 53 | 11 | 12 | 0 |
+| Agents, negotiating | 100% | 53 | 11 | 12 | 0 |
 | *Surge, partial info* | | | | | |
 | Nearest | 37% | 63 | 25 | 288 | 3.8 |
 | Rule-based | 37% | 63 | 48 | 536 | 3.6 |
-| Agents, no negotiation | 36% | 69 | 60 | 533 | 3.4 |
-| Agents, negotiating | 37% | 58 | 57 | 483 | 4.0 |
+| Agents, no negotiation | 36% | 65 | 62 | 558 | 3.6 |
+| Agents, negotiating | 36% | 60 | 70 | 504 | 4.0 |
 | *Surge, complete info* | | | | | |
 | Nearest | 33% | 62 | 32 | 299 | 3.6 |
 | Rule-based | 33% | 67 | 46 | 548 | 3.0 |
 | Agents, no negotiation | 33% | 69 | 56 | 540 | 3.4 |
-| Agents, negotiating | 33% | 69 | 54 | 538 | 3.0 |
+| Agents, negotiating | 33% | 66 | 48 | 517 | 3.4 |
 
 Where the agents helped:
 - **Incomplete information on a normal day.** Every critical patient reached care within 60
-  minutes (both baselines: none), and 12–28 minutes sooner on average. The agents read the
-  scene and hospital facts and avoided the hospitals that turned out to be full.
-- **Negotiation under surge with partial information.** Compared with the same agents without
-  negotiation, critical patients reached care 11 minutes sooner and ambulances waited less at
-  ER doors (483 vs 533 minutes). Paired by seed, negotiation was better for critical care in
-  6 of 10 surge runs and worse in 1.
+  minutes (both baselines: none), 15–31 minutes sooner on average. The agents read the scene and
+  hospital facts and avoided the hospitals that turned out to be full.
+- **Negotiation under surge.** Compared with the same agents without negotiation, ambulances
+  waited less at ER doors (504 vs 558 minutes with partial information, 517 vs 540 with
+  complete), and critical patients reached care 3–5 minutes sooner on average. With complete
+  information, negotiation also sent the first ambulance sooner (48 vs 56 minutes). Paired by
+  seed, the critical-care gain is uneven: better in 3 of 10 surge runs, worse in 5.
 
 Where they did not:
-- **Response time in a surge.** The first ambulance reached calls later (54–60 minutes against
-  25–48 for the baselines), because the agents commit units to mass-casualty patients first.
-  Deaths and the outcome score are about the same as the baselines.
-- **Complete information.** With an accurate status board, the agents add nothing over the
+- **Response time in a surge.** With partial information the first ambulance reached calls later
+  (62–70 minutes against 25–48 for the baselines), because the agents commit units to
+  mass-casualty patients first. Deaths and the outcome score are about the same as the
+  baselines; the outcome score was slightly lower than rule-based in all 5 surge/partial seeds.
+- **Complete information.** With an accurate status board, the agents add little over the
   rule-based policy.
-- **Hypotheses.** H1 (fewer capacity failures with negotiation) is mixed. H2 (faster critical
-  care in scarcity) is mixed, leaning positive. H3 (a larger benefit under surge and partial
-  information) is not supported: the gain appears under partial information on a normal day,
-  not under surge.
+- **Hypotheses.** H1 (fewer capacity failures with negotiation) is not supported. H2 (faster
+  critical care in scarcity) is mixed. H3 (a larger benefit under surge and partial
+  information) is not supported: the clear gain appears under partial information on a normal
+  day, not under surge.
 
-Cost: 64 LLM calls and about 135k tokens per negotiated run (88k without negotiation), around
-2–3 US cents on gpt-4o-mini; the whole grid cost about $0.80. When an agent's answer was unusable, the
-rule backup decided and the log and dashboard label it as such: 8% of decisions per negotiated
-run on average (21% without negotiation, where a hospital's counter or rejection always goes to
-the backup by design). Five seeds and one model make this descriptive evidence, not a significance
-test.
+Cost: 69 LLM calls and about 144k tokens per negotiated run (43 calls and 89k tokens without
+negotiation), a few US cents each on gpt-4o-mini; the whole grid cost about $1. When an agent's
+answer was unusable or failed the grounding check, the rule backup decided, and the log and
+dashboard label it as such: about 25% of decisions per agent run on average. The stricter
+grounding check raised this from 8% before the audit. Five seeds and one model make this
+descriptive evidence, not a significance test.
 
 ## 6. Limitations
 
